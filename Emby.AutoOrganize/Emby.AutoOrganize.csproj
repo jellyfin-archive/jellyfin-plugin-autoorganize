@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{14F5F69E-4C8D-491B-8917-8E90E8317530}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Emby.AutoOrganize</RootNamespace>
+    <AssemblyName>Emby.AutoOrganize</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MediaBrowser.Common, Version=3.2.26.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaBrowser.Common.3.0.709\lib\portable-net45+win8+wpa81\MediaBrowser.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MediaBrowser.Controller, Version=3.2.26.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaBrowser.Server.Core.3.0.709\lib\net45\MediaBrowser.Controller.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MediaBrowser.Model, Version=3.2.26.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaBrowser.Common.3.0.709\lib\portable-net45+win8+wpa81\MediaBrowser.Model.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MediaBrowser.Naming, Version=1.0.6279.25941, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaBrowser.Naming.1.0.5\lib\portable-net45+win8\MediaBrowser.Naming.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SQLitePCL.pretty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SQLitePCL.pretty.1.1.0\lib\portable-net45+netcore45+wpa81+wp8\SQLitePCL.pretty.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1488e028ca7ab535, processorArchitecture=MSIL">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.7\lib\net45\SQLitePCLRaw.core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Api\FileOrganizationService.cs" />
+    <Compile Include="Configuration\PluginConfiguration.cs" />
+    <Compile Include="Core\EpisodeFileOrganizer.cs" />
+    <Compile Include="Core\Extensions.cs" />
+    <Compile Include="Core\FileOrganizationService.cs" />
+    <Compile Include="Core\IFileOrganizationService.cs" />
+    <Compile Include="Core\NameUtils.cs" />
+    <Compile Include="Core\OrganizerScheduledTask.cs" />
+    <Compile Include="Core\TvFolderOrganizer.cs" />
+    <Compile Include="Data\BaseSqliteRepository.cs" />
+    <Compile Include="Data\IFileOrganizationRepository.cs" />
+    <Compile Include="Data\ManagedConnection.cs" />
+    <Compile Include="Data\SqliteExtensions.cs" />
+    <Compile Include="Data\SqliteFileOrganizationRepository.cs" />
+    <Compile Include="Model\AutoOrganizeOptions.cs" />
+    <Compile Include="Model\EpisodeFileOrganizationRequest.cs" />
+    <Compile Include="Model\FileOrganizationResult.cs" />
+    <Compile Include="Model\FileOrganizationResultQuery.cs" />
+    <Compile Include="Model\FileOrganizerType.cs" />
+    <Compile Include="Model\FileSortingStatus.cs" />
+    <Compile Include="Model\SmartMatchInfo.cs" />
+    <Compile Include="Model\TvFileOrganizationOptions.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="PluginEntryPoint.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\fileorganizer.js" />
+    <EmbeddedResource Include="Configuration\fileorganizer.template.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\autoorganizelog.html" />
+    <EmbeddedResource Include="Configuration\autoorganizelog.js" />
+    <EmbeddedResource Include="Configuration\autoorganizesmart.html" />
+    <EmbeddedResource Include="Configuration\autoorganizesmart.js" />
+    <EmbeddedResource Include="Configuration\autoorganizetv.html" />
+    <EmbeddedResource Include="Configuration\autoorganizetv.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\autoorganizetable.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
