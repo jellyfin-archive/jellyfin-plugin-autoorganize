@@ -1,20 +1,94 @@
-﻿<div id="libraryFileOrganizerLogPage" data-role="page" class="page type-interior organizePage withTabs fullWidthContent" data-helpurl="https://github.com/MediaBrowser/Wiki/wiki/Auto-Organize">
+﻿<div id="libraryFileOrganizerLogPage" data-role="page" class="page type-interior libraryFileOrganizerLogPage pluginConfigurationPage withTabs fullWidthContent" data-helpurl="https://github.com/MediaBrowser/Wiki/wiki/Auto-Organize" data-controller="__plugin/AutoOrganizeLogJs">
+
+    <style>
+        .autoorganizetable > .table {
+            width: 100%;
+        }
+
+        .autoorganizetable th {
+            padding: 0.4em;
+        }
+
+        .autoorganizetable > .table > tbody > tr > td {
+            padding: 0.4em;
+        }
+
+        .autoorganizetable .fileCell {
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .autoorganizetable > .table > thead > th {
+            text-align: left;
+        }
+
+        .autoorganizetable tbody tr:nth-child(odd) td,
+        .autoorganizetable tbody tr:nth-child(odd) th {
+            background-color: #eeeeee;
+        }
+
+
+        @media screen and (max-width: 50em) {
+            .autoorganizetable > .table {
+                margin-bottom: 0;
+                background-color: transparent;
+            }
+
+            .autoorganizetable .spinnerCell {
+                display: none !important;
+            }
+
+            .autoorganizetable > .table > thead,
+            .autoorganizetable > .table > tfoot {
+                display: none;
+            }
+
+            .autoorganizetable > .table > tbody {
+                display: block;
+            }
+
+                .autoorganizetable > .table > tbody > tr {
+                    display: block;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 2px;
+                    margin-bottom: 1.6rem;
+                }
+
+                    .autoorganizetable > .table > tbody > tr > td {
+                        background-color: #eeeeee;
+                        display: block;
+                        vertical-align: middle;
+                        text-align: left;
+                        text-overflow: ellipsis;
+                        padding: 0.4em;
+                    }
+
+                        .autoorganizetable > .table > tbody > tr > td[data-title]:before {
+                            content: attr(data-title);
+                            float: left;
+                            font-size: inherit;
+                            font-weight: bold;
+                            min-width: 20%;
+                        }
+        }
+    </style>
+
     <div>
         <div class="content-primary">
 
             <div>
-                <div style="text-align:right;" class="organizeTaskPanel hide">
+                <div style="text-align: right;" class="organizeTaskPanel hide">
                     <button is="emby-button" type="button" class="btnClearLog raised button-cancel">
                         <i class="md-icon">clear_all</i><span>${ButtonClear}</span>
                     </button>
                     <button is="emby-button" type="button" class="btnOrganize raised button-cancel"><i class="md-icon">check</i><span>${ButtonOrganize}</span></button>
-                    <progress max="100" min="0" style="width:100px;" class="organizeProgress"></progress>
+                    <progress max="100" min="0" style="width: 100px;" class="organizeProgress"></progress>
                 </div>
                 <div class="listTopPaging">
                 </div>
 
                 <div class="autoorganizetable">
-                    <table class="tblOrganizationResults table" style="border-collapse:collapse;">
+                    <table class="tblOrganizationResults table" style="border-collapse: collapse;">
                         <thead>
                             <tr style="text-align: left;">
                                 <th data-priority="1"></th>
@@ -28,12 +102,12 @@
                     </table>
                 </div>
                 <br />
-                <div style="text-align: right;vertical-align:middle;" class="legend">
-                    <div style="display: inline-block; height: 10px; width: 10px; background: green;margin-right:1px;"></div>
+                <div style="text-align: right; vertical-align: middle;" class="legend">
+                    <div style="display: inline-block; height: 10px; width: 10px; background: green; margin-right: 1px;"></div>
                     <span>${LabelCompleted}</span>
-                    <div style="display: inline-block; height: 10px; width: 10px; background: red; margin-left: 1em;margin-right:1px;"></div>
+                    <div style="display: inline-block; height: 10px; width: 10px; background: red; margin-left: 1em; margin-right: 1px;"></div>
                     <span>${LabelFailed}</span>
-                    <div style="display: inline-block; height: 10px; width: 10px; background: blue; margin-left: 1em;margin-right:1px;"></div>
+                    <div style="display: inline-block; height: 10px; width: 10px; background: blue; margin-left: 1em; margin-right: 1px;"></div>
                     <span>${LabelSkipped}</span>
                 </div>
                 <div class="listBottomPaging">
@@ -41,4 +115,5 @@
             </div>
         </div>
     </div>
+
 </div>

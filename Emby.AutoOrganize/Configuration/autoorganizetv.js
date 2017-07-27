@@ -1,4 +1,4 @@
-﻿define(['libraryMenu'], function (libraryMenu) {
+﻿define(['libraryMenu', 'emby-input', 'emby-select', 'emby-checkbox', 'emby-button', 'emby-collapse'], function (libraryMenu) {
     'use strict';
 
     function getEpisodeFileName(value, enableMultiEpisode) {
@@ -83,18 +83,18 @@
 
     function getTabs() {
         return [
-        {
-            href: 'autoorganizelog.html',
-            name: Globalize.translate('TabActivityLog')
-        },
-         {
-             href: 'autoorganizetv.html',
-             name: Globalize.translate('TabTV')
-         },
-         {
-             href: 'autoorganizesmart.html',
-             name: Globalize.translate('TabSmartMatches')
-         }];
+            {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
+                name: Globalize.translate('TabActivityLog')
+            },
+            {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
+                name: Globalize.translate('TabTV')
+            },
+            {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
+                name: Globalize.translate('TabSmartMatches')
+            }];
     }
 
     return function (view, params) {

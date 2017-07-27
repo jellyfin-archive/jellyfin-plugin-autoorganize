@@ -56,7 +56,7 @@ namespace Emby.AutoOrganize
             }
 
             Current = this;
-            FileOrganizationService = new FileOrganizationService(_taskManager, null, _logger, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
+            FileOrganizationService = new FileOrganizationService(_taskManager, Repository, _logger, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
 
             FileOrganizationService.ItemAdded += _organizationService_ItemAdded;
             FileOrganizationService.ItemRemoved += _organizationService_ItemRemoved;

@@ -124,15 +124,15 @@
     function getTabs() {
         return [
             {
-                href: 'autoorganizelog.html',
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
                 name: Globalize.translate('TabActivityLog')
             },
             {
-                href: 'autoorganizetv.html',
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
                 name: Globalize.translate('TabTV')
             },
             {
-                href: 'autoorganizesmart.html',
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
                 name: Globalize.translate('TabSmartMatches')
             }];
     }

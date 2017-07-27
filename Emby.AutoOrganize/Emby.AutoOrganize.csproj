@@ -96,17 +96,16 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Configuration\autoorganizelog.html" />
-    <EmbeddedResource Include="Configuration\autoorganizelog.js" />
     <EmbeddedResource Include="Configuration\autoorganizesmart.html" />
     <EmbeddedResource Include="Configuration\autoorganizesmart.js" />
     <EmbeddedResource Include="Configuration\autoorganizetv.html" />
     <EmbeddedResource Include="Configuration\autoorganizetv.js" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Configuration\autoorganizetable.css" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <EmbeddedResource Include="Configuration\autoorganizelog.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

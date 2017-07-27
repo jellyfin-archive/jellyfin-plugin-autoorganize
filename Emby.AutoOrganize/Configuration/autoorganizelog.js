@@ -70,7 +70,7 @@
 
     function showCorrectionPopup(page, item) {
 
-        require(['components/fileorganizer/fileorganizer'], function (fileorganizer) {
+        require([Dashboard.getConfigurationPageUrl('FileOrganizerJs')], function (fileorganizer) {
 
             fileorganizer.show(item).then(function () {
                 reloadItems(page, false);
@@ -353,27 +353,25 @@
 
     function getTabs() {
         return [
-        {
-            href: 'autoorganizelog.html',
-            name: Globalize.translate('TabActivityLog')
-        },
-         {
-             href: 'autoorganizetv.html',
-             name: Globalize.translate('TabTV')
-         },
-         {
-             href: 'autoorganizesmart.html',
-             name: Globalize.translate('TabSmartMatches')
-         }];
+            {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
+                name: Globalize.translate('TabActivityLog')
+            },
+            {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
+                name: Globalize.translate('TabTV')
+            },
+            {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
+                name: Globalize.translate('TabSmartMatches')
+            }];
     }
-
 
     return function (view, params) {
 
         page = view;
 
-        var clearButton = view.querySelector('.btnClearLog');
-        clearButton.addEventListener('click', function () {
+        view.querySelector('.btnClearLog').addEventListener('click', function () {
 
             ApiClient.clearOrganizationLog().then(function () {
                 query.StartIndex = 0;

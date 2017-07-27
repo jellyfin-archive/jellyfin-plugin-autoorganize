@@ -195,7 +195,7 @@
                 existingSeriesHtml = null;
 
                 var xhr = new XMLHttpRequest();
-                xhr.open('GET', 'components/fileorganizer/fileorganizer.template.html', true);
+                xhr.open('GET', Dashboard.getConfigurationPageUrl('FileOrganizerHtml'), true);
 
                 xhr.onload = function (e) {
 
