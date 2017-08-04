@@ -1,78 +1,5 @@
 ﻿<div id="libraryFileOrganizerLogPage" data-role="page" class="page type-interior libraryFileOrganizerLogPage pluginConfigurationPage withTabs fullWidthContent" data-helpurl="https://github.com/MediaBrowser/Wiki/wiki/Auto-Organize" data-controller="__plugin/AutoOrganizeLogJs">
 
-    <style>
-        .autoorganizetable > .table {
-            width: 100%;
-        }
-
-        .autoorganizetable th {
-            padding: 0.4em;
-        }
-
-        .autoorganizetable > .table > tbody > tr > td {
-            padding: 0.4em;
-        }
-
-        .autoorganizetable .fileCell {
-            word-wrap: break-word;
-            word-break: break-all;
-        }
-
-        .autoorganizetable > .table > thead > th {
-            text-align: left;
-        }
-
-        .autoorganizetable tbody tr:nth-child(odd) td,
-        .autoorganizetable tbody tr:nth-child(odd) th {
-            background-color: #eeeeee;
-        }
-
-
-        @media screen and (max-width: 50em) {
-            .autoorganizetable > .table {
-                margin-bottom: 0;
-                background-color: transparent;
-            }
-
-            .autoorganizetable .spinnerCell {
-                display: none !important;
-            }
-
-            .autoorganizetable > .table > thead,
-            .autoorganizetable > .table > tfoot {
-                display: none;
-            }
-
-            .autoorganizetable > .table > tbody {
-                display: block;
-            }
-
-                .autoorganizetable > .table > tbody > tr {
-                    display: block;
-                    border: 1px solid #e0e0e0;
-                    border-radius: 2px;
-                    margin-bottom: 1.6rem;
-                }
-
-                    .autoorganizetable > .table > tbody > tr > td {
-                        background-color: #eeeeee;
-                        display: block;
-                        vertical-align: middle;
-                        text-align: left;
-                        text-overflow: ellipsis;
-                        padding: 0.4em;
-                    }
-
-                        .autoorganizetable > .table > tbody > tr > td[data-title]:before {
-                            content: attr(data-title);
-                            float: left;
-                            font-size: inherit;
-                            font-weight: bold;
-                            min-width: 20%;
-                        }
-        }
-    </style>
-
     <div>
         <div class="content-primary">
 
@@ -88,14 +15,14 @@
                 </div>
 
                 <div class="autoorganizetable">
-                    <table class="tblOrganizationResults table" style="border-collapse: collapse;">
+                    <table class="tblOrganizationResults table detailTable" style="width:100%;">
                         <thead>
                             <tr style="text-align: left;">
-                                <th data-priority="1"></th>
-                                <th data-priority="2">${HeaderDate}</th>
-                                <th data-priority="1">${HeaderSource}</th>
-                                <th data-priority="3">${HeaderDestination}</th>
-                                <th data-priority="1"></th>
+                                <th class="detailTableHeaderCell" data-priority="1"></th>
+                                <th class="detailTableHeaderCell" data-priority="2">${HeaderDate}</th>
+                                <th class="detailTableHeaderCell" data-priority="1">${HeaderSource}</th>
+                                <th class="detailTableHeaderCell" data-priority="3">${HeaderDestination}</th>
+                                <th class="detailTableHeaderCell" data-priority="1"></th>
                             </tr>
                         </thead>
                         <tbody class="resultBody"></tbody>

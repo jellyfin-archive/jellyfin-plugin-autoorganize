@@ -1,4 +1,4 @@
-﻿define(['serverNotifications', 'events', 'scripts/taskbutton', 'datetime', 'loading', 'libraryMenu', 'libraryBrowser', 'paper-icon-button-light', 'emby-linkbutton'], function (serverNotifications, events, taskButton, datetime, loading, libraryMenu, libraryBrowser) {
+﻿define(['globalize', 'serverNotifications', 'events', 'scripts/taskbutton', 'datetime', 'loading', 'libraryMenu', 'libraryBrowser', 'paper-icon-button-light', 'emby-linkbutton', 'detailtablecss'], function (globalize, serverNotifications, events, taskButton, datetime, loading, libraryMenu, libraryBrowser) {
     'use strict';
 
     var query = {
@@ -44,11 +44,11 @@
             return i.Id === id;
         })[0];
 
-        var message = Globalize.translate('MessageFileWillBeDeleted') + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + Globalize.translate('MessageSureYouWishToProceed');
+        var message = globalize.translate('MessageFileWillBeDeleted') + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + globalize.translate('MessageSureYouWishToProceed');
 
         require(['confirm'], function (confirm) {
 
-            confirm(message, Globalize.translate('HeaderDeleteFile')).then(function () {
+            confirm(message, globalize.translate('HeaderDeleteFile')).then(function () {
 
                 loading.show();
 
@@ -94,19 +94,19 @@
             return;
         }
 
-        var message = Globalize.translate('MessageFollowingFileWillBeMovedFrom') + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + Globalize.translate('MessageDestinationTo') + '<br/><br/>' + item.TargetPath;
+        var message = globalize.translate('MessageFollowingFileWillBeMovedFrom') + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + globalize.translate('MessageDestinationTo') + '<br/><br/>' + item.TargetPath;
 
         if (item.DuplicatePaths.length) {
-            message += '<br/><br/>' + Globalize.translate('MessageDuplicatesWillBeDeleted');
+            message += '<br/><br/>' + globalize.translate('MessageDuplicatesWillBeDeleted');
 
             message += '<br/><br/>' + item.DuplicatePaths.join('<br/>');
         }
 
-        message += '<br/><br/>' + Globalize.translate('MessageSureYouWishToProceed');
+        message += '<br/><br/>' + globalize.translate('MessageSureYouWishToProceed');
 
         require(['confirm'], function (confirm) {
 
-            confirm(message, Globalize.translate('HeaderOrganizeFile')).then(function () {
+            confirm(message, globalize.translate('HeaderOrganizeFile')).then(function () {
 
                 loading.show();
 
@@ -143,22 +143,22 @@
         var color = null;
 
         if (status === 'SkippedExisting') {
-            status = Globalize.translate('StatusSkipped');
+            status = globalize.translate('StatusSkipped');
         }
         else if (status === 'Failure') {
             color = '#cc0000';
-            status = Globalize.translate('StatusFailed');
+            status = globalize.translate('StatusFailed');
         }
         if (status === 'Success') {
             color = 'green';
-            status = Globalize.translate('StatusSuccess');
+            status = globalize.translate('StatusSuccess');
         }
 
         if (enhance) {
 
             if (item.StatusMessage) {
 
-                return '<a style="color:' + color + ';" data-resultid="' + item.Id + '" is="emby-linkbutton" href="#" class="btnShowStatusMessage">' + status + '</a>';
+                return '<a style="color:' + color + ';" data-resultid="' + item.Id + '" is="emby-linkbutton" href="#" class="button-link btnShowStatusMessage">' + status + '</a>';
             } else {
                 return '<span data-resultid="' + item.Id + '" style="color:' + color + ';">' + status + '</span>';
             }
@@ -173,7 +173,7 @@
 
             var html = '';
 
-            html += '<tr id="row' + item.Id + '">';
+            html += '<tr class="detailTableBodyRow detailTableBodyRow-shaded" id="row' + item.Id + '">';
 
             html += renderItemRow(item);
 
@@ -247,17 +247,17 @@
 
         var html = '';
 
-        html += '<td>';
+        html += '<td class="detailTableBodyCell">';
         var hide = item.IsInProgress ? '' : ' hide';
         html += '<img src="css/images/throbber.gif" alt="" class="syncSpinner' + hide + '" style="vertical-align: middle;" />';
         html += '</td>';
 
-        html += '<td data-title="Date">';
+        html += '<td class="detailTableBodyCell" data-title="Date">';
         var date = datetime.parseISO8601Date(item.Date, true);
         html += datetime.toLocaleDateString(date);
         html += '</td>';
 
-        html += '<td data-title="Source" class="fileCell">';
+        html += '<td data-title="Source" class="detailTableBodyCell fileCell">';
         var status = item.Status;
 
         if (item.IsInProgress) {
@@ -266,12 +266,12 @@
             html += '</span>';
         }
         else if (status === 'SkippedExisting') {
-            html += '<a data-resultid="' + item.Id + '" style="color:blue;" href="#" class="btnShowStatusMessage">';
+            html += '<a is="emby-linkbutton" data-resultid="' + item.Id + '" style="color:blue;" href="#" class="button-link btnShowStatusMessage">';
             html += item.OriginalFileName;
             html += '</a>';
         }
         else if (status === 'Failure') {
-            html += '<a data-resultid="' + item.Id + '" style="color:red;" href="#" class="btnShowStatusMessage">';
+            html += '<a is="emby-linkbutton" data-resultid="' + item.Id + '" style="color:red;" href="#" class="button-link btnShowStatusMessage">';
             html += item.OriginalFileName;
             html += '</a>';
         } else {
@@ -281,16 +281,16 @@
         }
         html += '</td>';
 
-        html += '<td data-title="Destination" class="fileCell">';
+        html += '<td data-title="Destination" class="detailTableBodyCell fileCell">';
         html += item.TargetPath || '';
         html += '</td>';
 
-        html += '<td class="organizerButtonCell" style="whitespace:no-wrap;">';
+        html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;">';
 
         if (item.Status !== 'Success') {
 
-            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="' + Globalize.translate('ButtonOrganizeFile') + '"><i class="md-icon">folder</i></button>';
-            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="' + Globalize.translate('ButtonDeleteFile') + '"><i class="md-icon">delete</i></button>';
+            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="' + globalize.translate('ButtonOrganizeFile') + '"><i class="md-icon">folder</i></button>';
+            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="' + globalize.translate('ButtonDeleteFile') + '"><i class="md-icon">delete</i></button>';
         }
 
         html += '</td>';
@@ -355,15 +355,15 @@
         return [
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
-                name: Globalize.translate('TabActivityLog')
+                name: globalize.translate('TabActivityLog')
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
-                name: Globalize.translate('TabTV')
+                name: globalize.translate('TabTV')
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
-                name: Globalize.translate('TabSmartMatches')
+                name: globalize.translate('TabSmartMatches')
             }];
     }
 
