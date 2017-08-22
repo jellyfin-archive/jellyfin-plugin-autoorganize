@@ -70,7 +70,7 @@
 
     function showCorrectionPopup(page, item) {
 
-        require([Dashboard.getConfigurationPageUrl('FileOrganizerJs')], function (fileorganizer) {
+        require([Dashboard.getConfigurationResourceUrl('FileOrganizerJs')], function (fileorganizer) {
 
             fileorganizer.show(item).then(function () {
                 reloadItems(page, false);
