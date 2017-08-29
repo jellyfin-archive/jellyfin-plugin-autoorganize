@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emby.AutoOrganize", "Emby.AutoOrganize\Emby.AutoOrganize.csproj", "{14F5F69E-4C8D-491B-8917-8E90E8317530}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emby.AutoOrganize", "Emby.AutoOrganize\Emby.AutoOrganize.csproj", "{1911AD3B-5FC3-44FF-86F2-BEA8DAE80FE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{14F5F69E-4C8D-491B-8917-8E90E8317530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14F5F69E-4C8D-491B-8917-8E90E8317530}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14F5F69E-4C8D-491B-8917-8E90E8317530}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{14F5F69E-4C8D-491B-8917-8E90E8317530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1911AD3B-5FC3-44FF-86F2-BEA8DAE80FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1911AD3B-5FC3-44FF-86F2-BEA8DAE80FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1911AD3B-5FC3-44FF-86F2-BEA8DAE80FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1911AD3B-5FC3-44FF-86F2-BEA8DAE80FE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C28F12A8-A345-43B1-A3C5-FBD29F585674}
 	EndGlobalSection
 EndGlobal

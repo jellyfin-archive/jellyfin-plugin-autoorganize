@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Emby.AutoOrganize.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
@@ -21,6 +22,12 @@ namespace Emby.AutoOrganize
             => "Automatically organize new media";
 
         public PluginConfiguration PluginConfiguration => Configuration;
+
+        private Guid _id = new Guid("14f5f69e-4c8d-491b-8917-8e90e8317530");
+        public override Guid Id
+        {
+            get { return _id; }
+        }
 
         public IEnumerable<PluginPageInfo> GetPages()
         {
