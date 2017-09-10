@@ -2,12 +2,36 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;</TargetFrameworks>
-    <AssemblyVersion>1.1.0.12</AssemblyVersion>
-    <FileVersion>1.1.0.12</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="mediabrowser.server.core" Version="3.3.0-beta" />
+    <None Remove="Configuration\autoorganizelog.html" />
+    <None Remove="Configuration\autoorganizelog.js" />
+    <None Remove="Configuration\autoorganizesmart.html" />
+    <None Remove="Configuration\autoorganizesmart.js" />
+    <None Remove="Configuration\autoorganizetv.html" />
+    <None Remove="Configuration\autoorganizetv.js" />
+    <None Remove="Configuration\fileorganizer.js" />
+    <None Remove="Configuration\fileorganizer.template.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\autoorganizelog.html" />
+    <EmbeddedResource Include="Configuration\autoorganizelog.js" />
+    <EmbeddedResource Include="Configuration\autoorganizesmart.html" />
+    <EmbeddedResource Include="Configuration\autoorganizesmart.js" />
+    <EmbeddedResource Include="Configuration\autoorganizetv.html" />
+    <EmbeddedResource Include="Configuration\autoorganizetv.js" />
+    <EmbeddedResource Include="Configuration\fileorganizer.js" />
+    <EmbeddedResource Include="Configuration\fileorganizer.template.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediaBrowser.Naming" Version="1.0.8-beta" />
+    <PackageReference Include="mediabrowser.server.core" Version="3.3.4-beta" />
+    <PackageReference Include="SQLitePCL.pretty.core" Version="1.1.8" />
   </ItemGroup>
 
 </Project>

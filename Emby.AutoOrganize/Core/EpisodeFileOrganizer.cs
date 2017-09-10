@@ -17,8 +17,8 @@ using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.IO;
 using MediaBrowser.Model.IO;
-using MediaBrowser.Naming.Common;
-using MediaBrowser.Naming.TV;
+using Emby.Naming.Common;
+using Emby.Naming.TV;
 using EpisodeInfo = MediaBrowser.Controller.Providers.EpisodeInfo;
 
 namespace Emby.AutoOrganize.Core
@@ -92,10 +92,10 @@ namespace Emby.AutoOrganize.Core
                 }
 
                 var namingOptions = GetNamingOptionsInternal();
-                var resolver = new EpisodeResolver(namingOptions, new NullLogger());
+                var resolver = new EpisodeResolver(namingOptions);
 
                 var episodeInfo = resolver.Resolve(path, false) ??
-                    new MediaBrowser.Naming.TV.EpisodeInfo();
+                    new Emby.Naming.TV.EpisodeInfo();
 
                 var seriesName = episodeInfo.SeriesName;
 
