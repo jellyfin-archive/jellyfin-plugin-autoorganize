@@ -36,7 +36,8 @@ namespace Emby.AutoOrganize
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeLog",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizelog.html"
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizelog.html",
+                    EnableInMainMenu = true
                 },
                 new PluginPageInfo
                 {
