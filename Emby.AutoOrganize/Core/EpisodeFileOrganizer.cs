@@ -784,7 +784,8 @@ namespace Emby.AutoOrganize.Core
                 .Replace("%ext", sourceExtension)
                 .Replace("%en", "%#1")
                 .Replace("%e.n", "%#2")
-                .Replace("%e_n", "%#3");
+                .Replace("%e_n", "%#3")
+                .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath));
 
             if (endingEpisodeNumber.HasValue)
             {
