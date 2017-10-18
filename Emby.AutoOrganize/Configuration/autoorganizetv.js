@@ -5,6 +5,7 @@
 
         var seriesName = "Series Name";
         var episodeTitle = "Episode Four";
+        var fileName = seriesName + ' ' + episodeTitle + '.mkv';
 
         var result = value.replace('%sn', seriesName)
             .replace('%s.n', seriesName.replace(' ', '.'))
@@ -15,7 +16,8 @@
             .replace('%ext', 'mkv')
             .replace('%en', episodeTitle)
             .replace('%e.n', episodeTitle.replace(' ', '.'))
-            .replace('%e_n', episodeTitle.replace(' ', '_'));
+            .replace('%e_n', episodeTitle.replace(' ', '_'))
+            .replace('%fn', fileName);
 
         if (enableMultiEpisode) {
             result = result
