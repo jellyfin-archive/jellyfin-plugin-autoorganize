@@ -13,8 +13,8 @@
 
         require(['alert'], function (alert) {
             alert({
-                title: Globalize.translate('AutoOrganizeError'),
-                text: Globalize.translate('ErrorOrganizingFileWithErrorCode', e.headers.get("X-Application-Error-Code"))
+                title: 'Error',
+                text: 'Error: ' + e.headers.get("X-Application-Error-Code")
             });
         });
     }
@@ -150,8 +150,8 @@
 
             require(['alert'], function (alert) {
                 alert({
-                    title: Globalize.translate('AutoOrganizeError'),
-                    text: Globalize.translate('NoTvFoldersConfigured')
+                    title: 'Error',
+                    text: 'No TV libraries are configured in Emby library setup.'
                 });
             });
             return;
@@ -212,11 +212,11 @@
 
                     var html = '';
 
-                    html += Globalize.translateDocument(template);
+                    html += template;
 
                     dlg.innerHTML = html;
 
-                    dlg.querySelector('.formDialogHeaderTitle').innerHTML = Globalize.translate('FileOrganizeManually');
+                    dlg.querySelector('.formDialogHeaderTitle').innerHTML = 'Organize';
 
                     dialogHelper.open(dlg);
 

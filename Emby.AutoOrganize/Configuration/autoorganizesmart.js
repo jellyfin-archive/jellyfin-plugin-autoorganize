@@ -56,7 +56,7 @@
 
             matchStringHtml += '</div>';
 
-            matchStringHtml += '<button type="button" is="emby-button" class="btnDeleteMatchEntry" style="padding: 0;" data-index="' + i + '" data-matchindex="' + matchStringIndex + '" title="' + Globalize.translate('ButtonDelete') + '"><i class="md-icon">delete</i></button>';
+            matchStringHtml += '<button type="button" is="emby-button" class="btnDeleteMatchEntry" style="padding: 0;" data-index="' + i + '" data-matchindex="' + matchStringIndex + '" title="Delete"><i class="md-icon">delete</i></button>';
 
             matchStringHtml += '</div>';
             matchStringIndex++;
@@ -125,15 +125,15 @@
         return [
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
-                name: Globalize.translate('TabActivityLog')
+                name: 'Activity Log'
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
-                name: Globalize.translate('TabTV')
+                name: 'TV'
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
-                name: Globalize.translate('TabSmartMatches')
+                name: 'Smart Matches'
             }];
     }
 

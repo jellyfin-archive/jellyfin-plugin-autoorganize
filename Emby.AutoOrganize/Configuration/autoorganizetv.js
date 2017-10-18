@@ -87,15 +87,15 @@
         return [
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
-                name: Globalize.translate('TabActivityLog')
+                name: 'Activity Log'
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
-                name: Globalize.translate('TabTV')
+                name: 'TV'
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
-                name: Globalize.translate('TabSmartMatches')
+                name: 'Smart Matches'
             }];
     }
 
@@ -107,7 +107,7 @@
             var value = view.querySelector('#txtSeasonFolderPattern').value;
             value = value.replace('%s', '1').replace('%0s', '01').replace('%00s', '001');
 
-            var replacementHtmlResult = Globalize.translate('OrganizePatternResult').replace('{0}', value);
+            var replacementHtmlResult = 'Result: ' + value;
 
             view.querySelector('.seasonFolderFieldDescription').innerHTML = replacementHtmlResult;
         }
@@ -117,7 +117,7 @@
             var value = view.querySelector('#txtEpisodePattern').value;
             var fileName = getEpisodeFileName(value, false);
 
-            var replacementHtmlResult = Globalize.translate('OrganizePatternResult').replace('{0}', fileName);
+            var replacementHtmlResult = 'Result: ' + fileName;
 
             view.querySelector('.episodePatternDescription').innerHTML = replacementHtmlResult;
         }
@@ -127,7 +127,7 @@
             var value = view.querySelector('#txtMultiEpisodePattern').value;
             var fileName = getEpisodeFileName(value, true);
 
-            var replacementHtmlResult = Globalize.translate('OrganizePatternResult').replace('{0}', fileName);
+            var replacementHtmlResult = 'Result: ' + fileName;
 
             view.querySelector('.multiEpisodePatternDescription').innerHTML = replacementHtmlResult;
         }
@@ -148,8 +148,8 @@
                         }
                         picker.close();
                     },
-                    header: Globalize.translate('HeaderSelectWatchFolder'),
-                    instruction: Globalize.translate('HeaderSelectWatchFolderHelp')
+                    header: 'Select Watch Folder',
+                    validateWriteable: true
                 });
             });
         }

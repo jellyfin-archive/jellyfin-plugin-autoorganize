@@ -44,11 +44,11 @@
             return i.Id === id;
         })[0];
 
-        var message = globalize.translate('MessageFileWillBeDeleted') + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + globalize.translate('MessageSureYouWishToProceed');
+        var message = 'The following file will be deleted:' + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + 'Are you sure you wish to proceed?';
 
         require(['confirm'], function (confirm) {
 
-            confirm(message, globalize.translate('HeaderDeleteFile')).then(function () {
+            confirm(message, 'Delete File').then(function () {
 
                 loading.show();
 
@@ -94,19 +94,19 @@
             return;
         }
 
-        var message = globalize.translate('MessageFollowingFileWillBeMovedFrom') + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + globalize.translate('MessageDestinationTo') + '<br/><br/>' + item.TargetPath;
+        var message = 'The following file will be moved from:' + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + 'To:' + '<br/><br/>' + item.TargetPath;
 
         if (item.DuplicatePaths.length) {
-            message += '<br/><br/>' + globalize.translate('MessageDuplicatesWillBeDeleted');
+            message += '<br/><br/>' + 'The following duplicates will be deleted:';
 
             message += '<br/><br/>' + item.DuplicatePaths.join('<br/>');
         }
 
-        message += '<br/><br/>' + globalize.translate('MessageSureYouWishToProceed');
+        message += '<br/><br/>' + 'Are you sure you wish to proceed?';
 
         require(['confirm'], function (confirm) {
 
-            confirm(message, globalize.translate('HeaderOrganizeFile')).then(function () {
+            confirm(message, 'Organize File').then(function () {
 
                 loading.show();
 
@@ -143,15 +143,15 @@
         var color = null;
 
         if (status === 'SkippedExisting') {
-            status = globalize.translate('StatusSkipped');
+            status = 'Skipped';
         }
         else if (status === 'Failure') {
             color = '#cc0000';
-            status = globalize.translate('StatusFailed');
+            status = 'Failed';
         }
         if (status === 'Success') {
             color = 'green';
-            status = globalize.translate('StatusSuccess');
+            status = 'Success';
         }
 
         if (enhance) {
@@ -289,8 +289,8 @@
 
         if (item.Status !== 'Success') {
 
-            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="' + globalize.translate('ButtonOrganizeFile') + '"><i class="md-icon">folder</i></button>';
-            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="' + globalize.translate('ButtonDeleteFile') + '"><i class="md-icon">delete</i></button>';
+            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="Organize"><i class="md-icon">folder</i></button>';
+            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="Delete"><i class="md-icon">delete</i></button>';
         }
 
         html += '</td>';
@@ -355,15 +355,15 @@
         return [
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
-                name: globalize.translate('TabActivityLog')
+                name: 'Activity Log'
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
-                name: globalize.translate('TabTV')
+                name: 'TV'
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
-                name: globalize.translate('TabSmartMatches')
+                name: 'Smart Matches'
             }];
     }
 
