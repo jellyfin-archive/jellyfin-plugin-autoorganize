@@ -12,7 +12,7 @@
             <div class="selectContainer">
                 <div style="display: flex; align-items: center;">
                     <div style="flex-grow:1; position: relative;">
-                        <select is="emby-select" id="selectSeries" data-mini="true" required="required" label="${LabelSeries}"></select>
+                        <select is="emby-select" id="selectSeries" data-mini="true" required="required" label="Series"></select>
                     </div>
                     <button type="button" is="paper-icon-button-light" id="btnNewSeries" class="autoSize"><i class="md-icon">add</i></button>
                 </div>
@@ -21,19 +21,19 @@
                 <select id="selectSeriesFolder" is="emby-select" label="Series root folder:"></select>
             </div>
             <div class="inputContainer">
-                <input is="emby-input" id="txtSeason" type="number" pattern="[0-9]*" required min="0" label="${LabelSeasonNumber}" />
+                <input is="emby-input" id="txtSeason" type="number" pattern="[0-9]*" required min="0" label="Season number:" />
             </div>
             <div class="inputContainer">
-                <input is="emby-input" id="txtEpisode" type="number" pattern="[0-9]*" required min="0" label="${LabelEpisodeNumber}" />
+                <input is="emby-input" id="txtEpisode" type="number" pattern="[0-9]*" required min="0" label="Episode number:" />
             </div>
             <div class="inputContainer">
-                <input is="emby-input" id="txtEndingEpisode" type="number" pattern="[0-9]*" min="0" label="${LabelEndingEpisodeNumber}" />
-                <div class="fieldDescription">${LabelEndingEpisodeNumberHelp}</div>
+                <input is="emby-input" id="txtEndingEpisode" type="number" pattern="[0-9]*" min="0" label="Ending episode number:" />
+                <div class="fieldDescription">Only required for multi-episode files.</div>
             </div>
             <div class="fldRemember hide checkboxContainer checkboxContainer-withDescription">
                 <label class="checkboxContainer">
                     <input is="emby-checkbox" id="chkRememberCorrection" type="checkbox" />
-                    <span>${OptionRememberOrganizeCorrection}</span>
+                    <span>Remember this correction</span>
                 </label>
                 <div class="extractedName hide fieldDescription checkboxFieldDescription"></div>
             </div>
@@ -43,7 +43,7 @@
 
             <div class="formDialogFooter">
                 <button is="emby-button" type="submit" class="raised button-submit block formDialogFooterItem">
-                    <span>${ButtonOk}</span>
+                    <span>OK</span>
                 </button>
             </div>
 
