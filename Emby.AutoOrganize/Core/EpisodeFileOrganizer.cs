@@ -735,7 +735,7 @@ namespace Emby.AutoOrganize.Core
 
             var path = series.Path;
 
-            if (series.ContainsEpisodesWithoutSeasonFolders)
+            if (ContainsEpisodesWithoutSeasonFolders(series))
             {
                 return path;
             }
@@ -751,6 +751,19 @@ namespace Emby.AutoOrganize.Core
                 .Replace("%00s", seasonNumber.ToString("000", _usCulture));
 
             return Path.Combine(path, _fileSystem.GetValidFilename(seasonFolderName));
+        }
+
+        private bool ContainsEpisodesWithoutSeasonFolders(Series series)
+        {
+            var children = series.Children;
+            foreach (var child in children)
+            {
+                if (child is Video)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private string GetEpisodeFileName(string sourcePath, string seriesName, int seasonNumber, int episodeNumber, int? endingEpisodeNumber, string episodeTitle, TvFileOrganizationOptions options)
