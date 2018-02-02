@@ -1,6 +1,85 @@
 ﻿define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button', 'emby-select', 'paper-icon-button-light', 'formDialogStyle'], function (dialogHelper, loading) {
     'use strict';
 
+    ApiClient.getFileOrganizationResults = function (options) {
+
+        var url = this.getUrl("Library/FileOrganization", options || {});
+
+        return this.getJSON(url);
+    };
+
+    ApiClient.deleteOriginalFileFromOrganizationResult = function (id) {
+
+        var url = this.getUrl("Library/FileOrganizations/" + id + "/File");
+
+        return this.ajax({
+            type: "DELETE",
+            url: url
+        });
+    };
+
+    ApiClient.clearOrganizationLog = function () {
+
+        var url = this.getUrl("Library/FileOrganizations");
+
+        return this.ajax({
+            type: "DELETE",
+            url: url
+        });
+    };
+
+    ApiClient.performOrganization = function (id) {
+
+        var url = this.getUrl("Library/FileOrganizations/" + id + "/Organize");
+
+        return this.ajax({
+            type: "POST",
+            url: url
+        });
+    };
+
+    ApiClient.performEpisodeOrganization = function (id, options) {
+
+        var url = this.getUrl("Library/FileOrganizations/" + id + "/Episode/Organize");
+
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(options),
+            contentType: 'application/json'
+        });
+    };
+
+    ApiClient.getSmartMatchInfos = function (options) {
+
+        options = options || {};
+
+        var url = this.getUrl("Library/FileOrganizations/SmartMatches", options);
+
+        return this.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json"
+        });
+    };
+
+    ApiClient.deleteSmartMatchEntries = function (entries) {
+
+        var url = this.getUrl("Library/FileOrganizations/SmartMatches/Delete");
+
+        var postData = {
+            Entries: entries
+        };
+
+        return this.ajax({
+
+            type: "POST",
+            url: url,
+            data: JSON.stringify(postData),
+            contentType: "application/json"
+        });
+    };
+
     var extractedName;
     var extractedYear;
     var currentNewItem;
