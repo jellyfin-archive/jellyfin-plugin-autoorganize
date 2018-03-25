@@ -88,6 +88,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = "Path is locked by other processes. Please try again later.";
+                    _logger.Info("Auto-organize Path is locked by other processes. Please try again later.");
                     return result;
                 }
 
@@ -174,6 +175,7 @@ namespace Emby.AutoOrganize.Core
             {
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = ex.Message;
+                _logger.ErrorException("Error organizing file", ex);
             }
 
             return result;
