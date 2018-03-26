@@ -606,6 +606,11 @@ namespace Emby.AutoOrganize.Core
             var yearInName = parsedName.Year;
             var nameWithoutYear = parsedName.Name;
 
+            if (string.IsNullOrWhiteSpace(nameWithoutYear))
+            {
+                nameWithoutYear = seriesName;
+            }
+
             result.ExtractedName = nameWithoutYear;
             result.ExtractedYear = yearInName;
 
