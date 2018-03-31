@@ -89,6 +89,28 @@ namespace Emby.AutoOrganize.Api
         public string TargetFolder { get; set; }
     }
 
+    [Route("/Library/FileOrganizations/{Id}/Movie/Organize", "POST", Summary = "Performs organization of a movie")]
+    public class OrganizeMovie
+    {
+        [ApiMember(Name = "Id", Description = "Result Id", IsRequired = true, DataType = "string", ParameterType = "path", Verb = "POST")]
+        public string Id { get; set; }
+
+        [ApiMember(Name = "MovieId", Description = "Movie Id", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "POST")]
+        public string MovieId { get; set; }
+
+        [ApiMember(Name = "NewMovieProviderIds", Description = "A list of provider IDs identifying a new movie.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
+        public Dictionary<string, string> NewMovieProviderIds { get; set; }
+
+        [ApiMember(Name = "NewMovieName", Description = "Name of a movie to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
+        public string NewMovieName { get; set; }
+
+        [ApiMember(Name = "NewMovieYear", Description = "Year of a movie to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
+        public string NewMovieYear { get; set; }
+
+        [ApiMember(Name = "TargetFolder", Description = "Target Folder", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
+        public string TargetFolder { get; set; }
+    }
+
     [Route("/Library/FileOrganizations/SmartMatches", "GET", Summary = "Gets smart match entries")]
     public class GetSmartMatchInfos : IReturn<QueryResult<SmartMatchInfo>>
     {
@@ -176,7 +198,7 @@ namespace Emby.AutoOrganize.Api
             }
 
             // Don't await this
-            var task = InternalFileOrganizationService.PerformEpisodeOrganization(new EpisodeFileOrganizationRequest
+            var task = InternalFileOrganizationService.PerformOrganization(new EpisodeFileOrganizationRequest
             {
                 EndingEpisodeNumber = request.EndingEpisodeNumber,
                 EpisodeNumber = request.EpisodeNumber,
@@ -187,6 +209,31 @@ namespace Emby.AutoOrganize.Api
                 NewSeriesName = request.NewSeriesName,
                 NewSeriesYear = request.NewSeriesYear,
                 NewSeriesProviderIds = dicNewProviderIds,
+                TargetFolder = request.TargetFolder
+            });
+
+            // Async processing (close dialog early instead of waiting until the file has been copied)
+            // Wait 2s for exceptions that may occur to have them forwarded to the client for immediate error display
+            task.Wait(2000);
+        }
+
+        public void Post(OrganizeMovie request)
+        {
+            var dicNewProviderIds = new Dictionary<string, string>();
+
+            if (request.NewMovieProviderIds != null)
+            {
+                dicNewProviderIds = request.NewMovieProviderIds;
+            }
+
+            // Don't await this
+            var task = InternalFileOrganizationService.PerformOrganization(new MovieFileOrganizationRequest
+            {
+                ResultId = request.Id,
+                MovieId = request.MovieId,
+                NewMovieName = request.NewMovieName,
+                NewMovieYear = request.NewMovieYear,
+                NewMovieProviderIds = dicNewProviderIds,
                 TargetFolder = request.TargetFolder
             });
 

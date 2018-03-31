@@ -99,6 +99,7 @@ namespace Emby.AutoOrganize.Core
                     new Emby.Naming.TV.EpisodeInfo();
 
                 var seriesName = episodeInfo.SeriesName;
+                var forceEpisodeType = false;
 
                 if (!string.IsNullOrEmpty(seriesName))
                 {
@@ -125,6 +126,11 @@ namespace Emby.AutoOrganize.Core
                         {
                             _logger.Debug("Extracted information from {0}. Series name {1}, Season {2}, Episode {3}", path, seriesName, seasonNumber, episodeNumber);
                         }
+
+                        // We detected an airdate or (an season number and an episode number)
+                        // We have all the chance that the media type is an Episode
+                        // if an earlier result exist with an different type, we update it
+                        forceEpisodeType = true;
 
                         var endingEpisodeNumber = episodeInfo.EndingEpsiodeNumber;
 
@@ -162,10 +168,14 @@ namespace Emby.AutoOrganize.Core
 
                 if (previousResult != null)
                 {
-                    // Don't keep saving the same result over and over if nothing has changed
-                    if (previousResult.Status == result.Status && previousResult.StatusMessage == result.StatusMessage && result.Status != FileSortingStatus.Success)
+                    // if an earlier result exist with an different type, an we are pretty sure it was an Episode, we update it
+                    if (previousResult.Type == FileOrganizerType.Episode || !forceEpisodeType)
                     {
-                        return previousResult;
+                        // Don't keep saving the same result over and over if nothing has changed
+                        if (previousResult.Status == result.Status && previousResult.StatusMessage == result.StatusMessage && result.Status != FileSortingStatus.Success)
+                        {
+                            return previousResult;
+                        }
                     }
                 }
 
@@ -192,9 +202,6 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewSeriesProviderIds.Count > 0)
                 {
                     // We're having a new series here
-                    SeriesInfo seriesRequest = new SeriesInfo();
-                    seriesRequest.ProviderIds = request.NewSeriesProviderIds;
-
                     var refreshOptions = new MetadataRefreshOptions(_fileSystem);
                     series = new Series();
                     series.Id = Guid.NewGuid();
