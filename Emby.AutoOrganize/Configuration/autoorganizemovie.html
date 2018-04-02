@@ -60,6 +60,11 @@
                                     <td>Movie_name</td>
                                 </tr>
                                 <tr>
+                                    <td>Production year</td>
+                                    <td>%my</td>
+                                    <td>2017</td>
+                                </tr>
+                                <tr>
                                     <td>File extension</td>
                                     <td>%ext</td>
                                     <td>mkv</td>
@@ -99,6 +104,18 @@
                     </label>
                     <div class="fieldDescription checkboxFieldDescription">Empty folders will be deleted</div>
                 </div>
+                <div class="checkboxContainer">
+                    <label>
+                        <input type="checkbox" is="emby-checkbox" id="chkEnableMovieAutoDetect" />
+                        <span>Enable auto-detect for movies</span>
+                    </label>
+                </div>
+                <div class="fldSelectMovieFolder hide selectContainer">
+                    <select id="selectMovieFolder" is="emby-select" label="Movie library:"></select>
+                </div>
+
+
+
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
                 </div>

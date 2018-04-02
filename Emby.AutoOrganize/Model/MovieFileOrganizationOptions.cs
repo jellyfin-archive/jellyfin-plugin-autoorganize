@@ -16,6 +16,10 @@ namespace Emby.AutoOrganize.Model
 
         public bool CopyOriginalFile { get; set; }
 
+        public bool AutoDetectMovie { get; set; }
+
+        public string DefaultMovieLibraryPath { get; set; }
+
         public MovieFileOrganizationOptions()
         {
             MinFileSizeMb = 50;
