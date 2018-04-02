@@ -21,6 +21,10 @@ namespace Emby.AutoOrganize.Model
 
         public bool CopyOriginalFile { get; set; }
 
+        public bool AutoDetectSeries { get; set; }
+
+        public string DefaultSeriesLibraryPath { get; set; }
+
         public TvFileOrganizationOptions()
         {
             MinFileSizeMb = 50;
