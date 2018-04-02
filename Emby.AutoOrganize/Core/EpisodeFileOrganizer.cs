@@ -201,31 +201,37 @@ namespace Emby.AutoOrganize.Core
 
                 if (request.NewSeriesProviderIds.Count > 0)
                 {
-                    // We're having a new series here
-                    var refreshOptions = new MetadataRefreshOptions(_fileSystem);
-                    series = new Series();
-                    series.Id = Guid.NewGuid();
-                    series.Name = request.NewSeriesName;
+                    // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
+                    series = GetMatchingSeries(request.NewSeriesName, null, options);
 
-                    int year;
-                    if (int.TryParse(request.NewSeriesYear, out year))
+                    if (series == null)
                     {
-                        series.ProductionYear = year;
+                        // We're having a new series here
+                        var refreshOptions = new MetadataRefreshOptions(_fileSystem);
+                        series = new Series();
+                        series.Id = Guid.NewGuid();
+                        series.Name = request.NewSeriesName;
+
+                        int year;
+                        if (int.TryParse(request.NewSeriesYear, out year))
+                        {
+                            series.ProductionYear = year;
+                        }
+
+                        var seriesFolderName = series.Name;
+                        if (series.ProductionYear.HasValue)
+                        {
+                            seriesFolderName = string.Format("{0} ({1})", seriesFolderName, series.ProductionYear);
+                        }
+
+                        seriesFolderName = _fileSystem.GetValidFilename(seriesFolderName);
+
+                        series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
+
+                        series.ProviderIds = request.NewSeriesProviderIds;
+
+                        await series.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
                     }
-
-                    var seriesFolderName = series.Name;
-                    if (series.ProductionYear.HasValue)
-                    {
-                        seriesFolderName = string.Format("{0} ({1})", seriesFolderName, series.ProductionYear);
-                    }
-
-                    seriesFolderName = _fileSystem.GetValidFilename(seriesFolderName);
-
-                    series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
-
-                    series.ProviderIds = request.NewSeriesProviderIds;
-
-                    await series.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (series == null)
@@ -618,8 +624,11 @@ namespace Emby.AutoOrganize.Core
                 nameWithoutYear = seriesName;
             }
 
-            result.ExtractedName = nameWithoutYear;
-            result.ExtractedYear = yearInName;
+            if (result != null)
+            {
+                result.ExtractedName = nameWithoutYear;
+                result.ExtractedYear = yearInName;
+            }
 
             var series = _libraryManager.GetItemList(new InternalItemsQuery
             {

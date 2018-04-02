@@ -154,27 +154,37 @@ namespace Emby.AutoOrganize.Core
 
                 if (request.NewMovieProviderIds.Count > 0)
                 {
-                    // We're having a new movie here
-                    movie = new Movie();
-                    movie.Id = Guid.NewGuid();
-                    movie.Name = request.NewMovieName;
+                    // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
+                    movie = GetMatchingMovie(request.NewMovieName, null, options);
 
-                    int year;
-                    if (int.TryParse(request.NewMovieYear, out year))
+                    if (movie == null)
                     {
-                        movie.ProductionYear = year;
+                        // We're having a new movie here
+                        movie = new Movie();
+                        movie.Id = Guid.NewGuid();
+                        movie.Name = request.NewMovieName;
+
+                        int year;
+                        if (int.TryParse(request.NewMovieYear, out year))
+                        {
+                            movie.ProductionYear = year;
+                        }
+
+                        var newPath =
+                            await GetNewPath(result.OriginalPath, movie, options.MovieOptions, cancellationToken)
+                                .ConfigureAwait(false);
+
+                        if (string.IsNullOrEmpty(newPath))
+                        {
+                            var msg = string.Format("Unable to sort {0} because target path could not be determined.",
+                                result.OriginalPath);
+                            throw new Exception(msg);
+                        }
+
+                        movie.Path = Path.Combine(request.TargetFolder, newPath);
+
+                        movie.ProviderIds = request.NewMovieProviderIds;
                     }
-
-                    var newPath = await GetNewPath(result.OriginalPath, movie, options.MovieOptions, cancellationToken).ConfigureAwait(false);
-
-                    if (string.IsNullOrEmpty(newPath))
-                    {
-                        var msg = string.Format("Unable to sort {0} because target path could not be determined.", result.OriginalPath);
-                        throw new Exception(msg);
-                    }
-                    movie.Path = Path.Combine(request.TargetFolder, newPath);
-
-                    movie.ProviderIds = request.NewMovieProviderIds;
                 }
 
                 if (movie == null)
@@ -366,8 +376,11 @@ namespace Emby.AutoOrganize.Core
                 nameWithoutYear = movieName;
             }
 
-            result.ExtractedName = nameWithoutYear;
-            result.ExtractedYear = yearInName;
+            if (result != null)
+            {
+                result.ExtractedName = nameWithoutYear;
+                result.ExtractedYear = yearInName;
+            }
 
             var movie = _libraryManager.GetItemList(new InternalItemsQuery
             {
