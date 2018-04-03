@@ -25,6 +25,8 @@ namespace Emby.AutoOrganize.Model
 
         public string DefaultSeriesLibraryPath { get; set; }
 
+        public string SeriesFolderPattern { get; set; }
+
         public TvFileOrganizationOptions()
         {
             MinFileSizeMb = 50;
@@ -37,6 +39,7 @@ namespace Emby.AutoOrganize.Model
             MultiEpisodeNamePattern = "%sn - %sx%0e-x%0ed - %en.%ext";
             SeasonFolderPattern = "Season %s";
             SeasonZeroFolderName = "Season 0";
+            SeriesFolderPattern = "%fn";
 
             CopyOriginalFile = false;
         }

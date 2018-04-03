@@ -324,19 +324,13 @@ namespace Emby.AutoOrganize.Core
                 if (series == null)
                 {
                     // We're having a new series here
-                    
+
                     series = new Series();
                     series.Id = Guid.NewGuid();
                     series.Name = request.NewSeriesName;
                     series.ProductionYear = newSeriesYear;
 
-                    var seriesFolderName = series.Name;
-                    if (series.ProductionYear.HasValue)
-                    {
-                        seriesFolderName = string.Format("{0} ({1})", seriesFolderName, series.ProductionYear);
-                    }
-
-                    seriesFolderName = _fileSystem.GetValidFilename(seriesFolderName);
+                    var seriesFolderName = GetSeriesDirectoryName(series, options.TvOptions);
 
                     series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
 
@@ -801,6 +795,32 @@ namespace Emby.AutoOrganize.Core
             }
 
             return series;
+        }
+
+        /// <summary>
+        /// Get the new series name
+        /// </summary>
+        /// <param name="series"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        private string GetSeriesDirectoryName(Series series, TvFileOrganizationOptions options)
+        {
+            var seriesName = series.Name;
+            var serieYear = series.ProductionYear;
+            var seriesFullName = seriesName;
+            if (series.ProductionYear.HasValue)
+            {
+                seriesFullName = string.Format("{0} ({1})", seriesFullName, series.ProductionYear);
+            }
+
+            var seasonFolderName = options.SeriesFolderPattern.
+                Replace("%sn", seriesName)
+                .Replace("%s.n", seriesName.Replace(" ", "."))
+                .Replace("%s_n", seriesName.Replace(" ", "_"))
+                .Replace("%sy", serieYear.ToString())
+                .Replace("%fn", seriesFullName);
+
+            return _fileSystem.GetValidFilename(seasonFolderName);
         }
 
         /// <summary>

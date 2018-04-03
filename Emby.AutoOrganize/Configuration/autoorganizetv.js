@@ -123,6 +123,19 @@
             .replace('%00e', '004');
     }
 
+    function getSeriesDirecoryName(value) {
+
+        var seriesName = "Series Name";
+        var seriesYear = "2017";
+        var fullName = seriesName + ' (' + seriesYear + ')';
+
+        return value.replace('%sn', seriesName)
+            .replace('%s.n', seriesName.replace(' ', '.'))
+            .replace('%s_n', seriesName.replace(' ', '_'))
+            .replace('%sy', seriesYear)
+            .replace('%fn', fullName);
+    }
+
     function loadPage(view, config) {
 
         var tvOptions = config.TvOptions;
@@ -141,6 +154,8 @@
 
         view.querySelector('#chkEnableSeriesAutoDetect').checked = tvOptions.AutoDetectSeries;
         view.querySelector('#selectSeriesFolder').value = tvOptions.DefaultSeriesLibraryPath;
+
+        view.querySelector('#txtSeriesPattern').value = tvOptions.SeriesFolderPattern; 
 
         view.querySelector('#txtDeleteLeftOverFiles').value = tvOptions.LeftOverFileExtensionsToDelete.join(';');
 
@@ -166,6 +181,8 @@
 
             tvOptions.AutoDetectSeries = view.querySelector('#chkEnableSeriesAutoDetect').checked;
             tvOptions.DefaultSeriesLibraryPath = view.querySelector('#selectSeriesFolder').value;
+
+            tvOptions.SeriesFolderPattern = view.querySelector('#txtSeriesPattern').value; 
 
             tvOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverFiles').value.split(';');
 
@@ -214,6 +231,15 @@
 
     return function (view, params) {
 
+        function updateSeriesPatternHelp() {
+
+            var value = view.querySelector('#txtSeriesPattern').value;
+            value = getSeriesDirecoryName(value);
+
+            var replacementHtmlResult = 'Result: ' + value;
+
+            view.querySelector('.seriesPatternDescription').innerHTML = replacementHtmlResult;
+        } 
 
         function updateSeasonPatternHelp() {
 
@@ -312,6 +338,8 @@
             }, onApiFailure);
         }
 
+        view.querySelector('#txtSeriesPattern').addEventListener('change', updateSeriesPatternHelp);
+        view.querySelector('#txtSeriesPattern').addEventListener('keyup', updateSeriesPatternHelp); 
         view.querySelector('#txtSeasonFolderPattern').addEventListener('change', updateSeasonPatternHelp);
         view.querySelector('#txtSeasonFolderPattern').addEventListener('keyup', updateSeasonPatternHelp);
         view.querySelector('#txtEpisodePattern').addEventListener('change', updateEpisodePatternHelp);
