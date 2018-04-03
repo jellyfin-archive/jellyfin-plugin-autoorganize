@@ -50,6 +50,18 @@
         });
     };
 
+    ApiClient.performMovieOrganization = function (id, options) {
+
+        var url = this.getUrl("Library/FileOrganizations/" + id + "/Movie/Organize");
+
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(options),
+            contentType: 'application/json'
+        });
+    };
+
     ApiClient.getSmartMatchInfos = function (options) {
 
         options = options || {};
@@ -87,7 +99,7 @@
     };
 
     var currentResult;
-    var page;
+    var pageGlobal;
 
     function parentWithClass(elem, className) {
 
@@ -165,10 +177,7 @@
         })[0];
 
         if (!item.TargetPath) {
-
-            if (item.Type === "Episode") {
-                organizeFileWithCorrections(page, item);
-            }
+            organizeFileWithCorrections(page, item);
 
             return;
         }
@@ -408,14 +417,14 @@
         if (e.type === 'ScheduledTaskEnded') {
 
             if (data && data.Key === 'AutoOrganize') {
-                reloadItems(page, false);
+                reloadItems(pageGlobal, false);
             }
         } else if (e.type === 'AutoOrganize_ItemUpdated' && data) {
 
-            updateItemStatus(page, data);
+            updateItemStatus(pageGlobal, data);
         } else {
 
-            reloadItems(page, false);
+            reloadItems(pageGlobal, false);
         }
     }
 
@@ -441,6 +450,10 @@
                 name: 'TV'
             },
             {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeMovie'),
+                name: 'Movie'
+            },
+            {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
                 name: 'Smart Matches'
             }];
@@ -448,7 +461,7 @@
 
     return function (view, params) {
 
-        page = view;
+        pageGlobal = view;
 
         view.querySelector('.btnClearLog').addEventListener('click', function () {
 

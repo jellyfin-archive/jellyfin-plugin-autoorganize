@@ -50,6 +50,18 @@
         });
     };
 
+    ApiClient.performMovieOrganization = function (id, options) {
+
+        var url = this.getUrl("Library/FileOrganizations/" + id + "/Movie/Organize");
+
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(options),
+            contentType: 'application/json'
+        });
+    };
+
     ApiClient.getSmartMatchInfos = function (options) {
 
         options = options || {};
@@ -171,6 +183,10 @@
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
                 name: 'TV'
+            },
+            {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeMovie'),
+                name: 'Movie'
             },
             {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),

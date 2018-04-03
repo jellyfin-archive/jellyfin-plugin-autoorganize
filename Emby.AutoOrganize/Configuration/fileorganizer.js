@@ -50,6 +50,18 @@
         });
     };
 
+    ApiClient.performMovieOrganization = function (id, options) {
+
+        var url = this.getUrl("Library/FileOrganizations/" + id + "/Movie/Organize");
+
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(options),
+            contentType: 'application/json'
+        });
+    };
+
     ApiClient.getSmartMatchInfos = function (options) {
 
         options = options || {};
@@ -80,11 +92,12 @@
         });
     };
 
+    var chosenType;
     var extractedName;
     var extractedYear;
     var currentNewItem;
-    var existingSeriesHtml;
-    var seriesLocationsCount = 0;
+    var existingMediasHtml;
+    var mediasLocationsCount = 0;
 
     function onApiFailure(e) {
 
@@ -98,50 +111,46 @@
         });
     }
 
-    function initEpisodeForm(context, item) {
-
-        if (!item.ExtractedName || item.ExtractedName.length < 3) {
-            context.querySelector('.fldRemember').classList.add('hide');
-        }
-        else {
-            context.querySelector('.fldRemember').classList.remove('hide');
-        }
-
+    function initBaseForm(context, item) {
         context.querySelector('.inputFile').innerHTML = item.OriginalFileName;
-
-        context.querySelector('#txtSeason').value = item.ExtractedSeasonNumber;
-        context.querySelector('#txtEpisode').value = item.ExtractedEpisodeNumber;
-        context.querySelector('#txtEndingEpisode').value = item.ExtractedEndingEpisodeNumber;
-        //context.querySelector('.extractedName').innerHTML = item.ExtractedName;
-
-        extractedName = item.ExtractedName;
-        extractedYear = item.ExtractedYear;
-
-        context.querySelector('#chkRememberCorrection').checked = false;
 
         context.querySelector('#hfResultId').value = item.Id;
 
+        extractedName = item.ExtractedName;
+        extractedYear = item.ExtractedYear;
+    }
+
+    function initMovieForm(context, item) {
+
+        initBaseForm(context, item);
+
+        chosenType = 'Movie';
+
+        populateMedias(context);
+    }
+
+    function populateMedias(context) {
+
         ApiClient.getItems(null, {
             recursive: true,
-            includeItemTypes: 'Series',
+            includeItemTypes: chosenType,
             sortBy: 'SortName'
 
         }).then(function (result) {
 
-            existingSeriesHtml = result.Items.map(function (s) {
+            existingMediasHtml = result.Items.map(function (s) {
 
                 return '<option value="' + s.Id + '">' + s.Name + '</option>';
 
             }).join('');
 
-            existingSeriesHtml = '<option value=""></option>' + existingSeriesHtml;
+            existingMediasHtml = '<option value=""></option>' + existingMediasHtml;
 
-            context.querySelector('#selectSeries').innerHTML = existingSeriesHtml;
+            context.querySelector('#selectMedias').innerHTML = existingMediasHtml;
 
             ApiClient.getVirtualFolders().then(function (result) {
 
-                //var movieLocations = [];
-                var seriesLocations = [];
+                var mediasLocations = [];
 
                 for (var n = 0; n < result.length; n++) {
 
@@ -153,79 +162,121 @@
                             display: virtualFolder.Name + ': ' + virtualFolder.Locations[i]
                         };
 
-                        //if (virtualFolder.CollectionType == 'movies') {
-                        //    movieLocations.push(location);
-                        //}
-                        if (virtualFolder.CollectionType == 'tvshows') {
-                            seriesLocations.push(location);
-                        }
+                        if ((chosenType == 'Movie' && virtualFolder.CollectionType == 'movies') || 
+                            (chosenType == 'Series' && virtualFolder.CollectionType == 'tvshows')) {
+                            mediasLocations.push(location);
+                        } 
                     }
                 }
 
-                seriesLocationsCount = seriesLocations.length;
+                mediasLocationsCount = mediasLocations.length;
 
-                var seriesFolderHtml = seriesLocations.map(function (s) {
+                var mediasFolderHtml = mediasLocations.map(function (s) {
                     return '<option value="' + s.value + '">' + s.display + '</option>';
                 }).join('');
 
-                if (seriesLocations.length > 1) {
+                if (mediasLocations.length > 1) {
                     // If the user has multiple folders, add an empty item to enforce a manual selection
-                    seriesFolderHtml = '<option value=""></option>' + seriesFolderHtml;
+                    mediasFolderHtml = '<option value=""></option>' + mediasFolderHtml;
                 }
 
-                context.querySelector('#selectSeriesFolder').innerHTML = seriesFolderHtml;
+                context.querySelector('#selectMediaFolder').innerHTML = mediasFolderHtml;
 
             }, onApiFailure);
 
         }, onApiFailure);
     }
 
-    function submitEpisodeForm(dlg) {
+    function initEpisodeForm(context, item) {
+
+        initBaseForm(context, item);
+
+        chosenType = 'Series';
+
+        if (!item.ExtractedName || item.ExtractedName.length < 3) {
+            context.querySelector('.fldRemember').classList.add('hide');
+        }
+        else {
+            context.querySelector('.fldRemember').classList.remove('hide');
+        }
+
+        context.querySelector('#txtSeason').value = item.ExtractedSeasonNumber;
+        context.querySelector('#txtEpisode').value = item.ExtractedEpisodeNumber;
+        context.querySelector('#txtEndingEpisode').value = item.ExtractedEndingEpisodeNumber;
+
+        context.querySelector('#chkRememberCorrection').checked = false;
+
+        populateMedias(context);
+    }
+
+    function submitMediaForm(dlg) {
 
         loading.show();
 
         var resultId = dlg.querySelector('#hfResultId').value;
-        var seriesId = dlg.querySelector('#selectSeries').value;
+        var mediaId = dlg.querySelector('#selectMedias').value;
 
         var targetFolder = null;
         var newProviderIds = null;
-        var newSeriesName = null;
-        var newSeriesYear = null;
+        var newMediaName = null;
+        var newMediaYear = null;
 
-        if (seriesId == "##NEW##" && currentNewItem != null) {
-            seriesId = null;
+        if (mediaId == "##NEW##" && currentNewItem != null) {
+            mediaId = null;
             newProviderIds = JSON.stringify(currentNewItem.ProviderIds);
-            newSeriesName = currentNewItem.Name;
-            newSeriesYear = currentNewItem.ProductionYear;
-            targetFolder = dlg.querySelector('#selectSeriesFolder').value;
+            newMediaName = currentNewItem.Name;
+            newMediaYear = currentNewItem.ProductionYear;
+            targetFolder = dlg.querySelector('#selectMediaFolder').value;
         }
 
-        var options = {
+        if (chosenType == 'Series') {
+            var options = {
 
-            SeriesId: seriesId,
-            SeasonNumber: dlg.querySelector('#txtSeason').value,
-            EpisodeNumber: dlg.querySelector('#txtEpisode').value,
-            EndingEpisodeNumber: dlg.querySelector('#txtEndingEpisode').value,
-            RememberCorrection: dlg.querySelector('#chkRememberCorrection').checked,
-            NewSeriesProviderIds: newProviderIds,
-            NewSeriesName: newSeriesName,
-            NewSeriesYear: newSeriesYear,
-            TargetFolder: targetFolder
-        };
+                SeriesId: mediaId,
+                SeasonNumber: dlg.querySelector('#txtSeason').value,
+                EpisodeNumber: dlg.querySelector('#txtEpisode').value,
+                EndingEpisodeNumber: dlg.querySelector('#txtEndingEpisode').value,
+                RememberCorrection: dlg.querySelector('#chkRememberCorrection').checked,
+                NewSeriesProviderIds: newProviderIds,
+                NewSeriesName: newMediaName,
+                NewSeriesYear: newMediaYear,
+                TargetFolder: targetFolder
+            };
 
-        ApiClient.performEpisodeOrganization(resultId, options).then(function () {
+            ApiClient.performEpisodeOrganization(resultId, options).then(function () {
 
-            loading.hide();
+                loading.hide();
 
-            dlg.submitted = true;
-            dialogHelper.close(dlg);
+                dlg.submitted = true;
+                dialogHelper.close(dlg);
 
-        }, onApiFailure);
+            }, onApiFailure);
+        } else if (chosenType == 'Movie') {
+            var options = {
+
+                MovieId: mediaId,
+                NewMovieProviderIds: newProviderIds,
+                NewMovieName: newMediaName,
+                NewMovieYear: newMediaYear,
+                TargetFolder: targetFolder
+            };
+
+            ApiClient.performMovieOrganization(resultId, options).then(function () {
+
+                loading.hide();
+
+                dlg.submitted = true;
+                dialogHelper.close(dlg);
+
+            }, onApiFailure);
+        }
+
+
     }
 
-    function showNewSeriesDialog(dlg) {
+    function showNewMediaDialog(dlg) {
 
-        if (seriesLocationsCount == 0) {
+        if (mediasLocationsCount == 0) {
 
             require(['alert'], function (alert) {
                 alert({
@@ -238,29 +289,68 @@
 
         require(['itemIdentifier'], function (itemIdentifier) {
 
-            itemIdentifier.showFindNew(extractedName, extractedYear, 'Series', ApiClient.serverId()).then(function (newItem) {
+            itemIdentifier.showFindNew(extractedName, extractedYear, chosenType, ApiClient.serverId()).then(function (newItem) {
 
                 if (newItem != null) {
                     currentNewItem = newItem;
-                    var seriesHtml = existingSeriesHtml;
-                    seriesHtml = seriesHtml + '<option selected value="##NEW##">' + currentNewItem.Name + '</option>';
-                    dlg.querySelector('#selectSeries').innerHTML = seriesHtml;
-                    selectedSeriesChanged(dlg);
+                    var mediasHtml = existingMediasHtml;
+                    mediasHtml = mediasHtml + '<option selected value="##NEW##">' + currentNewItem.Name + '</option>';
+                    dlg.querySelector('#selectMedias').innerHTML = mediasHtml;
+                    selectedMediasChanged(dlg);
                 }
             });
         });
     }
 
-    function selectedSeriesChanged(dlg) {
-        var seriesId = dlg.querySelector('#selectSeries').value;
+    function selectedMediasChanged(dlg) {
+        var mediasId = dlg.querySelector('#selectMedias').value;
 
-        if (seriesId == "##NEW##") {
-            dlg.querySelector('.fldSelectSeriesFolder').classList.remove('hide');
-            dlg.querySelector('#selectSeriesFolder').setAttribute('required', 'required');
+        if (mediasId == "##NEW##") {
+            dlg.querySelector('.fldSelectMediaFolder').classList.remove('hide');
+            dlg.querySelector('#selectMediaFolder').setAttribute('required', 'required');
         }
         else {
-            dlg.querySelector('.fldSelectSeriesFolder').classList.add('hide');
-            dlg.querySelector('#selectSeriesFolder').removeAttribute('required');
+            dlg.querySelector('.fldSelectMediaFolder').classList.add('hide');
+            dlg.querySelector('#selectMediaFolder').removeAttribute('required');
+        }
+    }
+
+    function selectedMediaTypeChanged(dlg, item) {
+        var mediaType = dlg.querySelector('#selectMediaType').value;
+
+        switch (mediaType) {
+            case "":
+                dlg.querySelector('#divPermitChoice').classList.add('hide');
+                dlg.querySelector('#divGlobalChoice').classList.add('hide');
+                dlg.querySelector('#divEpisodeChoice').classList.add('hide');
+                break;
+            case "Movie":
+                dlg.querySelector('#selectMedias').setAttribute('label', 'Movie');
+                dlg.querySelector('[for="selectMedias"]').innerHTML =  'Movie';
+
+                dlg.querySelector('#divPermitChoice').classList.remove('hide');
+                dlg.querySelector('#divGlobalChoice').classList.remove('hide');
+                dlg.querySelector('#divEpisodeChoice').classList.add('hide');
+
+                dlg.querySelector('#txtSeason').removeAttribute('required');
+                dlg.querySelector('#txtEpisode').removeAttribute('required');
+
+                initMovieForm(dlg, item);
+
+                break;
+            case "Episode":
+                dlg.querySelector('#selectMedias').setAttribute('label', 'Series');
+                dlg.querySelector('[for="selectMedias"]').innerHTML = 'Series';
+
+                dlg.querySelector('#divPermitChoice').classList.remove('hide');
+                dlg.querySelector('#divGlobalChoice').classList.remove('hide');
+                dlg.querySelector('#divEpisodeChoice').classList.remove('hide');
+
+                dlg.querySelector('#txtSeason').setAttribute('required', 'required');
+                dlg.querySelector('#txtEpisode').setAttribute('required', 'required');
+
+                initEpisodeForm(dlg, item);
+                break;
         }
     }
 
@@ -271,7 +361,7 @@
                 extractedName = null;
                 extractedYear = null;
                 currentNewItem = null;
-                existingSeriesHtml = null;
+                existingMediasHtml = null;
 
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', Dashboard.getConfigurationResourceUrl('FileOrganizerHtml'), true);
@@ -315,23 +405,31 @@
 
                     dlg.querySelector('form').addEventListener('submit', function (e) {
 
-                        submitEpisodeForm(dlg);
+                        submitMediaForm(dlg);
 
                         e.preventDefault();
                         return false;
                     });
 
-                    dlg.querySelector('#btnNewSeries').addEventListener('click', function (e) {
+                    dlg.querySelector('#btnNewMedia').addEventListener('click', function (e) {
 
-                        showNewSeriesDialog(dlg);
+                        showNewMediaDialog(dlg);
                     });
 
-                    dlg.querySelector('#selectSeries').addEventListener('change', function (e) {
+                    dlg.querySelector('#selectMedias').addEventListener('change', function (e) {
 
-                        selectedSeriesChanged(dlg);
+                        selectedMediasChanged(dlg);
                     });
 
-                    initEpisodeForm(dlg, item);
+                    dlg.querySelector('#selectMediaType').addEventListener('change', function (e) {
+
+                        selectedMediaTypeChanged(dlg, item);
+                    });
+
+                    dlg.querySelector('#selectMediaType').value = item.Type;
+
+                    // Init media type
+                    selectedMediaTypeChanged(dlg, item);
                 }
 
                 xhr.send();

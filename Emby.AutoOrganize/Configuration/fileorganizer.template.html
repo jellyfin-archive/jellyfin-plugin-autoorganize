@@ -7,46 +7,63 @@
     <div class="dialogContentInner dialog-content-centered">
         <form class="episodeCorrectionForm">
 
-            <p><span class="inputFile"></span></p>
-
             <div class="selectContainer">
                 <div style="display: flex; align-items: center;">
                     <div style="flex-grow:1; position: relative;">
-                        <select is="emby-select" id="selectSeries" data-mini="true" required="required" label="Series"></select>
+                        <select is="emby-select" id="selectMediaType" data-mini="true" required="required" label="Media type">
+                            <option></option>
+                            <option value="Episode">Series</option>
+                            <option value="Movie">Movie</option>
+                        </select>
                     </div>
-                    <button type="button" is="paper-icon-button-light" id="btnNewSeries" class="autoSize"><i class="md-icon">add</i></button>
                 </div>
             </div>
-            <div class="fldSelectSeriesFolder hide selectContainer">
-                <select id="selectSeriesFolder" is="emby-select" label="Series root folder:"></select>
-            </div>
-            <div class="inputContainer">
-                <input is="emby-input" id="txtSeason" type="number" pattern="[0-9]*" required min="0" label="Season number:" />
-            </div>
-            <div class="inputContainer">
-                <input is="emby-input" id="txtEpisode" type="number" pattern="[0-9]*" required min="0" label="Episode number:" />
-            </div>
-            <div class="inputContainer">
-                <input is="emby-input" id="txtEndingEpisode" type="number" pattern="[0-9]*" min="0" label="Ending episode number:" />
-                <div class="fieldDescription">Only required for multi-episode files.</div>
-            </div>
-            <div class="fldRemember hide checkboxContainer checkboxContainer-withDescription">
-                <label class="checkboxContainer">
-                    <input is="emby-checkbox" id="chkRememberCorrection" type="checkbox" />
-                    <span>Remember this correction</span>
-                </label>
-                <div class="extractedName hide fieldDescription checkboxFieldDescription"></div>
-            </div>
 
-            <br />
-            <input id="hfResultId" type="hidden" />
+            <p><span class="inputFile"></span></p>
 
-            <div class="formDialogFooter">
-                <button is="emby-button" type="submit" class="raised button-submit block formDialogFooterItem">
-                    <span>OK</span>
-                </button>
+            <div id="divPermitChoice">
+                <div id="divGlobalChoice">
+                    <div class="selectContainer">
+                        <div style="display: flex; align-items: center;">
+                            <div style="flex-grow: 1; position: relative;">
+                                <select is="emby-select" id="selectMedias" data-mini="true" required="required"></select>
+                            </div>
+                            <button type="button" is="paper-icon-button-light" id="btnNewMedia" class="autoSize"><i class="md-icon">add</i></button>
+                        </div>
+                    </div>
+                    <div class="fldSelectMediaFolder hide selectContainer">
+                        <select id="selectMediaFolder" is="emby-select" label="Root folder:"></select>
+                    </div>
+                </div>
+                <div id="divEpisodeChoice">
+                    <div class="fldTxtSeason inputContainer">
+                        <input is="emby-input" id="txtSeason" type="number" pattern="[0-9]*" required min="0" label="Season number:" />
+                    </div>
+                    <div class="fldTxtEpisode inputContainer">
+                        <input is="emby-input" id="txtEpisode" type="number" pattern="[0-9]*" required min="0" label="Episode number:" />
+                    </div>
+                    <div class="fldTxtEndingEpisode inputContainer">
+                        <input is="emby-input" id="txtEndingEpisode" type="number" pattern="[0-9]*" min="0" label="Ending episode number:" />
+                        <div class="fieldDescription">Only required for multi-episode files.</div>
+                    </div>
+                    <div class="fldRemember hide checkboxContainer checkboxContainer-withDescription">
+                        <label class="checkboxContainer">
+                            <input is="emby-checkbox" id="chkRememberCorrection" type="checkbox" />
+                            <span>Remember this correction</span>
+                        </label>
+                        <div class="extractedName hide fieldDescription checkboxFieldDescription"></div>
+                    </div>
+                </div>
+
+                <br />
+                <input id="hfResultId" type="hidden" />
+
+                <div class="formDialogFooter">
+                    <button is="emby-button" type="submit" class="raised button-submit block formDialogFooterItem">
+                        <span>OK</span>
+                    </button>
+                </div>
             </div>
-
         </form>
     </div>
 </div>

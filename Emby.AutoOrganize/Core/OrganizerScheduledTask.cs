@@ -60,6 +60,14 @@ namespace Emby.AutoOrganize.Core
                 await new TvFolderOrganizer(_libraryManager, _logger, _fileSystem, _libraryMonitor, fileOrganizationService, _config, _providerManager)
                     .Organize(GetAutoOrganizeOptions(), cancellationToken, progress).ConfigureAwait(false);
             }
+
+            if (GetAutoOrganizeOptions().MovieOptions.IsEnabled)
+            {
+                var fileOrganizationService = PluginEntryPoint.Current.FileOrganizationService;
+
+                await new MovieFolderOrganizer(_libraryManager, _logger, _fileSystem, _libraryMonitor, fileOrganizationService, _config, _providerManager)
+                    .Organize(GetAutoOrganizeOptions(), cancellationToken, progress).ConfigureAwait(false);
+            }
         }
 
         /// <summary>

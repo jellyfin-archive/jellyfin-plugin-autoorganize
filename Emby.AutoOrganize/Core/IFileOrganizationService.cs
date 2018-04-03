@@ -44,8 +44,15 @@ namespace Emby.AutoOrganize.Core
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>Task.</returns>
-        Task PerformEpisodeOrganization(EpisodeFileOrganizationRequest request);
-        
+        Task PerformOrganization(EpisodeFileOrganizationRequest request);
+
+        /// <summary>
+        /// Performs the episode organization.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>Task.</returns>
+        Task PerformOrganization(MovieFileOrganizationRequest request);
+
         /// <summary>
         /// Gets the results.
         /// </summary>

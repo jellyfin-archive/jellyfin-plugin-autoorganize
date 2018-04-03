@@ -51,6 +51,11 @@ namespace Emby.AutoOrganize
                 },
                 new PluginPageInfo
                 {
+                    Name = "AutoOrganizeMovie",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizemovie.html"
+                },
+                new PluginPageInfo
+                {
                     Name = "AutoOrganizeLogJs",
                     EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizelog.js"
                 },
@@ -63,6 +68,11 @@ namespace Emby.AutoOrganize
                 {
                     Name = "AutoOrganizeTvJs",
                     EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizetv.js"
+                },
+                new PluginPageInfo
+                {
+                    Name = "AutoOrganizeMovieJs",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizemovie.js"
                 },
                 new PluginPageInfo
                 {

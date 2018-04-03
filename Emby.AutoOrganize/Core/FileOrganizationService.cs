@@ -95,7 +95,7 @@ namespace Emby.AutoOrganize.Core
             {
                 throw new ArgumentNullException("path");
             }
-            
+
             var id = path.GetMD5().ToString("N");
 
             return GetResult(id);
@@ -144,11 +144,27 @@ namespace Emby.AutoOrganize.Core
                 throw new ArgumentException("No target path available.");
             }
 
-            var organizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
-                _libraryMonitor, _providerManager);
+            FileOrganizationResult organizeResult;
+            switch (result.Type)
+            {
+                case FileOrganizerType.Episode:
+                    var episodeOrganizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
+                        _libraryMonitor, _providerManager);
 
-            var organizeResult = await organizer.OrganizeEpisodeFile(result.OriginalPath, GetAutoOrganizeOptions(), true, CancellationToken.None)
-                    .ConfigureAwait(false);
+                    organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, GetAutoOrganizeOptions(), true, CancellationToken.None)
+                        .ConfigureAwait(false);
+
+                    break;
+                case FileOrganizerType.Movie:
+                    var movieOrganizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
+                        _libraryMonitor, _providerManager);
+
+                    organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, GetAutoOrganizeOptions(), true, CancellationToken.None)
+                        .ConfigureAwait(false);
+                    break;
+                default:
+                    throw new Exception("No organizer exist for the type " + result.Type);
+            }
 
             if (organizeResult.Status != FileSortingStatus.Success)
             {
@@ -162,9 +178,22 @@ namespace Emby.AutoOrganize.Core
             EventHelper.FireEventIfNotNull(LogReset, this, EventArgs.Empty, _logger);
         }
 
-        public async Task PerformEpisodeOrganization(EpisodeFileOrganizationRequest request)
+        public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
         {
             var organizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
+                _libraryMonitor, _providerManager);
+
+            var result = await organizer.OrganizeWithCorrection(request, GetAutoOrganizeOptions(), CancellationToken.None).ConfigureAwait(false);
+
+            if (result.Status != FileSortingStatus.Success)
+            {
+                throw new Exception(result.StatusMessage);
+            }
+        }
+
+        public async Task PerformOrganization(MovieFileOrganizationRequest request)
+        {
+            var organizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
                 _libraryMonitor, _providerManager);
 
             var result = await organizer.OrganizeWithCorrection(request, GetAutoOrganizeOptions(), CancellationToken.None).ConfigureAwait(false);

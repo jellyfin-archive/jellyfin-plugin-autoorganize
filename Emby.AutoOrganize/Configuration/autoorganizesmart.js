@@ -50,6 +50,18 @@
         });
     };
 
+    ApiClient.performMovieOrganization = function (id, options) {
+
+        var url = this.getUrl("Library/FileOrganizations/" + id + "/Movie/Organize");
+
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(options),
+            contentType: 'application/json'
+        });
+    };
+
     ApiClient.getSmartMatchInfos = function (options) {
 
         options = options || {};
@@ -211,6 +223,10 @@
                 name: 'TV'
             },
             {
+                href: Dashboard.getConfigurationPageUrl('AutoOrganizeMovie'),
+                name: 'Movie'
+            },
+            {
                 href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
                 name: 'Smart Matches'
             }];
@@ -248,7 +264,7 @@
 
         view.addEventListener('viewshow', function (e) {
 
-            libraryMenu.setTabs('autoorganize', 2, getTabs);
+            libraryMenu.setTabs('autoorganize', 3, getTabs);
             loading.show();
 
             reloadList(view);
