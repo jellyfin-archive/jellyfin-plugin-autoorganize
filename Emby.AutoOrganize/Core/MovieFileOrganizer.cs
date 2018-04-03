@@ -175,6 +175,15 @@ namespace Emby.AutoOrganize.Core
                 movie.Path = Path.Combine(request.TargetFolder, newPath);
 
                 movie.ProviderIds = request.NewMovieProviderIds;
+
+                // Correctly set the parent of the Movie
+                if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
+                    movie.SetParent(baseFolder);
+
+                _libraryManager.CreateItem(movie, cancellationToken);
+
+                var refreshOptions = new MetadataRefreshOptions(_fileSystem);
+                await movie.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
             }
 
             return movie;
@@ -206,9 +215,6 @@ namespace Emby.AutoOrganize.Core
                     true,
                     result,
                     cancellationToken).ConfigureAwait(false);
-
-                var refreshOptions = new MetadataRefreshOptions(_fileSystem);
-                await movie.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
 
                 await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
             }

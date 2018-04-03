@@ -336,6 +336,10 @@ namespace Emby.AutoOrganize.Core
 
                     series.ProviderIds = request.NewSeriesProviderIds;
 
+                    // Correctly set the parent of the Series
+                    if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
+                        series.SetParent(baseFolder);
+
                     _libraryManager.CreateItem(series, cancellationToken);
                 }
             }
