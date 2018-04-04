@@ -72,7 +72,7 @@
                                 <tr>
                                     <td>Original File Name</td>
                                     <td>%fn</td>
-                                    <td>filename.mkv</td>
+                                    <td>filename</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -104,18 +104,16 @@
                     </label>
                     <div class="fieldDescription checkboxFieldDescription">Empty folders will be deleted</div>
                 </div>
-                <div class="checkboxContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
                     <label>
                         <input type="checkbox" is="emby-checkbox" id="chkEnableMovieAutoDetect" />
                         <span>Enable auto-detect for movies</span>
                     </label>
+                    <div class="fieldDescription checkboxFieldDescription">Warning Beta feature, Use with caution, this may cause significantly longer scans and false identification</div>
                 </div>
                 <div class="fldSelectMovieFolder hide selectContainer">
-                    <select id="selectMovieFolder" is="emby-select" label="Movie library:"></select>
+                    <select id="selectMovieFolder" is="emby-select" label="Default Movie library:"></select>
                 </div>
-
-
-
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
                 </div>

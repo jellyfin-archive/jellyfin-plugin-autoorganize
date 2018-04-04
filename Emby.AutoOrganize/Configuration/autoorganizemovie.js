@@ -138,7 +138,7 @@
             movieOptions.DeleteEmptyFolders = view.querySelector('#chkDeleteEmptyMovieFolders').checked;
 
             movieOptions.MinFileSizeMb = view.querySelector('#txtMovieMinFileSize').value;
-            movieOptions.SeasonFolderPattern = view.querySelector('#txtMoviePattern').value;
+            movieOptions.MoviePattern = view.querySelector('#txtMoviePattern').value;
             movieOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverMovieFiles').value.split(';');
 
             movieOptions.AutoDetectMovie = view.querySelector('#chkEnableMovieAutoDetect').checked;

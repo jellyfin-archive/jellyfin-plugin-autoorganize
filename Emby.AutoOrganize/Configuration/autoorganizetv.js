@@ -96,7 +96,7 @@
 
         var seriesName = "Series Name";
         var episodeTitle = "Episode Four";
-        var fileName = seriesName + ' ' + episodeTitle + '.mkv';
+        var fileName = seriesName + ' ' + episodeTitle;
 
         var result = value.replace('%sn', seriesName)
             .replace('%s.n', seriesName.replace(' ', '.'))
