@@ -85,12 +85,12 @@ namespace Emby.AutoOrganize.Core
 
         public bool IsHidden
         {
-            get { return !GetAutoOrganizeOptions().TvOptions.IsEnabled; }
+            get { return !GetAutoOrganizeOptions().TvOptions.IsEnabled && !GetAutoOrganizeOptions().MovieOptions.IsEnabled; }
         }
 
         public bool IsEnabled
         {
-            get { return GetAutoOrganizeOptions().TvOptions.IsEnabled; }
+            get { return GetAutoOrganizeOptions().TvOptions.IsEnabled || GetAutoOrganizeOptions().MovieOptions.IsEnabled; }
         }
 
         public bool IsLogged

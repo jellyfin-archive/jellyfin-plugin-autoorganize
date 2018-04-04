@@ -1,11 +1,8 @@
 ﻿using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.Entities;
-using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,7 +15,7 @@ using MediaBrowser.Model.IO;
 using Emby.Naming.Common;
 using Emby.Naming.Video;
 using MediaBrowser.Controller.Entities.Movies;
-using EpisodeInfo = MediaBrowser.Controller.Providers.EpisodeInfo;
+using MediaBrowser.Model.Providers;
 
 namespace Emby.AutoOrganize.Core
 {
@@ -95,7 +92,7 @@ namespace Emby.AutoOrganize.Core
                 var resolver = new VideoResolver(namingOptions);
 
                 var movieInfo = resolver.Resolve(path, false) ??
-                    new Emby.Naming.Video.VideoFileInfo();
+                    new VideoFileInfo();
 
                 var movieName = movieInfo.Name;
 
@@ -144,6 +141,54 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
+        private async Task<Movie> CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        {
+            int? newMovieYear = null;
+            int year;
+            if (int.TryParse(request.NewMovieYear, out year))
+            {
+                newMovieYear = year;
+
+            }
+
+            // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
+            var movie = GetMatchingMovie(request.NewMovieName, newMovieYear, null, options);
+
+            if (movie == null)
+            {
+                // We're having a new movie here
+                movie = new Movie();
+                movie.Id = Guid.NewGuid();
+                movie.Name = request.NewMovieName;
+                movie.ProductionYear = newMovieYear;
+
+                var newPath =
+                     await GetNewPath(originalPath, movie, options.MovieOptions, cancellationToken)
+                        .ConfigureAwait(false);
+
+                if (string.IsNullOrEmpty(newPath))
+                {
+                    var msg = string.Format("Unable to sort {0} because target path could not be determined.", originalPath);
+                    throw new Exception(msg);
+                }
+
+                movie.Path = Path.Combine(request.TargetFolder, newPath);
+
+                movie.ProviderIds = request.NewMovieProviderIds;
+
+                // Correctly set the parent of the Movie
+                if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
+                    movie.SetParent(baseFolder);
+
+                _libraryManager.CreateItem(movie, cancellationToken);
+
+                var refreshOptions = new MetadataRefreshOptions(_fileSystem);
+                await movie.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
+            }
+
+            return movie;
+        }
+
         public async Task<FileOrganizationResult> OrganizeWithCorrection(MovieFileOrganizationRequest request, AutoOrganizeOptions options, CancellationToken cancellationToken)
         {
             var result = _organizationService.GetResult(request.ResultId);
@@ -155,36 +200,7 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewMovieProviderIds.Count > 0)
                 {
                     // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    movie = GetMatchingMovie(request.NewMovieName, null, options);
-
-                    if (movie == null)
-                    {
-                        // We're having a new movie here
-                        movie = new Movie();
-                        movie.Id = Guid.NewGuid();
-                        movie.Name = request.NewMovieName;
-
-                        int year;
-                        if (int.TryParse(request.NewMovieYear, out year))
-                        {
-                            movie.ProductionYear = year;
-                        }
-
-                        var newPath =
-                            await GetNewPath(result.OriginalPath, movie, options.MovieOptions, cancellationToken)
-                                .ConfigureAwait(false);
-
-                        if (string.IsNullOrEmpty(newPath))
-                        {
-                            var msg = string.Format("Unable to sort {0} because target path could not be determined.",
-                                result.OriginalPath);
-                            throw new Exception(msg);
-                        }
-
-                        movie.Path = Path.Combine(request.TargetFolder, newPath);
-
-                        movie.ProviderIds = request.NewMovieProviderIds;
-                    }
+                    movie = await CreateNewMovie(request, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (movie == null)
@@ -199,9 +215,6 @@ namespace Emby.AutoOrganize.Core
                     true,
                     result,
                     cancellationToken).ConfigureAwait(false);
-
-                var refreshOptions = new MetadataRefreshOptions(_fileSystem);
-                await movie.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
 
                 await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
             }
@@ -222,15 +235,20 @@ namespace Emby.AutoOrganize.Core
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            var movie = GetMatchingMovie(movieName, result, options);
+            var movie = GetMatchingMovie(movieName, movieYear, result, options);
 
             if (movie == null)
             {
-                var msg = string.Format("Unable to find movie in library matching name {0}", movieName);
-                result.Status = FileSortingStatus.Failure;
-                result.StatusMessage = msg;
-                _logger.Warn(msg);
-                return Task.FromResult(true);
+                movie = AutoDetectMovie(movieName, movieYear, result, options, cancellationToken).Result;
+
+                if (movie == null)
+                {
+                    var msg = string.Format("Unable to find movie in library matching name {0}", movieName);
+                    result.Status = FileSortingStatus.Failure;
+                    result.StatusMessage = msg;
+                    _logger.Warn(msg);
+                    return Task.FromResult(true);
+                }
             }
 
             return OrganizeMovie(sourcePath,
@@ -364,7 +382,118 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
-        private Movie GetMatchingMovie(string movieName, FileOrganizationResult result, AutoOrganizeOptions options)
+        private async Task<Movie> AutoDetectMovie(string movieName, int? movieYear, FileOrganizationResult result, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        {
+            if (options.MovieOptions.AutoDetectMovie)
+            {
+                var parsedName = _libraryManager.ParseName(movieName);
+
+                var yearInName = parsedName.Year;
+                var nameWithoutYear = parsedName.Name;
+
+                if (string.IsNullOrWhiteSpace(nameWithoutYear))
+                {
+                    nameWithoutYear = movieName;
+                }
+
+                if (!yearInName.HasValue)
+                {
+                    yearInName = movieYear;
+                }
+
+                #region Search One
+
+                var movieInfo = new MovieInfo
+                {
+                    Name = nameWithoutYear,
+                    Year = yearInName
+                };
+
+                var searchResultsTask = _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>
+                {
+                    SearchInfo = movieInfo
+
+                }, CancellationToken.None);
+
+                #endregion
+
+                #region Search Two
+
+                // Remote search Hack, some provider does not handle correctly dot as name separator
+                var secondSearchName = nameWithoutYear.Replace('.', '_');
+
+                var movieInfo2 = new MovieInfo
+                {
+                    Name = secondSearchName,
+                    Year = yearInName
+                };
+
+                var searchResultsTask2 = _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>
+                {
+                    SearchInfo = movieInfo2
+
+                }, CancellationToken.None);
+
+                #endregion
+
+                Task.WaitAll(searchResultsTask, searchResultsTask2);
+
+                var listResultOne = searchResultsTask.Result.ToList();
+                var listResultTwo = searchResultsTask2.Result.ToList();
+
+                RemoteSearchResult finalResult = null;
+
+                // We need at least one result for the 2 results
+                // We permit max 1 result for the autodetection to work
+                if (listResultOne.Count <= 1 && listResultTwo.Count <= 1)
+                {
+                    // if we have only one result for the total, 
+                    var resultOne = listResultOne.SingleOrDefault();
+                    var resultTwo = listResultTwo.SingleOrDefault();
+
+
+                    if (resultOne != null && resultTwo != null)
+                    {
+                        // 2 results, we check if it's the same provider id (at least one)
+                        foreach (var resultOneProviders in resultOne.ProviderIds)
+                        {
+                            if (resultTwo.ProviderIds.TryGetValue(resultOneProviders.Key, out var resultTwoValue) && resultOneProviders.Value == resultTwoValue)
+                            {
+                                // We got a winner, take the first (unaltered search)
+                                finalResult = resultOne;
+                                break;
+                            }
+                        }
+                    }
+                    else if (resultOne != null)
+                    {
+                        finalResult = resultOne;
+                    }
+                    else if (resultTwo != null)
+                    {
+                        finalResult = resultTwo;
+                    }
+                }
+
+                if (finalResult != null)
+                {
+                    // We are in the good position, we can create the item
+                    var organizationRequest = new MovieFileOrganizationRequest
+                    {
+                        NewMovieName = finalResult.Name,
+                        NewMovieProviderIds = finalResult.ProviderIds,
+                        NewMovieYear = finalResult.ProductionYear.ToString(),
+                        TargetFolder = options.MovieOptions.DefaultMovieLibraryPath
+                    };
+
+                    return await CreateNewMovie(organizationRequest, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                }
+            }
+
+            return null;
+        }
+
+        private Movie GetMatchingMovie(string movieName, int? movieYear, FileOrganizationResult result, AutoOrganizeOptions options)
         {
             var parsedName = _libraryManager.ParseName(movieName);
 
@@ -374,6 +503,11 @@ namespace Emby.AutoOrganize.Core
             if (string.IsNullOrWhiteSpace(nameWithoutYear))
             {
                 nameWithoutYear = movieName;
+            }
+
+            if (!yearInName.HasValue)
+            {
+                yearInName = movieYear;
             }
 
             if (result != null)
@@ -434,7 +568,7 @@ namespace Emby.AutoOrganize.Core
                 throw new Exception(msg);
             }
 
-            var episodeFileName = GetMovieFileName(sourcePath, movie.Name, options);
+            var episodeFileName = GetMovieFileName(sourcePath, movie.Name, movie.ProductionYear, options);
 
             if (string.IsNullOrEmpty(episodeFileName))
             {
@@ -445,7 +579,7 @@ namespace Emby.AutoOrganize.Core
             return episodeFileName;
         }
 
-        private string GetMovieFileName(string sourcePath, string movieName, MovieFileOrganizationOptions options)
+        private string GetMovieFileName(string sourcePath, string movieName, int? productionYear, MovieFileOrganizationOptions options)
         {
             movieName = _fileSystem.GetValidFilename(movieName).Trim();
 
@@ -461,6 +595,7 @@ namespace Emby.AutoOrganize.Core
             var result = pattern.Replace("%mn", movieName)
                 .Replace("%m.n", movieName.Replace(" ", "."))
                 .Replace("%m_n", movieName.Replace(" ", "_"))
+                .Replace("%my", productionYear.ToString())
                 .Replace("%ext", sourceExtension)
                 .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath));
 

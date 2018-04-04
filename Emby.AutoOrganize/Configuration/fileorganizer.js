@@ -131,12 +131,15 @@
 
     function populateMedias(context) {
 
+        loading.show();
         ApiClient.getItems(null, {
             recursive: true,
             includeItemTypes: chosenType,
             sortBy: 'SortName'
 
         }).then(function (result) {
+
+            loading.hide();
 
             existingMediasHtml = result.Items.map(function (s) {
 

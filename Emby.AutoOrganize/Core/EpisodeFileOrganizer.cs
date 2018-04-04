@@ -19,6 +19,7 @@ using MediaBrowser.Controller.IO;
 using MediaBrowser.Model.IO;
 using Emby.Naming.Common;
 using Emby.Naming.TV;
+using MediaBrowser.Model.Providers;
 using EpisodeInfo = MediaBrowser.Controller.Providers.EpisodeInfo;
 
 namespace Emby.AutoOrganize.Core
@@ -191,6 +192,168 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
+        private async Task<Series> AutoDetectSeries(string seriesName, int? seriesYear, FileOrganizationResult result, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        {
+            if (options.TvOptions.AutoDetectSeries)
+            {
+                var parsedName = _libraryManager.ParseName(seriesName);
+
+                var yearInName = parsedName.Year;
+                var nameWithoutYear = parsedName.Name;
+
+                if (string.IsNullOrWhiteSpace(nameWithoutYear))
+                {
+                    nameWithoutYear = seriesName;
+                }
+
+                if (!yearInName.HasValue)
+                {
+                    yearInName = seriesYear;
+                }
+
+                #region Search One
+
+                var seriesInfo = new SeriesInfo
+                {
+                    Name = nameWithoutYear,
+                    Year = yearInName
+                };
+
+                var searchResultsTask = _providerManager.GetRemoteSearchResults<Series, SeriesInfo>(new RemoteSearchQuery<SeriesInfo>
+                {
+                    SearchInfo = seriesInfo
+
+                }, CancellationToken.None);
+
+                #endregion
+
+                #region Search Two
+
+                // Remote search Hack, some provider does not handle correctly dot as name separator
+                var secondSearchName = nameWithoutYear.Replace('.', '_');
+
+                var seriesInfo2 = new SeriesInfo
+                {
+                    Name = secondSearchName,
+                    Year = yearInName
+                };
+
+                var searchResultsTask2 = _providerManager.GetRemoteSearchResults<Series, SeriesInfo>(new RemoteSearchQuery<SeriesInfo>
+                {
+                    SearchInfo = seriesInfo2
+
+                }, CancellationToken.None);
+
+                #endregion
+
+                Task.WaitAll(searchResultsTask, searchResultsTask2);
+
+                var listResultOne = searchResultsTask.Result.ToList();
+                var listResultTwo = searchResultsTask2.Result.ToList();
+
+                RemoteSearchResult finalResult = null;
+
+                // We need at least one result for the 2 results
+                // We permit max 1 result for the autodetection to work
+                if (listResultOne.Count <= 1 && listResultTwo.Count <= 1)
+                {
+                    // if we have only one result for the total, 
+                    var resultOne = listResultOne.SingleOrDefault();
+                    var resultTwo = listResultTwo.SingleOrDefault();
+
+                    if (resultOne != null && resultTwo != null)
+                    {
+                        // 2 results, we check if it's the same provider id (at least one)
+                        foreach (var resultOneProviders in resultOne.ProviderIds)
+                        {
+                            if (resultTwo.ProviderIds.TryGetValue(resultOneProviders.Key, out var resultTwoValue) && resultOneProviders.Value == resultTwoValue)
+                            {
+                                // We got a winner, take the first (unaltered search)
+                                finalResult = resultOne;
+                                break;
+                            }
+                        }
+                    }
+                    else if (resultOne != null)
+                    {
+                        finalResult = resultOne;
+                    }
+                    else if (resultTwo != null)
+                    {
+                        finalResult = resultTwo;
+                    }
+                }
+
+                if (finalResult != null)
+                {
+                    // We are in the good position, we can create the item
+                    var organizationRequest = new EpisodeFileOrganizationRequest
+                    {
+                        NewSeriesName = finalResult.Name,
+                        NewSeriesProviderIds = finalResult.ProviderIds,
+                        NewSeriesYear = finalResult.ProductionYear.ToString(),
+                        TargetFolder = options.TvOptions.DefaultSeriesLibraryPath
+                    };
+
+                    return await CreateNewSeries(organizationRequest, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                }
+            }
+
+            return null;
+        }
+
+        private async Task<Series> CreateNewSeries(EpisodeFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        {
+            int? newSeriesYear = null;
+            int year;
+            if (int.TryParse(request.NewSeriesYear, out year))
+            {
+                newSeriesYear = year;
+
+            }
+
+            Series series = null;
+
+            // Ensure that we don't create the same series multiple time 
+            // We create series one at a time
+            var seriesCreationLock = new Object();
+            lock (seriesCreationLock)
+            {
+                series = GetMatchingSeries(request.NewSeriesName, null, options);
+
+                if (series == null)
+                {
+                    // We're having a new series here
+
+                    series = new Series();
+                    series.Id = Guid.NewGuid();
+                    series.Name = request.NewSeriesName;
+                    series.ProductionYear = newSeriesYear;
+
+                    var seriesFolderName = GetSeriesDirectoryName(series, options.TvOptions);
+
+                    series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
+
+                    series.ProviderIds = request.NewSeriesProviderIds;
+
+                    // Correctly set the parent of the Series
+                    if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
+                        series.SetParent(baseFolder);
+
+                    _libraryManager.CreateItem(series, cancellationToken);
+                }
+            }
+
+            if (series != null)
+            {
+                // RefreshMetadata in async outside of the lock for perfs
+                var refreshOptions = new MetadataRefreshOptions(_fileSystem);
+                await series.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
+            }
+
+            return series;
+        }
+
         public async Task<FileOrganizationResult> OrganizeWithCorrection(EpisodeFileOrganizationRequest request, AutoOrganizeOptions options, CancellationToken cancellationToken)
         {
             var result = _organizationService.GetResult(request.ResultId);
@@ -201,37 +364,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (request.NewSeriesProviderIds.Count > 0)
                 {
-                    // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    series = GetMatchingSeries(request.NewSeriesName, null, options);
-
-                    if (series == null)
-                    {
-                        // We're having a new series here
-                        var refreshOptions = new MetadataRefreshOptions(_fileSystem);
-                        series = new Series();
-                        series.Id = Guid.NewGuid();
-                        series.Name = request.NewSeriesName;
-
-                        int year;
-                        if (int.TryParse(request.NewSeriesYear, out year))
-                        {
-                            series.ProductionYear = year;
-                        }
-
-                        var seriesFolderName = series.Name;
-                        if (series.ProductionYear.HasValue)
-                        {
-                            seriesFolderName = string.Format("{0} ({1})", seriesFolderName, series.ProductionYear);
-                        }
-
-                        seriesFolderName = _fileSystem.GetValidFilename(seriesFolderName);
-
-                        series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
-
-                        series.ProviderIds = request.NewSeriesProviderIds;
-
-                        await series.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
-                    }
+                    series = await CreateNewSeries(request, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (series == null)
@@ -279,11 +412,16 @@ namespace Emby.AutoOrganize.Core
 
             if (series == null)
             {
-                var msg = string.Format("Unable to find series in library matching name {0}", seriesName);
-                result.Status = FileSortingStatus.Failure;
-                result.StatusMessage = msg;
-                _logger.Warn(msg);
-                return Task.FromResult(true);
+                series = AutoDetectSeries(seriesName, null, result, options, cancellationToken).Result;
+
+                if (series == null)
+                {
+                    var msg = string.Format("Unable to find series in library matching name {0}", seriesName);
+                    result.Status = FileSortingStatus.Failure;
+                    result.StatusMessage = msg;
+                    _logger.Warn(msg);
+                    return Task.FromResult(true);
+                }
             }
 
             return OrganizeEpisode(sourcePath,
@@ -661,6 +799,32 @@ namespace Emby.AutoOrganize.Core
             }
 
             return series;
+        }
+
+        /// <summary>
+        /// Get the new series name
+        /// </summary>
+        /// <param name="series"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        private string GetSeriesDirectoryName(Series series, TvFileOrganizationOptions options)
+        {
+            var seriesName = series.Name;
+            var serieYear = series.ProductionYear;
+            var seriesFullName = seriesName;
+            if (series.ProductionYear.HasValue)
+            {
+                seriesFullName = string.Format("{0} ({1})", seriesFullName, series.ProductionYear);
+            }
+
+            var seasonFolderName = options.SeriesFolderPattern.
+                Replace("%sn", seriesName)
+                .Replace("%s.n", seriesName.Replace(" ", "."))
+                .Replace("%s_n", seriesName.Replace(" ", "_"))
+                .Replace("%sy", serieYear.ToString())
+                .Replace("%fn", seriesFullName);
+
+            return _fileSystem.GetValidFilename(seasonFolderName);
         }
 
         /// <summary>

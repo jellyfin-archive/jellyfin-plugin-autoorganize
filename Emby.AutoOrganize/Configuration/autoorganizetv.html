@@ -32,6 +32,56 @@
                     <div class="fieldDescription"></div>
                 </div>
 
+                <div is="emby-collapse" title="Series directory pattern">
+                    <div class="collapseContent">
+                        <br />
+                        <div class="inputContainer">
+                            <input is="emby-input" id="txtSeriesPattern" type="text" label="Series pattern:" required />
+                            <div class="fieldDescription seriesPatternDescription"></div>
+                        </div>
+
+                        <br />
+                        <p>Supported Patterns</p>
+
+                        <table id="series-table" class="ui-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Term</th>
+                                    <th>Pattern</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Series name</td>
+                                    <td>%sn</td>
+                                    <td>Series name</td>
+                                </tr>
+                                <tr>
+                                    <td>Series name</td>
+                                    <td>%s.n</td>
+                                    <td>Series.name</td>
+                                </tr>
+                                <tr>
+                                    <td>Series name</td>
+                                    <td>%s_n</td>
+                                    <td>Series_name</td>
+                                </tr>
+                                <tr>
+                                    <td>Series year</td>
+                                    <td>%sy</td>
+                                    <td>2017</td>
+                                </tr>
+                                <tr>
+                                    <td>Original Directory Path</td>
+                                    <td>%fn</td>
+                                    <td>Series name (2017)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div is="emby-collapse" title="Episode file pattern">
                     <div class="collapseContent">
                         <br />
@@ -47,7 +97,7 @@
                         <br />
                         <p>Supported Patterns</p>
 
-                        <table id="movie-table" class="ui-responsive">
+                        <table id="episode-table" class="ui-responsive">
                             <thead>
                                 <tr>
                                     <th>Term</th>
@@ -124,7 +174,7 @@
                                 <tr>
                                     <td>Original File Name</td>
                                     <td>%fn</td>
-                                    <td>filename.mkv</td>
+                                    <td>filename</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -155,6 +205,16 @@
                         <span>Delete empty folders</span>
                     </label>
                     <div class="fieldDescription checkboxFieldDescription">Empty folders will be deleted</div>
+                </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input type="checkbox" is="emby-checkbox" id="chkEnableSeriesAutoDetect" />
+                        <span>Enable auto-detect for Series</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">Warning Beta feature, Use with caution, this may cause significantly longer scans and false identification</div>
+                </div>
+                <div class="fldSelectSeriesFolder hide selectContainer">
+                    <select id="selectSeriesFolder" is="emby-select" label="Default Series library:"></select>
                 </div>
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>

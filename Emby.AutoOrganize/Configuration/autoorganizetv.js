@@ -96,7 +96,7 @@
 
         var seriesName = "Series Name";
         var episodeTitle = "Episode Four";
-        var fileName = seriesName + ' ' + episodeTitle + '.mkv';
+        var fileName = seriesName + ' ' + episodeTitle;
 
         var result = value.replace('%sn', seriesName)
             .replace('%s.n', seriesName.replace(' ', '.'))
@@ -112,15 +112,28 @@
 
         if (enableMultiEpisode) {
             result = result
-            .replace('%ed', '5')
-            .replace('%0ed', '05')
-            .replace('%00ed', '005');
+                .replace('%ed', '5')
+                .replace('%0ed', '05')
+                .replace('%00ed', '005');
         }
 
         return result
             .replace('%e', '4')
             .replace('%0e', '04')
             .replace('%00e', '004');
+    }
+
+    function getSeriesDirecoryName(value) {
+
+        var seriesName = "Series Name";
+        var seriesYear = "2017";
+        var fullName = seriesName + ' (' + seriesYear + ')';
+
+        return value.replace('%sn', seriesName)
+            .replace('%s.n', seriesName.replace(' ', '.'))
+            .replace('%s_n', seriesName.replace(' ', '_'))
+            .replace('%sy', seriesYear)
+            .replace('%fn', fullName);
     }
 
     function loadPage(view, config) {
@@ -139,6 +152,11 @@
         view.querySelector('#txtEpisodePattern').value = tvOptions.EpisodeNamePattern;
         view.querySelector('#txtMultiEpisodePattern').value = tvOptions.MultiEpisodeNamePattern;
 
+        view.querySelector('#chkEnableSeriesAutoDetect').checked = tvOptions.AutoDetectSeries;
+        view.querySelector('#selectSeriesFolder').value = tvOptions.DefaultSeriesLibraryPath;
+
+        view.querySelector('#txtSeriesPattern').value = tvOptions.SeriesFolderPattern; 
+
         view.querySelector('#txtDeleteLeftOverFiles').value = tvOptions.LeftOverFileExtensionsToDelete.join(';');
 
         view.querySelector('#copyOrMoveFile').value = tvOptions.CopyOriginalFile.toString();
@@ -149,7 +167,7 @@
         ApiClient.getNamedConfiguration('autoorganize').then(function (config) {
 
             var tvOptions = config.TvOptions;
-            
+
             tvOptions.IsEnabled = view.querySelector('#chkEnableTvSorting').checked;
             tvOptions.OverwriteExistingEpisodes = view.querySelector('#chkOverwriteExistingEpisodes').checked;
             tvOptions.DeleteEmptyFolders = view.querySelector('#chkDeleteEmptyFolders').checked;
@@ -160,6 +178,11 @@
 
             tvOptions.EpisodeNamePattern = view.querySelector('#txtEpisodePattern').value;
             tvOptions.MultiEpisodeNamePattern = view.querySelector('#txtMultiEpisodePattern').value;
+
+            tvOptions.AutoDetectSeries = view.querySelector('#chkEnableSeriesAutoDetect').checked;
+            tvOptions.DefaultSeriesLibraryPath = view.querySelector('#selectSeriesFolder').value;
+
+            tvOptions.SeriesFolderPattern = view.querySelector('#txtSeriesPattern').value; 
 
             tvOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverFiles').value.split(';');
 
@@ -172,6 +195,18 @@
         });
 
         return false;
+    }
+
+    function onApiFailure(e) {
+
+        loading.hide();
+
+        require(['alert'], function (alert) {
+            alert({
+                title: 'Error',
+                text: 'Error: ' + e.headers.get("X-Application-Error-Code")
+            });
+        });
     }
 
     function getTabs() {
@@ -196,6 +231,15 @@
 
     return function (view, params) {
 
+        function updateSeriesPatternHelp() {
+
+            var value = view.querySelector('#txtSeriesPattern').value;
+            value = getSeriesDirecoryName(value);
+
+            var replacementHtmlResult = 'Result: ' + value;
+
+            view.querySelector('.seriesPatternDescription').innerHTML = replacementHtmlResult;
+        } 
 
         function updateSeasonPatternHelp() {
 
@@ -249,6 +293,53 @@
             });
         }
 
+        function toggleSeriesLocation() {
+            if (view.querySelector('#chkEnableSeriesAutoDetect').checked) {
+                view.querySelector('.fldSelectSeriesFolder').classList.remove('hide');
+                view.querySelector('#selectSeriesFolder').setAttribute('required', 'required');
+            } else {
+                view.querySelector('.fldSelectSeriesFolder').classList.add('hide');
+                view.querySelector('#selectSeriesFolder').removeAttribute('required');
+            }
+        }
+
+        function populateSeriesLocation() {
+            ApiClient.getVirtualFolders().then(function (result) {
+
+                var mediasLocations = [];
+
+                for (var n = 0; n < result.length; n++) {
+
+                    var virtualFolder = result[n];
+
+                    for (var i = 0, length = virtualFolder.Locations.length; i < length; i++) {
+                        var location = {
+                            value: virtualFolder.Locations[i],
+                            display: virtualFolder.Name + ': ' + virtualFolder.Locations[i]
+                        };
+
+                        if (virtualFolder.CollectionType == 'tvshows') {
+                            mediasLocations.push(location);
+                        }
+                    }
+                }
+
+                var mediasFolderHtml = mediasLocations.map(function (s) {
+                    return '<option value="' + s.value + '">' + s.display + '</option>';
+                }).join('');
+
+                if (mediasLocations.length > 1) {
+                    // If the user has multiple folders, add an empty item to enforce a manual selection
+                    mediasFolderHtml = '<option value=""></option>' + mediasFolderHtml;
+                }
+
+                view.querySelector('#selectSeriesFolder').innerHTML = mediasFolderHtml;
+
+            }, onApiFailure);
+        }
+
+        view.querySelector('#txtSeriesPattern').addEventListener('change', updateSeriesPatternHelp);
+        view.querySelector('#txtSeriesPattern').addEventListener('keyup', updateSeriesPatternHelp); 
         view.querySelector('#txtSeasonFolderPattern').addEventListener('change', updateSeasonPatternHelp);
         view.querySelector('#txtSeasonFolderPattern').addEventListener('keyup', updateSeasonPatternHelp);
         view.querySelector('#txtEpisodePattern').addEventListener('change', updateEpisodePatternHelp);
@@ -256,6 +347,8 @@
         view.querySelector('#txtMultiEpisodePattern').addEventListener('change', updateMultiEpisodePatternHelp);
         view.querySelector('#txtMultiEpisodePattern').addEventListener('keyup', updateMultiEpisodePatternHelp);
         view.querySelector('#btnSelectWatchFolder').addEventListener('click', selectWatchFolder);
+
+        view.querySelector('#chkEnableSeriesAutoDetect').addEventListener('change', toggleSeriesLocation);
 
         view.querySelector('.libraryFileOrganizerForm').addEventListener('submit', function (e) {
 
@@ -273,6 +366,8 @@
                 updateSeasonPatternHelp();
                 updateEpisodePatternHelp();
                 updateMultiEpisodePatternHelp();
+                populateSeriesLocation();
+                toggleSeriesLocation();
             });
         });
     };
