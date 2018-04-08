@@ -295,14 +295,14 @@ namespace Emby.AutoOrganize.Core
                         TargetFolder = options.TvOptions.DefaultSeriesLibraryPath
                     };
 
-                    return await CreateNewSeries(organizationRequest, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                    return await CreateNewSeries(organizationRequest, result.OriginalPath, options, finalResult, cancellationToken).ConfigureAwait(false);
                 }
             }
 
             return null;
         }
 
-        private async Task<Series> CreateNewSeries(EpisodeFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        private async Task<Series> CreateNewSeries(EpisodeFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, RemoteSearchResult result, CancellationToken cancellationToken)
         {
             int? newSeriesYear = null;
             int year;
@@ -348,6 +348,7 @@ namespace Emby.AutoOrganize.Core
             {
                 // RefreshMetadata in async outside of the lock for perfs
                 var refreshOptions = new MetadataRefreshOptions(_fileSystem);
+                refreshOptions.SearchResult = result;
                 await series.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
             }
 
@@ -364,7 +365,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (request.NewSeriesProviderIds.Count > 0)
                 {
-                    series = await CreateNewSeries(request, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                    series = await CreateNewSeries(request, result.OriginalPath, options, null, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (series == null)
