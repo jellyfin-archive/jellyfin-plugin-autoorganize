@@ -151,7 +151,7 @@ namespace Emby.AutoOrganize.Core
 
             }
 
-            // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
+            // To avoid Movie duplicate by mistake (Missing SmartMatch and wrong selection in UI)
             var movie = GetMatchingMovie(request.NewMovieName, newMovieYear, null, options);
 
             if (movie == null)
@@ -173,6 +173,9 @@ namespace Emby.AutoOrganize.Core
                 }
 
                 movie.Path = Path.Combine(request.TargetFolder, newPath);
+
+                // If no special folder for movie
+                movie.IsInMixedFolder = true;
 
                 movie.ProviderIds = request.NewMovieProviderIds;
 
