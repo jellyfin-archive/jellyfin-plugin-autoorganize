@@ -141,7 +141,7 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private async Task<Movie> CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        private async Task<Movie> CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, RemoteSearchResult result, CancellationToken cancellationToken)
         {
             int? newMovieYear = null;
             int year;
@@ -181,11 +181,12 @@ namespace Emby.AutoOrganize.Core
 
                 // Correctly set the parent of the Movie
                 if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
-                    movie.SetParent(baseFolder);
-
-                _libraryManager.CreateItem(movie, cancellationToken);
-
+                {
+                    baseFolder.AddChild(movie, cancellationToken);
+                }
+                   
                 var refreshOptions = new MetadataRefreshOptions(_fileSystem);
+                refreshOptions.SearchResult = result;
                 await movie.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
             }
 
@@ -203,7 +204,7 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewMovieProviderIds.Count > 0)
                 {
                     // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    movie = await CreateNewMovie(request, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                    movie = await CreateNewMovie(request, result.OriginalPath, options, null, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (movie == null)
@@ -489,7 +490,7 @@ namespace Emby.AutoOrganize.Core
                         TargetFolder = options.MovieOptions.DefaultMovieLibraryPath
                     };
 
-                    return await CreateNewMovie(organizationRequest, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                    return await CreateNewMovie(organizationRequest, result.OriginalPath, options, finalResult, cancellationToken).ConfigureAwait(false);
                 }
             }
 

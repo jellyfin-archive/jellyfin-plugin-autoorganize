@@ -338,9 +338,9 @@ namespace Emby.AutoOrganize.Core
 
                     // Correctly set the parent of the Series
                     if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
-                        series.SetParent(baseFolder);
-
-                    _libraryManager.CreateItem(series, cancellationToken);
+                    {
+                        baseFolder.AddChild(series, cancellationToken);
+                    }
                 }
             }
 
