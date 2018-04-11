@@ -20,6 +20,10 @@ namespace Emby.AutoOrganize.Model
 
         public string DefaultMovieLibraryPath { get; set; }
 
+        public bool MovieFolder { get; set; }
+
+        public string MovieFolderPattern { get; set; }
+
         public MovieFileOrganizationOptions()
         {
             MinFileSizeMb = 50;
@@ -31,6 +35,10 @@ namespace Emby.AutoOrganize.Model
             WatchLocations = new string[] { };
 
             CopyOriginalFile = false;
+
+            MovieFolder = false;
+
+            MovieFolderPattern = "%mn (%my)";
         }
     }
 }
