@@ -24,6 +24,68 @@
                     <div class="fieldDescription">Files smaller than this will be ignored.</div>
                 </div>
 
+                <div class="checkboxContainer">
+                    <label>
+                        <input type="checkbox" is="emby-checkbox" id="chkSubMovieFolders" />
+                        <span>Create subdirectory per Movie</span>
+                    </label>
+                </div>
+
+                <div is="emby-collapse" class="hide fldSelectMovieFolderPattern" title="Movie folder pattern">
+                    <div class="collapseContent">
+                        <br />
+                        <div class="inputContainer">
+                            <input is="emby-input" id="txtMovieFolderPattern" type="text" label="Movie folder pattern:" required />
+                            <div class="fieldDescription movieFolderPatternDescription"></div>
+                        </div>
+
+                        <br />
+                        <p>Supported Patterns</p>
+
+                        <table id="movie-table" class="ui-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Term</th>
+                                    <th>Pattern</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Movie name</td>
+                                    <td>%mn</td>
+                                    <td>Movie name</td>
+                                </tr>
+                                <tr>
+                                    <td>Movie name</td>
+                                    <td>%m.n</td>
+                                    <td>Movie.name</td>
+                                </tr>
+                                <tr>
+                                    <td>Movie name</td>
+                                    <td>%m_n</td>
+                                    <td>Movie_name</td>
+                                </tr>
+                                <tr>
+                                    <td>Production year</td>
+                                    <td>%my</td>
+                                    <td>2017</td>
+                                </tr>
+                                <tr>
+                                    <td>File extension</td>
+                                    <td>%ext</td>
+                                    <td>mkv</td>
+                                </tr>
+                                <tr>
+                                    <td>Original File Name</td>
+                                    <td>%fn</td>
+                                    <td>filename</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div is="emby-collapse" title="Movie file pattern">
                     <div class="collapseContent">
                         <br />

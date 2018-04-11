@@ -120,13 +120,10 @@ namespace Emby.AutoOrganize.Core
 
                 var previousResult = _organizationService.GetResultBySourcePath(path);
 
-                if (previousResult != null)
+                // Don't keep saving the same result over and over if nothing has changed
+                if (previousResult?.Status == result.Status && previousResult?.StatusMessage == result.StatusMessage && result.Status != FileSortingStatus.Success)
                 {
-                    // Don't keep saving the same result over and over if nothing has changed
-                    if (previousResult.Status == result.Status && previousResult.StatusMessage == result.StatusMessage && result.Status != FileSortingStatus.Success)
-                    {
-                        return previousResult;
-                    }
+                    return previousResult;
                 }
 
                 await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
@@ -141,26 +138,26 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private async Task<Movie> CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        private async Task<Movie> CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, RemoteSearchResult result, CancellationToken cancellationToken)
         {
             int? newMovieYear = null;
-            int year;
-            if (int.TryParse(request.NewMovieYear, out year))
+            if (int.TryParse(request.NewMovieYear, out var year))
             {
                 newMovieYear = year;
-
             }
 
-            // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
+            // To avoid Movie duplicate by mistake (Missing SmartMatch and wrong selection in UI)
             var movie = GetMatchingMovie(request.NewMovieName, newMovieYear, null, options);
 
             if (movie == null)
             {
                 // We're having a new movie here
-                movie = new Movie();
-                movie.Id = Guid.NewGuid();
-                movie.Name = request.NewMovieName;
-                movie.ProductionYear = newMovieYear;
+                movie = new Movie
+                {
+                    Id = Guid.NewGuid(),
+                    Name = request.NewMovieName,
+                    ProductionYear = newMovieYear
+                };
 
                 var newPath =
                      await GetNewPath(originalPath, movie, options.MovieOptions, cancellationToken)
@@ -174,15 +171,17 @@ namespace Emby.AutoOrganize.Core
 
                 movie.Path = Path.Combine(request.TargetFolder, newPath);
 
+                movie.IsInMixedFolder = !options.MovieOptions.MovieFolder;
+
                 movie.ProviderIds = request.NewMovieProviderIds;
 
                 // Correctly set the parent of the Movie
                 if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
-                    movie.SetParent(baseFolder);
+                {
+                    baseFolder.AddChild(movie, cancellationToken);
+                }
 
-                _libraryManager.CreateItem(movie, cancellationToken);
-
-                var refreshOptions = new MetadataRefreshOptions(_fileSystem);
+                var refreshOptions = new MetadataRefreshOptions(_fileSystem) { SearchResult = result };
                 await movie.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
             }
 
@@ -200,7 +199,7 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewMovieProviderIds.Count > 0)
                 {
                     // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    movie = await CreateNewMovie(request, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                    movie = await CreateNewMovie(request, result.OriginalPath, options, null, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (movie == null)
@@ -291,7 +290,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (!overwriteExisting)
                 {
-                    if (options.MovieOptions.CopyOriginalFile && fileExists && IsSameEpisode(sourcePath, newPath))
+                    if (options.MovieOptions.CopyOriginalFile && fileExists && IsSameMovie(sourcePath, newPath))
                     {
                         var msg = string.Format("File '{0}' already copied to new path '{1}', stopping organization", sourcePath, newPath);
                         _logger.Info(msg);
@@ -486,7 +485,7 @@ namespace Emby.AutoOrganize.Core
                         TargetFolder = options.MovieOptions.DefaultMovieLibraryPath
                     };
 
-                    return await CreateNewMovie(organizationRequest, result.OriginalPath, options, cancellationToken).ConfigureAwait(false);
+                    return await CreateNewMovie(organizationRequest, result.OriginalPath, options, finalResult, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -568,28 +567,44 @@ namespace Emby.AutoOrganize.Core
                 throw new Exception(msg);
             }
 
-            var episodeFileName = GetMovieFileName(sourcePath, movie.Name, movie.ProductionYear, options);
+            var movieFileName = "";
 
-            if (string.IsNullOrEmpty(episodeFileName))
+            if (options.MovieFolder)
+            {
+                movieFileName = Path.Combine(movieFileName, GetMovieFolder(sourcePath, movie, options));
+            }
+
+            movieFileName = Path.Combine(movieFileName, GetMovieFileName(sourcePath, movie, options));
+
+            if (string.IsNullOrEmpty(movieFileName))
             {
                 // cause failure
                 return string.Empty;
             }
 
-            return episodeFileName;
+            return movieFileName;
         }
 
-        private string GetMovieFileName(string sourcePath, string movieName, int? productionYear, MovieFileOrganizationOptions options)
+        private string GetMovieFileName(string sourcePath, Movie movie, MovieFileOrganizationOptions options)
         {
-            movieName = _fileSystem.GetValidFilename(movieName).Trim();
+            return GetMovieNameInternal(sourcePath, movie, options.MoviePattern);
+        }
+
+        private string GetMovieFolder(string sourcePath, Movie movie, MovieFileOrganizationOptions options)
+        {
+            return GetMovieNameInternal(sourcePath, movie, options.MovieFolderPattern);
+        }
+
+        private string GetMovieNameInternal(string sourcePath, Movie movie, string pattern)
+        {
+            var movieName = _fileSystem.GetValidFilename(movie.Name).Trim();
+            var productionYear = movie.ProductionYear;
 
             var sourceExtension = (Path.GetExtension(sourcePath) ?? string.Empty).TrimStart('.');
 
-            var pattern = options.MoviePattern;
-
             if (string.IsNullOrWhiteSpace(pattern))
             {
-                throw new Exception("GetEpisodeFileName: Configured episode name pattern is empty!");
+                throw new Exception("GetMovieFolder: Configured movie name pattern is empty!");
             }
 
             var result = pattern.Replace("%mn", movieName)
@@ -599,11 +614,11 @@ namespace Emby.AutoOrganize.Core
                 .Replace("%ext", sourceExtension)
                 .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath));
 
-            // Finally, call GetValidFilename again in case user customized the episode expression with any invalid filename characters
+            // Finally, call GetValidFilename again in case user customized the movie expression with any invalid filename characters
             return _fileSystem.GetValidFilename(result).Trim();
         }
 
-        private bool IsSameEpisode(string sourcePath, string newPath)
+        private bool IsSameMovie(string sourcePath, string newPath)
         {
             try
             {

@@ -107,6 +107,21 @@
         return result;
     }
 
+    function getMovieFolderFileName(value) {
+        var movieName = "Movie Name";
+        var movieYear = "2017";
+        var fileNameWithoutExt = movieName + '.' + movieYear + '.MULTI.1080p.BluRay.DTS.x264-UTT';
+
+        var result = value.replace('%mn', movieName)
+            .replace('%m.n', movieName.replace(' ', '.'))
+            .replace('%m_n', movieName.replace(' ', '_'))
+            .replace('%my', movieYear)
+            .replace('%ext', 'mkv')
+            .replace('%fn', fileNameWithoutExt);
+
+        return result;
+    }
+
     function loadPage(view, config) {
 
         var movieOptions = config.MovieOptions;
@@ -118,6 +133,9 @@
         view.querySelector('#txtMovieMinFileSize').value = movieOptions.MinFileSizeMb;
         view.querySelector('#txtMoviePattern').value = movieOptions.MoviePattern;
         view.querySelector('#txtWatchMovieFolder').value = movieOptions.WatchLocations[0] || '';
+
+        view.querySelector('#chkSubMovieFolders').checked = movieOptions.MovieFolder;
+        view.querySelector('#txtMovieFolderPattern').value = movieOptions.MovieFolderPattern;
 
         view.querySelector('#txtDeleteLeftOverMovieFiles').value = movieOptions.LeftOverFileExtensionsToDelete.join(';');
 
@@ -143,6 +161,9 @@
 
             movieOptions.AutoDetectMovie = view.querySelector('#chkEnableMovieAutoDetect').checked;
             movieOptions.DefaultMovieLibraryPath = view.querySelector('#selectMovieFolder').value;
+
+            movieOptions.MovieFolder = view.querySelector('#chkSubMovieFolders').checked;
+            movieOptions.MovieFolderPattern =  view.querySelector('#txtMovieFolderPattern').value;
 
             var watchLocation = view.querySelector('#txtWatchMovieFolder').value;
             movieOptions.WatchLocations = watchLocation ? [watchLocation] : [];
@@ -201,6 +222,24 @@
             view.querySelector('.moviePatternDescription').innerHTML = replacementHtmlResult;
         }
 
+        function updateMovieFolderPatternHelp() {
+
+            var value = view.querySelector('#txtMovieFolderPattern').value;
+            value = getMovieFolderFileName(value);
+
+            var replacementHtmlResult = 'Result: ' + value;
+
+            view.querySelector('.movieFolderPatternDescription').innerHTML = replacementHtmlResult;
+        }
+
+        function toggleMovieFolderPattern() {
+            if (view.querySelector('#chkSubMovieFolders').checked) {
+                view.querySelector('.fldSelectMovieFolderPattern').classList.remove('hide');
+            } else {
+                view.querySelector('.fldSelectMovieFolderPattern').classList.add('hide');
+            }
+        }
+
         function selectWatchFolder(e) {
 
             require(['directorybrowser'], function (directoryBrowser) {
@@ -230,6 +269,12 @@
             } else {
                 view.querySelector('.fldSelectMovieFolder').classList.add('hide');
                 view.querySelector('#selectMovieFolder').removeAttribute('required');
+            }
+        }
+
+        function validate() {
+            if (view.querySelector("#txtMoviePattern").value.includes("/")) {
+                // TODO Validate
             }
         }
 
@@ -273,10 +318,15 @@
         view.querySelector('#txtMoviePattern').addEventListener('change', updateMoviePatternHelp);
         view.querySelector('#txtMoviePattern').addEventListener('keyup', updateMoviePatternHelp);
 
+        view.querySelector('#chkSubMovieFolders').addEventListener('click', toggleMovieFolderPattern);
+        view.querySelector('#txtMovieFolderPattern').addEventListener('change', updateMovieFolderPatternHelp);
+        view.querySelector('#txtMovieFolderPattern').addEventListener('keyup', updateMovieFolderPatternHelp);
+
         view.querySelector('#chkEnableMovieAutoDetect').addEventListener('change', toggleMovieLocation);
 
         view.querySelector('.libraryFileOrganizerForm').addEventListener('submit', function (e) {
             e.preventDefault();
+            validate();
             onSubmit(view);
             return false;
         });
@@ -288,8 +338,10 @@
             ApiClient.getNamedConfiguration('autoorganize').then(function (config) {
                 loadPage(view, config);
                 updateMoviePatternHelp();
+                updateMovieFolderPatternHelp();
                 populateMovieLocation();
                 toggleMovieLocation();
+                toggleMovieFolderPattern();
             });
         });
     };
