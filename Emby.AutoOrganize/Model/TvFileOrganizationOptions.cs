@@ -27,6 +27,8 @@ namespace Emby.AutoOrganize.Model
 
         public string SeriesFolderPattern { get; set; }
 
+        public bool QueueLibraryScan { get; set; }
+
         public TvFileOrganizationOptions()
         {
             MinFileSizeMb = 50;
@@ -42,6 +44,8 @@ namespace Emby.AutoOrganize.Model
             SeriesFolderPattern = "%fn";
 
             CopyOriginalFile = false;
+
+            QueueLibraryScan = false;
         }
     }
 }

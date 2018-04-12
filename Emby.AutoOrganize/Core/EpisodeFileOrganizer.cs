@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
-using MediaBrowser.Controller.IO;
 using MediaBrowser.Model.IO;
 using Emby.Naming.Common;
 using Emby.Naming.TV;
@@ -90,7 +89,7 @@ namespace Emby.AutoOrganize.Core
                 var resolver = new EpisodeResolver(namingOptions);
 
                 var episodeInfo = resolver.Resolve(path, false) ??
-                    new Emby.Naming.TV.EpisodeInfo();
+                    new Naming.TV.EpisodeInfo();
 
                 var seriesName = episodeInfo.SeriesName;
                 var forceEpisodeType = false;
@@ -196,6 +195,7 @@ namespace Emby.AutoOrganize.Core
 
                 var yearInName = parsedName.Year;
                 var nameWithoutYear = parsedName.Name;
+                RemoteSearchResult finalResult = null;
 
                 if (string.IsNullOrWhiteSpace(nameWithoutYear))
                 {
@@ -215,69 +215,22 @@ namespace Emby.AutoOrganize.Core
                     Year = yearInName
                 };
 
-                var searchResultsTask = _providerManager.GetRemoteSearchResults<Series, SeriesInfo>(new RemoteSearchQuery<SeriesInfo>
+                var searchResultsTask = await _providerManager.GetRemoteSearchResults<Series, SeriesInfo>(new RemoteSearchQuery<SeriesInfo>
                 {
                     SearchInfo = seriesInfo
 
-                }, CancellationToken.None);
+                }, cancellationToken);
 
                 #endregion
 
-                #region Search Two
+                // Group series by name and year (if 2 series with the exact same name, the same year ...)
+                var groupedResult = searchResultsTask.GroupBy(p => new { p.Name, p.ProductionYear },
+                    p => p,
+                    (key, g) => new { Key = key, Result = g.ToList() }).ToList();
 
-                // Remote search Hack, some provider does not handle correctly dot as name separator
-                var secondSearchName = nameWithoutYear.Replace('.', '_');
-
-                var seriesInfo2 = new SeriesInfo
+                if (groupedResult.Count() == 1)
                 {
-                    Name = secondSearchName,
-                    Year = yearInName
-                };
-
-                var searchResultsTask2 = _providerManager.GetRemoteSearchResults<Series, SeriesInfo>(new RemoteSearchQuery<SeriesInfo>
-                {
-                    SearchInfo = seriesInfo2
-
-                }, CancellationToken.None);
-
-                #endregion
-
-                Task.WaitAll(searchResultsTask, searchResultsTask2);
-
-                var listResultOne = searchResultsTask.Result.ToList();
-                var listResultTwo = searchResultsTask2.Result.ToList();
-
-                RemoteSearchResult finalResult = null;
-
-                // We need at least one result for the 2 results
-                // We permit max 1 result for the autodetection to work
-                if (listResultOne.Count <= 1 && listResultTwo.Count <= 1)
-                {
-                    // if we have only one result for the total, 
-                    var resultOne = listResultOne.SingleOrDefault();
-                    var resultTwo = listResultTwo.SingleOrDefault();
-
-                    if (resultOne != null && resultTwo != null)
-                    {
-                        // 2 results, we check if it's the same provider id (at least one)
-                        foreach (var resultOneProviders in resultOne.ProviderIds)
-                        {
-                            if (resultTwo.ProviderIds.TryGetValue(resultOneProviders.Key, out var resultTwoValue) && resultOneProviders.Value == resultTwoValue)
-                            {
-                                // We got a winner, take the first (unaltered search)
-                                finalResult = resultOne;
-                                break;
-                            }
-                        }
-                    }
-                    else if (resultOne != null)
-                    {
-                        finalResult = resultOne;
-                    }
-                    else if (resultTwo != null)
-                    {
-                        finalResult = resultTwo;
-                    }
+                    finalResult = groupedResult.First().Result.First();
                 }
 
                 if (finalResult != null)
@@ -312,7 +265,7 @@ namespace Emby.AutoOrganize.Core
 
             }
 
-            Series series = null;
+            Series series;
 
             // Ensure that we don't create the same series multiple time 
             // We create series one at a time
@@ -325,18 +278,23 @@ namespace Emby.AutoOrganize.Core
                 {
                     // We're having a new series here
 
-                    series = new Series();
-                    series.Id = Guid.NewGuid();
-                    series.Name = request.NewSeriesName;
-                    series.ProductionYear = newSeriesYear;
+                    series = new Series
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = request.NewSeriesName,
+                        ProductionYear = newSeriesYear
+                    };
 
                     var seriesFolderName = GetSeriesDirectoryName(series, options);
 
                     series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
 
+                    // Create the folder
+                    _fileSystem.CreateDirectory(series.Path);
+
                     series.ProviderIds = request.NewSeriesProviderIds;
 
-                    // Correctly set the parent of the Series
+                    // Temporary : Waiting for a core fix : Correctly set the parent of the Series
                     if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
                     {
                         baseFolder.AddChild(series, cancellationToken);
@@ -344,13 +302,12 @@ namespace Emby.AutoOrganize.Core
                 }
             }
 
-            if (series != null)
+            // async outside of the lock for perfs
+            var refreshOptions = new MetadataRefreshOptions(_fileSystem)
             {
-                // RefreshMetadata in async outside of the lock for perfs
-                var refreshOptions = new MetadataRefreshOptions(_fileSystem);
-                refreshOptions.SearchResult = result;
-                await series.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
-            }
+                SearchResult = result
+            };
+            await series.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
 
             return series;
         }
@@ -438,12 +395,60 @@ namespace Emby.AutoOrganize.Core
                 cancellationToken);
         }
 
+        /// <summary>
+        /// Organize part responsible of Season AND Episode recognition
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="series"></param>
+        /// <param name="seasonNumber"></param>
+        /// <param name="episodeNumber"></param>
+        /// <param name="endingEpiosdeNumber"></param>
+        /// <param name="premiereDate"></param>
+        /// <param name="options"></param>
+        /// <param name="overwriteExisting"></param>
+        /// <param name="rememberCorrection"></param>
+        /// <param name="result"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         private async Task OrganizeEpisode(string sourcePath,
             Series series,
             int? seasonNumber,
             int? episodeNumber,
             int? endingEpiosdeNumber,
             DateTime? premiereDate,
+            TvFileOrganizationOptions options,
+            bool rememberCorrection,
+            FileOrganizationResult result,
+            CancellationToken cancellationToken)
+        {
+
+            var matchEpisode = await GetMatchingEpisode(series, seasonNumber, episodeNumber, endingEpiosdeNumber, premiereDate, cancellationToken);
+            var episode = matchEpisode.Item1;
+            var searchResult = matchEpisode.Item2;
+
+            Season season;
+            season = !string.IsNullOrEmpty(episode.Season?.Path)
+                ? episode.Season
+                : await GetMatchingSeason(series, episode, options, cancellationToken);
+
+            // Now we can check the episode Path
+            if (string.IsNullOrEmpty(episode.Path))
+            {
+                SetEpisodeFileName(sourcePath, series, season, episode, options);
+            }
+
+            await OrganizeEpisode(sourcePath,
+                series,
+                episode,
+                options,
+                rememberCorrection,
+                result,
+                cancellationToken);
+        }
+
+        private async Task OrganizeEpisode(string sourcePath,
+            Series series,
+            Episode episode,
             TvFileOrganizationOptions options,
             bool rememberCorrection,
             FileOrganizationResult result,
@@ -468,7 +473,7 @@ namespace Emby.AutoOrganize.Core
             try
             {
                 // Proceed to sort the file
-                var newPath = await GetNewPath(sourcePath, series, seasonNumber, episodeNumber, endingEpiosdeNumber, premiereDate, options, cancellationToken).ConfigureAwait(false);
+                var newPath = episode.Path;
 
                 if (string.IsNullOrEmpty(newPath))
                 {
@@ -480,7 +485,7 @@ namespace Emby.AutoOrganize.Core
                 result.TargetPath = newPath;
 
                 var fileExists = _fileSystem.FileExists(result.TargetPath);
-                var otherDuplicatePaths = GetOtherDuplicatePaths(result.TargetPath, series, seasonNumber, episodeNumber, endingEpiosdeNumber);
+                var otherDuplicatePaths = GetOtherDuplicatePaths(result.TargetPath, series, episode);
 
                 if (!options.OverwriteExistingEpisodes)
                 {
@@ -632,12 +637,10 @@ namespace Emby.AutoOrganize.Core
 
         private List<string> GetOtherDuplicatePaths(string targetPath,
             Series series,
-            int? seasonNumber,
-            int? episodeNumber,
-            int? endingEpisodeNumber)
+            Episode episode)
         {
             // TODO: Support date-naming?
-            if (!seasonNumber.HasValue || !episodeNumber.HasValue)
+            if (!series.ParentIndexNumber.HasValue || !episode.IndexNumber.HasValue)
             {
                 return new List<string>();
             }
@@ -652,15 +655,15 @@ namespace Emby.AutoOrganize.Core
                     if (locationType != LocationType.Remote &&
                         locationType != LocationType.Virtual &&
                         i.ParentIndexNumber.HasValue &&
-                        i.ParentIndexNumber.Value == seasonNumber &&
+                        i.ParentIndexNumber.Value == series.ParentIndexNumber &&
                         i.IndexNumber.HasValue &&
-                        i.IndexNumber.Value == episodeNumber)
+                        i.IndexNumber.Value == episode.IndexNumber)
                     {
 
-                        if (endingEpisodeNumber.HasValue || i.IndexNumberEnd.HasValue)
+                        if (episode.IndexNumberEnd.HasValue || i.IndexNumberEnd.HasValue)
                         {
-                            return endingEpisodeNumber.HasValue && i.IndexNumberEnd.HasValue &&
-                                   endingEpisodeNumber.Value == i.IndexNumberEnd.Value;
+                            return episode.IndexNumberEnd.HasValue && i.IndexNumberEnd.HasValue &&
+                                   episode.IndexNumberEnd.Value == i.IndexNumberEnd.Value;
                         }
 
                         return true;
@@ -747,6 +750,68 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
+        private async Task<Tuple<Episode, RemoteSearchResult>> GetMatchingEpisode(Series series,
+            int? seasonNumber,
+            int? episodeNumber,
+            int? endingEpiosdeNumber,
+            DateTime? premiereDate,
+            CancellationToken cancellationToken)
+        {
+            var episode = series
+                .GetRecursiveChildren().OfType<Episode>()
+                .FirstOrDefault(e => e.ParentIndexNumber == seasonNumber
+                        && e.IndexNumber == episodeNumber
+                        && e.IndexNumberEnd == endingEpiosdeNumber
+                        && e.LocationType == LocationType.FileSystem);
+
+            if (episode == null)
+            {
+                return await CreateNewEpisode(series, seasonNumber, episodeNumber, endingEpiosdeNumber, premiereDate, cancellationToken).ConfigureAwait(false);
+            }
+
+            return new Tuple<Episode, RemoteSearchResult>(episode, null);
+        }
+
+        private async Task<Season> GetMatchingSeason(Series series, Episode episode, TvFileOrganizationOptions options, CancellationToken cancellationToken)
+        {
+            var season = episode.Season;
+
+            if (season == null)
+            {
+                season = series
+                    .GetRecursiveChildren().OfType<Season>()
+                    .FirstOrDefault(e => e.IndexNumber == episode.ParentIndexNumber
+                                         && e.LocationType == LocationType.FileSystem);
+
+                if (season == null)
+                {
+                    if (!episode.ParentIndexNumber.HasValue)
+                    {
+                        var msg = string.Format("No season found for {0} season {1} episode {2}", series.Name,
+                            episode.ParentIndexNumber, episode.IndexNumber);
+                        _logger.Warn(msg);
+                        throw new Exception(msg);
+                    }
+
+                    season = new Season
+                    {
+                        Id = Guid.NewGuid(),
+                        SeriesId = series.Id,
+                        IndexNumber = episode.ParentIndexNumber,
+                    };
+                }
+            }
+
+            if (string.IsNullOrEmpty(season.Path))
+            {
+                season.Path = GetSeasonFolderPath(series, episode.ParentIndexNumber.Value, options);
+                // Create the folder
+                _fileSystem.CreateDirectory(season.Path);
+            }
+
+            return season;
+        }
+
         private Series GetMatchingSeries(string seriesName, FileOrganizationResult result)
         {
             var parsedName = _libraryManager.ParseName(seriesName);
@@ -825,24 +890,21 @@ namespace Emby.AutoOrganize.Core
         }
 
         /// <summary>
-        /// Gets the new path.
+        /// CreateNewEpisode
         /// </summary>
-        /// <param name="sourcePath">The source path.</param>
         /// <param name="series">The series.</param>
         /// <param name="seasonNumber">The season number.</param>
         /// <param name="episodeNumber">The episode number.</param>
         /// <param name="endingEpisodeNumber">The ending episode number.</param>
         /// <param name="premiereDate">The premiere date.</param>
-        /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>System.String.</returns>
-        private async Task<string> GetNewPath(string sourcePath,
+        private async Task<Tuple<Episode, RemoteSearchResult>> CreateNewEpisode(
             Series series,
             int? seasonNumber,
             int? episodeNumber,
             int? endingEpisodeNumber,
             DateTime? premiereDate,
-            TvFileOrganizationOptions options,
             CancellationToken cancellationToken)
         {
             var episodeInfo = new EpisodeInfo
@@ -862,40 +924,30 @@ namespace Emby.AutoOrganize.Core
 
             }, cancellationToken).ConfigureAwait(false);
 
-            var episode = searchResults.FirstOrDefault();
+            var episodeSearch = searchResults.FirstOrDefault();
 
-            if (episode == null)
+            if (episodeSearch == null)
             {
                 var msg = string.Format("No provider metadata found for {0} season {1} episode {2}", series.Name, seasonNumber, episodeNumber);
                 _logger.Warn(msg);
                 throw new Exception(msg);
             }
 
-            var episodeName = episode.Name;
+            seasonNumber = seasonNumber ?? episodeSearch.ParentIndexNumber;
+            episodeNumber = episodeNumber ?? episodeSearch.IndexNumber;
+            endingEpisodeNumber = endingEpisodeNumber ?? episodeSearch.IndexNumberEnd;
 
-            //if (string.IsNullOrWhiteSpace(episodeName))
-            //{
-            //    var msg = string.Format("No provider metadata found for {0} season {1} episode {2}", series.Name, seasonNumber, episodeNumber);
-            //    _logger.Warn(msg);
-            //    return null;
-            //}
-
-            seasonNumber = seasonNumber ?? episode.ParentIndexNumber;
-            episodeNumber = episodeNumber ?? episode.IndexNumber;
-
-            var newPath = GetSeasonFolderPath(series, seasonNumber.Value, options);
-
-            var episodeFileName = GetEpisodeFileName(sourcePath, series.Name, seasonNumber.Value, episodeNumber.Value, endingEpisodeNumber, episodeName, options);
-
-            if (string.IsNullOrEmpty(episodeFileName))
+            var episode = new Episode
             {
-                // cause failure
-                return string.Empty;
-            }
+                ParentIndexNumber = seasonNumber,
+                SeriesId = series.Id,
+                IndexNumber = episodeNumber,
+                IndexNumberEnd = endingEpisodeNumber,
+                ProviderIds = episodeSearch.ProviderIds,
+                Name = episodeSearch.Name,
+            };
 
-            newPath = Path.Combine(newPath, episodeFileName);
-
-            return newPath;
+            return new Tuple<Episode, RemoteSearchResult>(episode, episodeSearch);
         }
 
         /// <summary>
@@ -907,16 +959,6 @@ namespace Emby.AutoOrganize.Core
         /// <returns>System.String.</returns>
         private string GetSeasonFolderPath(Series series, int seasonNumber, TvFileOrganizationOptions options)
         {
-            // If there's already a season folder, use that
-            var season = series
-                .GetRecursiveChildren(i => i is Season && i.LocationType == LocationType.FileSystem && i.IndexNumber.HasValue && i.IndexNumber.Value == seasonNumber)
-                .FirstOrDefault();
-
-            if (season != null)
-            {
-                return season.Path;
-            }
-
             var path = series.Path;
 
             if (ContainsEpisodesWithoutSeasonFolders(series))
@@ -950,18 +992,20 @@ namespace Emby.AutoOrganize.Core
             return false;
         }
 
-        private string GetEpisodeFileName(string sourcePath, string seriesName, int seasonNumber, int episodeNumber, int? endingEpisodeNumber, string episodeTitle, TvFileOrganizationOptions options)
+        private void SetEpisodeFileName(string sourcePath, Series series, Season season, Episode episode, TvFileOrganizationOptions options)
         {
-            seriesName = _fileSystem.GetValidFilename(seriesName).Trim();
+            var seriesName = _fileSystem.GetValidFilename(series.Name).Trim();
 
-            if (string.IsNullOrWhiteSpace(episodeTitle))
+            var episodeTitle = _fileSystem.GetValidFilename(episode.Name).Trim();
+
+            if (!episode.IndexNumber.HasValue || !season.IndexNumber.HasValue)
             {
-                episodeTitle = string.Empty;
+                throw new Exception("GetEpisodeFileName: Mandatory param as missing!");
             }
-            else
-            {
-                episodeTitle = _fileSystem.GetValidFilename(episodeTitle).Trim();
-            }
+
+            var endingEpisodeNumber = episode.IndexNumberEnd;
+            var episodeNumber = episode.IndexNumber.Value;
+            var seasonNumber = season.IndexNumber.Value;
 
             var sourceExtension = (Path.GetExtension(sourcePath) ?? string.Empty).TrimStart('.');
 
@@ -1003,7 +1047,7 @@ namespace Emby.AutoOrganize.Core
             }
 
             // Finally, call GetValidFilename again in case user customized the episode expression with any invalid filename characters
-            return _fileSystem.GetValidFilename(result).Trim();
+            episode.Path = Path.Combine(season.Path, _fileSystem.GetValidFilename(result).Trim());
         }
 
         private bool IsSameEpisode(string sourcePath, string newPath)

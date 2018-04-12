@@ -66,17 +66,17 @@ namespace Emby.AutoOrganize.Core
             return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i, path));
         }
 
-        public async Task Organize(AutoOrganizeOptions options, CancellationToken cancellationToken, IProgress<double> progress)
+        public async Task Organize(MovieFileOrganizationOptions options, CancellationToken cancellationToken, IProgress<double> progress)
         {
             var libraryFolderPaths = _libraryManager.GetVirtualFolders().SelectMany(i => i.Locations).ToList();
 
-            var watchLocations = options.MovieOptions.WatchLocations
+            var watchLocations = options.WatchLocations
                 .Where(i => IsValidWatchLocation(i, libraryFolderPaths))
                 .ToList();
 
             var eligibleFiles = watchLocations.SelectMany(GetFilesToOrganize)
                 .OrderBy(_fileSystem.GetCreationTimeUtc)
-                .Where(i => EnableOrganization(i, options.MovieOptions))
+                .Where(i => EnableOrganization(i, options))
                 .ToList();
 
             var processedFolders = new HashSet<string>();
@@ -96,7 +96,7 @@ namespace Emby.AutoOrganize.Core
 
                     try
                     {
-                        var result = await organizer.OrganizeMovieFile(file.FullName, options, options.MovieOptions.OverwriteExistingFiles, cancellationToken).ConfigureAwait(false);
+                        var result = await organizer.OrganizeMovieFile(file.FullName, options, options.OverwriteExistingFiles, cancellationToken).ConfigureAwait(false);
 
                         if (result.Status == FileSortingStatus.Success && !processedFolders.Contains(file.DirectoryName, StringComparer.OrdinalIgnoreCase))
                         {
@@ -125,7 +125,7 @@ namespace Emby.AutoOrganize.Core
 
             foreach (var path in processedFolders)
             {
-                var deleteExtensions = options.MovieOptions.LeftOverFileExtensionsToDelete
+                var deleteExtensions = options.LeftOverFileExtensionsToDelete
                     .Select(i => i.Trim().TrimStart('.'))
                     .Where(i => !string.IsNullOrEmpty(i))
                     .Select(i => "." + i)
@@ -136,7 +136,7 @@ namespace Emby.AutoOrganize.Core
                     DeleteLeftOverFiles(path, deleteExtensions);
                 }
 
-                if (options.MovieOptions.DeleteEmptyFolders)
+                if (options.DeleteEmptyFolders)
                 {
                     if (!IsWatchFolder(path, watchLocations))
                     {

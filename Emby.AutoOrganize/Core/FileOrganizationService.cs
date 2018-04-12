@@ -171,7 +171,7 @@ namespace Emby.AutoOrganize.Core
                     var movieOrganizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
                         _libraryMonitor, _providerManager);
 
-                    organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options, true, CancellationToken.None)
+                    organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options.MovieOptions, true, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
                 default:
@@ -209,7 +209,8 @@ namespace Emby.AutoOrganize.Core
             var organizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
                 _libraryMonitor, _providerManager);
 
-            var result = await organizer.OrganizeWithCorrection(request, GetAutoOrganizeOptions(), CancellationToken.None).ConfigureAwait(false);
+            var options = GetAutoOrganizeOptions();
+            var result = await organizer.OrganizeWithCorrection(request, options.MovieOptions, CancellationToken.None).ConfigureAwait(false);
 
             if (result.Status != FileSortingStatus.Success)
             {

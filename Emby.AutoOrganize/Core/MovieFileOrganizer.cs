@@ -3,6 +3,7 @@ using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Logging;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -55,7 +56,7 @@ namespace Emby.AutoOrganize.Core
             return _namingOptions;
         }
 
-        public async Task<FileOrganizationResult> OrganizeMovieFile(string path, AutoOrganizeOptions options, bool overwriteExisting, CancellationToken cancellationToken)
+        public async Task<FileOrganizationResult> OrganizeMovieFile(string path, MovieFileOrganizationOptions options, bool overwriteExisting, CancellationToken cancellationToken)
         {
             _logger.Info("Sorting file {0}", path);
 
@@ -128,7 +129,7 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private async Task<Movie> CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, RemoteSearchResult result, CancellationToken cancellationToken)
+        private Movie CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
         {
             int? newMovieYear = null;
             if (int.TryParse(request.NewMovieYear, out var year))
@@ -146,12 +147,12 @@ namespace Emby.AutoOrganize.Core
                 {
                     Id = Guid.NewGuid(),
                     Name = request.NewMovieName,
-                    ProductionYear = newMovieYear
+                    ProductionYear = newMovieYear,
+                    IsInMixedFolder = !options.MovieFolder,
+                    ProviderIds = request.NewMovieProviderIds,
                 };
 
-                var newPath =
-                     await GetNewPath(originalPath, movie, options.MovieOptions, cancellationToken)
-                        .ConfigureAwait(false);
+                var newPath = GetMoviePath(originalPath, movie, options);
 
                 if (string.IsNullOrEmpty(newPath))
                 {
@@ -160,25 +161,12 @@ namespace Emby.AutoOrganize.Core
                 }
 
                 movie.Path = Path.Combine(request.TargetFolder, newPath);
-
-                movie.IsInMixedFolder = !options.MovieOptions.MovieFolder;
-
-                movie.ProviderIds = request.NewMovieProviderIds;
-
-                // Correctly set the parent of the Movie
-                if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
-                {
-                    baseFolder.AddChild(movie, cancellationToken);
-                }
-
-                var refreshOptions = new MetadataRefreshOptions(_fileSystem) { SearchResult = result };
-                await movie.RefreshMetadata(refreshOptions, cancellationToken).ConfigureAwait(false);
             }
 
             return movie;
         }
 
-        public async Task<FileOrganizationResult> OrganizeWithCorrection(MovieFileOrganizationRequest request, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        public async Task<FileOrganizationResult> OrganizeWithCorrection(MovieFileOrganizationRequest request, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
         {
             var result = _organizationService.GetResult(request.ResultId);
 
@@ -189,7 +177,7 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewMovieProviderIds.Count > 0)
                 {
                     // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    movie = await CreateNewMovie(request, result.OriginalPath, options, null, cancellationToken).ConfigureAwait(false);
+                    movie = CreateNewMovie(request, result.OriginalPath, options, cancellationToken);
                 }
 
                 if (movie == null)
@@ -201,6 +189,7 @@ namespace Emby.AutoOrganize.Core
                 await OrganizeMovie(result.OriginalPath,
                     movie,
                     options,
+                    null,
                     true,
                     result,
                     cancellationToken).ConfigureAwait(false);
@@ -216,19 +205,25 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private Task OrganizeMovie(string sourcePath,
+
+
+        private async Task OrganizeMovie(string sourcePath,
             string movieName,
             int? movieYear,
-            AutoOrganizeOptions options,
+            MovieFileOrganizationOptions options,
             bool overwriteExisting,
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
             var movie = GetMatchingMovie(movieName, movieYear, result, options);
+            RemoteSearchResult searchResult = null;
 
             if (movie == null)
             {
-                movie = AutoDetectMovie(movieName, movieYear, result, options, cancellationToken).Result;
+                var autoResult = await AutoDetectMovie(movieName, movieYear, result, options, cancellationToken).ConfigureAwait(false);
+
+                movie = autoResult?.Item1;
+                searchResult = autoResult?.Item2;
 
                 if (movie == null)
                 {
@@ -236,21 +231,38 @@ namespace Emby.AutoOrganize.Core
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
                     _logger.Warn(msg);
-                    return Task.FromResult(true);
+                    return;
                 }
             }
 
-            return OrganizeMovie(sourcePath,
+            await OrganizeMovie(sourcePath,
                 movie,
                 options,
+                searchResult,
                 overwriteExisting,
                 result,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
         }
 
         private async Task OrganizeMovie(string sourcePath,
             Movie movie,
-            AutoOrganizeOptions options,
+            MovieFileOrganizationOptions options,
+            RemoteSearchResult remoteResult,
+            bool overwriteExisting,
+            FileOrganizationResult result,
+            CancellationToken cancellationToken)
+        {
+            await OrganizeMovie(sourcePath,
+                movie,
+                options,
+                overwriteExisting,
+                result,
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task OrganizeMovie(string sourcePath,
+            Movie movie,
+            MovieFileOrganizationOptions options,
             bool overwriteExisting,
             FileOrganizationResult result,
             CancellationToken cancellationToken)
@@ -280,7 +292,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (!overwriteExisting)
                 {
-                    if (options.MovieOptions.CopyOriginalFile && fileExists && IsSameMovie(sourcePath, newPath))
+                    if (options.CopyOriginalFile && fileExists && IsSameMovie(sourcePath, newPath))
                     {
                         var msg = string.Format("File '{0}' already copied to new path '{1}', stopping organization", sourcePath, newPath);
                         _logger.Info(msg);
@@ -300,14 +312,13 @@ namespace Emby.AutoOrganize.Core
                     }
                 }
 
-                PerformFileSorting(options.MovieOptions, result);
+                PerformFileSorting(options, result);
             }
             catch (Exception ex)
             {
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = ex.Message;
                 _logger.Warn(ex.Message);
-                return;
             }
             finally
             {
@@ -371,14 +382,15 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
-        private async Task<Movie> AutoDetectMovie(string movieName, int? movieYear, FileOrganizationResult result, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        private async Task<Tuple<Movie, RemoteSearchResult>> AutoDetectMovie(string movieName, int? movieYear, FileOrganizationResult result, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
         {
-            if (options.MovieOptions.AutoDetectMovie)
+            if (options.AutoDetectMovie)
             {
                 var parsedName = _libraryManager.ParseName(movieName);
 
                 var yearInName = parsedName.Year;
                 var nameWithoutYear = parsedName.Name;
+                RemoteSearchResult finalResult = null;
 
                 if (string.IsNullOrWhiteSpace(nameWithoutYear))
                 {
@@ -398,70 +410,22 @@ namespace Emby.AutoOrganize.Core
                     Year = yearInName
                 };
 
-                var searchResultsTask = _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>
+                var searchResultsTask = await _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>
                 {
                     SearchInfo = movieInfo
 
-                }, CancellationToken.None);
+                }, cancellationToken);
 
                 #endregion
 
-                #region Search Two
+                // Group movies by name and year (if 2 movie with the exact same name, the same year ...)
+                var groupedResult = searchResultsTask.GroupBy(p => new { p.Name, p.ProductionYear },
+                    p => p,
+                    (key, g) => new { Key = key, Result = g.ToList() }).ToList();
 
-                // Remote search Hack, some provider does not handle correctly dot as name separator
-                var secondSearchName = nameWithoutYear.Replace('.', '_');
-
-                var movieInfo2 = new MovieInfo
+                if (groupedResult.Count() == 1)
                 {
-                    Name = secondSearchName,
-                    Year = yearInName
-                };
-
-                var searchResultsTask2 = _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>
-                {
-                    SearchInfo = movieInfo2
-
-                }, CancellationToken.None);
-
-                #endregion
-
-                Task.WaitAll(searchResultsTask, searchResultsTask2);
-
-                var listResultOne = searchResultsTask.Result.ToList();
-                var listResultTwo = searchResultsTask2.Result.ToList();
-
-                RemoteSearchResult finalResult = null;
-
-                // We need at least one result for the 2 results
-                // We permit max 1 result for the autodetection to work
-                if (listResultOne.Count <= 1 && listResultTwo.Count <= 1)
-                {
-                    // if we have only one result for the total, 
-                    var resultOne = listResultOne.SingleOrDefault();
-                    var resultTwo = listResultTwo.SingleOrDefault();
-
-
-                    if (resultOne != null && resultTwo != null)
-                    {
-                        // 2 results, we check if it's the same provider id (at least one)
-                        foreach (var resultOneProviders in resultOne.ProviderIds)
-                        {
-                            if (resultTwo.ProviderIds.TryGetValue(resultOneProviders.Key, out var resultTwoValue) && resultOneProviders.Value == resultTwoValue)
-                            {
-                                // We got a winner, take the first (unaltered search)
-                                finalResult = resultOne;
-                                break;
-                            }
-                        }
-                    }
-                    else if (resultOne != null)
-                    {
-                        finalResult = resultOne;
-                    }
-                    else if (resultTwo != null)
-                    {
-                        finalResult = resultTwo;
-                    }
+                    finalResult = groupedResult.First().Result.First();
                 }
 
                 if (finalResult != null)
@@ -472,17 +436,19 @@ namespace Emby.AutoOrganize.Core
                         NewMovieName = finalResult.Name,
                         NewMovieProviderIds = finalResult.ProviderIds,
                         NewMovieYear = finalResult.ProductionYear.ToString(),
-                        TargetFolder = options.MovieOptions.DefaultMovieLibraryPath
+                        TargetFolder = options.DefaultMovieLibraryPath
                     };
 
-                    return await CreateNewMovie(organizationRequest, result.OriginalPath, options, finalResult, cancellationToken).ConfigureAwait(false);
+                    var movie = CreateNewMovie(organizationRequest, result.OriginalPath, options, cancellationToken);
+
+                    return new Tuple<Movie, RemoteSearchResult>(movie, finalResult);
                 }
             }
 
             return null;
         }
 
-        private Movie GetMatchingMovie(string movieName, int? movieYear, FileOrganizationResult result, AutoOrganizeOptions options)
+        private Movie GetMatchingMovie(string movieName, int? movieYear, FileOrganizationResult result, MovieFileOrganizationOptions options)
         {
             var parsedName = _libraryManager.ParseName(movieName);
 
@@ -527,36 +493,11 @@ namespace Emby.AutoOrganize.Core
         /// <param name="sourcePath">The source path.</param>
         /// <param name="movie">The movie.</param>
         /// <param name="options">The options.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>System.String.</returns>
-        private async Task<string> GetNewPath(string sourcePath,
+        private string GetMoviePath(string sourcePath,
             Movie movie,
-            MovieFileOrganizationOptions options,
-            CancellationToken cancellationToken)
+            MovieFileOrganizationOptions options)
         {
-            var movieInfo = new MovieInfo
-            {
-                Name = movie.Name,
-                MetadataCountryCode = movie.GetPreferredMetadataCountryCode(),
-                MetadataLanguage = movie.GetPreferredMetadataLanguage(),
-                ProviderIds = movie.ProviderIds,
-            };
-
-            var searchResults = await _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>
-            {
-                SearchInfo = movieInfo
-
-            }, cancellationToken).ConfigureAwait(false);
-
-            var searchedMovie = searchResults.FirstOrDefault();
-
-            if (searchedMovie == null)
-            {
-                var msg = string.Format("No provider metadata found for {0}", movie.Name);
-                _logger.Warn(msg);
-                throw new Exception(msg);
-            }
-
             var movieFileName = "";
 
             if (options.MovieFolder)
