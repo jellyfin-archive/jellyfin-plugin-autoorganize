@@ -52,22 +52,12 @@ namespace Emby.AutoOrganize.Core
         {
             if (_namingOptions == null)
             {
-                var options = new ExtendedNamingOptions();
-
-                InitNamingOptions(options);
+                var options = new NamingOptions();
 
                 _namingOptions = options;
             }
 
             return _namingOptions;
-        }
-
-        private void InitNamingOptions(NamingOptions options)
-        {
-            // These cause apps to have problems
-            options.VideoFileExtensions.Remove(".rar");
-            options.VideoFileExtensions.Remove(".zip");
-            options.VideoFileExtensions.Add(".tp");
         }
 
         public async Task<FileOrganizationResult> OrganizeEpisodeFile(string path, AutoOrganizeOptions options, bool overwriteExisting, CancellationToken cancellationToken)
