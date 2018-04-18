@@ -7,6 +7,8 @@ namespace Emby.AutoOrganize.Data
 {
     public interface IFileOrganizationRepository
     {
+        #region FileOrganizationResult
+
         /// <summary>
         /// Saves the result.
         /// </summary>
@@ -21,7 +23,7 @@ namespace Emby.AutoOrganize.Data
         /// <param name="id">The identifier.</param>
         /// <returns>Task.</returns>
         Task Delete(string id);
-        
+
         /// <summary>
         /// Gets the result.
         /// </summary>
@@ -41,5 +43,21 @@ namespace Emby.AutoOrganize.Data
         /// </summary>
         /// <returns>Task.</returns>
         Task DeleteAll();
+
+        #endregion
+
+        #region SmartMatch
+
+        Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
+
+        Task DeleteSmartMatch(string id);
+
+        Task DeleteSmartMatch(string id, string matchString);
+
+        Task DeleteAllSmartMatch();
+
+        QueryResult<SmartMatchResult> GetSmartMatch(FileOrganizationResultQuery query);
+
+        #endregion
     }
 }

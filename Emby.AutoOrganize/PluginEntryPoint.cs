@@ -11,6 +11,7 @@ using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Events;
 using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Tasks;
 
 namespace Emby.AutoOrganize
@@ -29,10 +30,11 @@ namespace Emby.AutoOrganize
         private readonly IServerConfigurationManager _config;
         private readonly IFileSystem _fileSystem;
         private readonly IProviderManager _providerManager;
+        private readonly IJsonSerializer _json;
 
         public IFileOrganizationRepository Repository;
 
-        public PluginEntryPoint(ISessionManager sessionManager, ITaskManager taskManager, ILogger logger, ILibraryMonitor libraryMonitor, ILibraryManager libraryManager, IServerConfigurationManager config, IFileSystem fileSystem, IProviderManager providerManager)
+        public PluginEntryPoint(ISessionManager sessionManager, ITaskManager taskManager, ILogger logger, ILibraryMonitor libraryMonitor, ILibraryManager libraryManager, IServerConfigurationManager config, IFileSystem fileSystem, IProviderManager providerManager, IJsonSerializer json)
         {
             _sessionManager = sessionManager;
             _taskManager = taskManager;
@@ -42,6 +44,7 @@ namespace Emby.AutoOrganize
             _config = config;
             _fileSystem = fileSystem;
             _providerManager = providerManager;
+            _json = json;
         }
 
         public void Run()
@@ -62,11 +65,14 @@ namespace Emby.AutoOrganize
             FileOrganizationService.ItemRemoved += _organizationService_ItemRemoved;
             FileOrganizationService.ItemUpdated += _organizationService_ItemUpdated;
             FileOrganizationService.LogReset += _organizationService_LogReset;
+
+            // Convert Config
+            _config.Convert(FileOrganizationService);
         }
 
         private IFileOrganizationRepository GetRepository()
         {
-            var repo = new SqliteFileOrganizationRepository(_logger, _config.ApplicationPaths);
+            var repo = new SqliteFileOrganizationRepository(_logger, _config.ApplicationPaths, _json);
 
             repo.Initialize();
 

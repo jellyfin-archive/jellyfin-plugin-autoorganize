@@ -53,12 +53,14 @@ namespace Emby.AutoOrganize.Core
 
         public async Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
         {
-            if (GetAutoOrganizeOptions().TvOptions.IsEnabled)
+            var options = GetAutoOrganizeOptions();
+
+            if (options.TvOptions.IsEnabled)
             {
                 var fileOrganizationService = PluginEntryPoint.Current.FileOrganizationService;
 
                 await new TvFolderOrganizer(_libraryManager, _logger, _fileSystem, _libraryMonitor, fileOrganizationService, _config, _providerManager)
-                    .Organize(GetAutoOrganizeOptions(), cancellationToken, progress).ConfigureAwait(false);
+                    .Organize(options.TvOptions, cancellationToken, progress).ConfigureAwait(false);
             }
 
             if (GetAutoOrganizeOptions().MovieOptions.IsEnabled)

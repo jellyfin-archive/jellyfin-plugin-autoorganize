@@ -60,7 +60,10 @@ namespace Emby.AutoOrganize.Core
             return _namingOptions;
         }
 
-        public async Task<FileOrganizationResult> OrganizeEpisodeFile(string path, AutoOrganizeOptions options, bool overwriteExisting, CancellationToken cancellationToken)
+        public async Task<FileOrganizationResult> OrganizeEpisodeFile(
+            string path,
+            TvFileOrganizationOptions options,
+            CancellationToken cancellationToken)
         {
             _logger.Info("Sorting file {0}", path);
 
@@ -134,7 +137,6 @@ namespace Emby.AutoOrganize.Core
                             endingEpisodeNumber,
                             premiereDate,
                             options,
-                            overwriteExisting,
                             false,
                             result,
                             cancellationToken).ConfigureAwait(false);
@@ -182,9 +184,13 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private async Task<Series> AutoDetectSeries(string seriesName, int? seriesYear, FileOrganizationResult result, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        private async Task<Series> AutoDetectSeries(
+            string seriesName,
+            int? seriesYear,
+            TvFileOrganizationOptions options,
+            CancellationToken cancellationToken)
         {
-            if (options.TvOptions.AutoDetectSeries)
+            if (options.AutoDetectSeries)
             {
                 var parsedName = _libraryManager.ParseName(seriesName);
 
@@ -282,17 +288,21 @@ namespace Emby.AutoOrganize.Core
                         NewSeriesName = finalResult.Name,
                         NewSeriesProviderIds = finalResult.ProviderIds,
                         NewSeriesYear = finalResult.ProductionYear.ToString(),
-                        TargetFolder = options.TvOptions.DefaultSeriesLibraryPath
+                        TargetFolder = options.DefaultSeriesLibraryPath
                     };
 
-                    return await CreateNewSeries(organizationRequest, result.OriginalPath, options, finalResult, cancellationToken).ConfigureAwait(false);
+                    return await CreateNewSeries(organizationRequest, finalResult, options, cancellationToken).ConfigureAwait(false);
                 }
             }
 
             return null;
         }
 
-        private async Task<Series> CreateNewSeries(EpisodeFileOrganizationRequest request, string originalPath, AutoOrganizeOptions options, RemoteSearchResult result, CancellationToken cancellationToken)
+        private async Task<Series> CreateNewSeries(
+            EpisodeFileOrganizationRequest request,
+            RemoteSearchResult result,
+            TvFileOrganizationOptions options,
+            CancellationToken cancellationToken)
         {
             int? newSeriesYear = null;
             int year;
@@ -309,7 +319,7 @@ namespace Emby.AutoOrganize.Core
             var seriesCreationLock = new Object();
             lock (seriesCreationLock)
             {
-                series = GetMatchingSeries(request.NewSeriesName, null, options);
+                series = GetMatchingSeries(request.NewSeriesName, null);
 
                 if (series == null)
                 {
@@ -320,7 +330,7 @@ namespace Emby.AutoOrganize.Core
                     series.Name = request.NewSeriesName;
                     series.ProductionYear = newSeriesYear;
 
-                    var seriesFolderName = GetSeriesDirectoryName(series, options.TvOptions);
+                    var seriesFolderName = GetSeriesDirectoryName(series, options);
 
                     series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
 
@@ -345,7 +355,10 @@ namespace Emby.AutoOrganize.Core
             return series;
         }
 
-        public async Task<FileOrganizationResult> OrganizeWithCorrection(EpisodeFileOrganizationRequest request, AutoOrganizeOptions options, CancellationToken cancellationToken)
+        public async Task<FileOrganizationResult> OrganizeWithCorrection(
+            EpisodeFileOrganizationRequest request,
+            TvFileOrganizationOptions options,
+            CancellationToken cancellationToken)
         {
             var result = _organizationService.GetResult(request.ResultId);
 
@@ -355,7 +368,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (request.NewSeriesProviderIds.Count > 0)
                 {
-                    series = await CreateNewSeries(request, result.OriginalPath, options, null, cancellationToken).ConfigureAwait(false);
+                    series = await CreateNewSeries(request, null, options, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (series == null)
@@ -371,7 +384,6 @@ namespace Emby.AutoOrganize.Core
                     request.EndingEpisodeNumber,
                     null,
                     options,
-                    true,
                     request.RememberCorrection,
                     result,
                     cancellationToken).ConfigureAwait(false);
@@ -393,17 +405,16 @@ namespace Emby.AutoOrganize.Core
             int? episodeNumber,
             int? endingEpiosdeNumber,
             DateTime? premiereDate,
-            AutoOrganizeOptions options,
-            bool overwriteExisting,
+            TvFileOrganizationOptions options,
             bool rememberCorrection,
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            var series = GetMatchingSeries(seriesName, result, options);
+            var series = GetMatchingSeries(seriesName, result);
 
             if (series == null)
             {
-                series = AutoDetectSeries(seriesName, null, result, options, cancellationToken).Result;
+                series = AutoDetectSeries(seriesName, null, options, cancellationToken).Result;
 
                 if (series == null)
                 {
@@ -422,7 +433,6 @@ namespace Emby.AutoOrganize.Core
                 endingEpiosdeNumber,
                 premiereDate,
                 options,
-                overwriteExisting,
                 rememberCorrection,
                 result,
                 cancellationToken);
@@ -434,8 +444,7 @@ namespace Emby.AutoOrganize.Core
             int? episodeNumber,
             int? endingEpiosdeNumber,
             DateTime? premiereDate,
-            AutoOrganizeOptions options,
-            bool overwriteExisting,
+            TvFileOrganizationOptions options,
             bool rememberCorrection,
             FileOrganizationResult result,
             CancellationToken cancellationToken)
@@ -459,7 +468,7 @@ namespace Emby.AutoOrganize.Core
             try
             {
                 // Proceed to sort the file
-                var newPath = await GetNewPath(sourcePath, series, seasonNumber, episodeNumber, endingEpiosdeNumber, premiereDate, options.TvOptions, cancellationToken).ConfigureAwait(false);
+                var newPath = await GetNewPath(sourcePath, series, seasonNumber, episodeNumber, endingEpiosdeNumber, premiereDate, options, cancellationToken).ConfigureAwait(false);
 
                 if (string.IsNullOrEmpty(newPath))
                 {
@@ -473,9 +482,9 @@ namespace Emby.AutoOrganize.Core
                 var fileExists = _fileSystem.FileExists(result.TargetPath);
                 var otherDuplicatePaths = GetOtherDuplicatePaths(result.TargetPath, series, seasonNumber, episodeNumber, endingEpiosdeNumber);
 
-                if (!overwriteExisting)
+                if (!options.OverwriteExistingEpisodes)
                 {
-                    if (options.TvOptions.CopyOriginalFile && fileExists && IsSameEpisode(sourcePath, newPath))
+                    if (options.CopyOriginalFile && fileExists && IsSameEpisode(sourcePath, newPath))
                     {
                         var msg = string.Format("File '{0}' already copied to new path '{1}', stopping organization", sourcePath, newPath);
                         _logger.Info(msg);
@@ -505,9 +514,9 @@ namespace Emby.AutoOrganize.Core
                     }
                 }
 
-                PerformFileSorting(options.TvOptions, result);
+                PerformFileSorting(options, result);
 
-                if (overwriteExisting)
+                if (options.OverwriteExistingEpisodes)
                 {
                     var hasRenamedFiles = false;
 
@@ -554,36 +563,33 @@ namespace Emby.AutoOrganize.Core
 
             if (rememberCorrection)
             {
-                SaveSmartMatchString(originalExtractedSeriesString, series, options);
+                SaveSmartMatchString(originalExtractedSeriesString, series, cancellationToken);
             }
         }
 
-        private void SaveSmartMatchString(string matchString, Series series, AutoOrganizeOptions options)
+        private void SaveSmartMatchString(string matchString, Series series, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(matchString) || matchString.Length < 3)
             {
                 return;
             }
 
-            SmartMatchInfo info = options.SmartMatchInfos.FirstOrDefault(i => string.Equals(i.ItemName, series.Name, StringComparison.OrdinalIgnoreCase));
+            var info = _organizationService.GetSmartMatchInfos().Items.FirstOrDefault(i => string.Equals(i.ItemName, series.Name, StringComparison.OrdinalIgnoreCase));
 
             if (info == null)
             {
-                info = new SmartMatchInfo();
-                info.ItemName = series.Name;
-                info.OrganizerType = FileOrganizerType.Episode;
-                info.DisplayName = series.Name;
-                var list = options.SmartMatchInfos.ToList();
-                list.Add(info);
-                options.SmartMatchInfos = list.ToArray();
+                info = new SmartMatchResult
+                {
+                    ItemName = series.Name,
+                    OrganizerType = FileOrganizerType.Episode,
+                    DisplayName = series.Name
+                };
             }
 
             if (!info.MatchStrings.Contains(matchString, StringComparer.OrdinalIgnoreCase))
             {
-                var list = info.MatchStrings.ToList();
-                list.Add(matchString);
-                info.MatchStrings = list.ToArray();
-                _config.SaveAutoOrganizeOptions(options);
+                info.MatchStrings.Add(matchString);
+                _organizationService.SaveResult(info, cancellationToken);
             }
         }
 
@@ -741,7 +747,7 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
-        private Series GetMatchingSeries(string seriesName, FileOrganizationResult result, AutoOrganizeOptions options)
+        private Series GetMatchingSeries(string seriesName, FileOrganizationResult result)
         {
             var parsedName = _libraryManager.ParseName(seriesName);
 
@@ -774,7 +780,7 @@ namespace Emby.AutoOrganize.Core
 
             if (series == null)
             {
-                SmartMatchInfo info = options.SmartMatchInfos.FirstOrDefault(e => e.MatchStrings.Contains(nameWithoutYear, StringComparer.OrdinalIgnoreCase));
+                var info = _organizationService.GetSmartMatchInfos().Items.FirstOrDefault(e => e.MatchStrings.Contains(seriesName, StringComparer.OrdinalIgnoreCase));
 
                 if (info != null)
                 {
