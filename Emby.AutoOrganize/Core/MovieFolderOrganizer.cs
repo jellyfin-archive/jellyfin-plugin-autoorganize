@@ -123,29 +123,41 @@ namespace Emby.AutoOrganize.Core
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report(99);
 
-            foreach (var path in processedFolders)
-            {
-                var deleteExtensions = options.LeftOverFileExtensionsToDelete
-                    .Select(i => i.Trim().TrimStart('.'))
-                    .Where(i => !string.IsNullOrEmpty(i))
-                    .Select(i => "." + i)
-                    .ToList();
 
+            List<string> deleteExtensions = options.LeftOverFileExtensionsToDelete
+                .Select(i => i.Trim().TrimStart('.'))
+                .Where(i => !string.IsNullOrEmpty(i))
+                .Select(i => "." + i)
+                .ToList();
+
+
+            // Normal Clean
+            Clean(processedFolders, watchLocations, options.DeleteEmptyFolders, deleteExtensions);
+
+            // Extended Clean
+            if (options.ExtendedClean)
+            {
+                Clean(watchLocations, watchLocations, options.DeleteEmptyFolders, deleteExtensions);
+            }
+
+            progress.Report(100);
+        }
+
+        private void Clean(IEnumerable<string> paths, List<string> watchLocations, bool deleteEmptyFolders, List<string> deleteExtensions)
+        {
+            foreach (var path in paths)
+            {
                 if (deleteExtensions.Count > 0)
                 {
                     DeleteLeftOverFiles(path, deleteExtensions);
                 }
 
-                if (options.DeleteEmptyFolders)
+                if (deleteEmptyFolders)
                 {
-                    if (!IsWatchFolder(path, watchLocations))
-                    {
-                        DeleteEmptyFolders(path);
-                    }
+                    DeleteEmptyFolders(path, watchLocations);
                 }
-            }
 
-            progress.Report(100);
+            }
         }
 
         /// <summary>
@@ -195,18 +207,19 @@ namespace Emby.AutoOrganize.Core
         /// Deletes the empty folders.
         /// </summary>
         /// <param name="path">The path.</param>
-        private void DeleteEmptyFolders(string path)
+        /// <param name="watchLocations">The path.</param>
+        private void DeleteEmptyFolders(string path, List<string> watchLocations)
         {
             try
             {
                 foreach (var d in _fileSystem.GetDirectoryPaths(path))
                 {
-                    DeleteEmptyFolders(d);
+                    DeleteEmptyFolders(d, watchLocations);
                 }
 
                 var entries = _fileSystem.GetFileSystemEntryPaths(path);
 
-                if (!entries.Any())
+                if (!entries.Any() && !IsWatchFolder(path, watchLocations))
                 {
                     try
                     {

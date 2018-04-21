@@ -14,6 +14,8 @@ namespace Emby.AutoOrganize.Model
 
         public bool DeleteEmptyFolders { get; set; }
 
+        public bool ExtendedClean { get; set; }
+
         public bool CopyOriginalFile { get; set; }
 
         public bool AutoDetectMovie { get; set; }
@@ -43,6 +45,8 @@ namespace Emby.AutoOrganize.Model
             MovieFolderPattern = "%mn (%my)";
 
             QueueLibraryScan = false;
+
+            ExtendedClean = false;
         }
     }
 }

@@ -157,7 +157,7 @@ namespace Emby.AutoOrganize.Core
                 if (string.IsNullOrEmpty(newPath))
                 {
                     var msg = string.Format("Unable to sort {0} because target path could not be determined.", originalPath);
-                    throw new Exception(msg);
+                    throw new OrganizationException(msg);
                 }
 
                 movie.Path = Path.Combine(request.TargetFolder, newPath);
@@ -278,7 +278,7 @@ namespace Emby.AutoOrganize.Core
 
             if (!_organizationService.AddToInProgressList(result, isNew))
             {
-                throw new Exception("File is currently processed otherwise. Please try again later.");
+                throw new OrganizationException("File is currently processed otherwise. Please try again later.");
             }
 
             try
@@ -313,6 +313,11 @@ namespace Emby.AutoOrganize.Core
                 }
 
                 PerformFileSorting(options, result);
+            }
+            catch (OrganizationException ex)
+            {
+                result.Status = FileSortingStatus.Failure;
+                result.StatusMessage = ex.Message;
             }
             catch (Exception ex)
             {
@@ -535,7 +540,7 @@ namespace Emby.AutoOrganize.Core
 
             if (string.IsNullOrWhiteSpace(pattern))
             {
-                throw new Exception("GetMovieFolder: Configured movie name pattern is empty!");
+                throw new OrganizationException("GetMovieFolder: Configured movie name pattern is empty!");
             }
 
             var result = pattern.Replace("%mn", movieName)

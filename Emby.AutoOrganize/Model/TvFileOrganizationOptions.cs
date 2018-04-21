@@ -19,6 +19,8 @@ namespace Emby.AutoOrganize.Model
 
         public bool DeleteEmptyFolders { get; set; }
 
+        public bool ExtendedClean { get; set; }
+
         public bool CopyOriginalFile { get; set; }
 
         public bool AutoDetectSeries { get; set; }
@@ -46,6 +48,8 @@ namespace Emby.AutoOrganize.Model
             CopyOriginalFile = false;
 
             QueueLibraryScan = false;
+
+            ExtendedClean = false;
         }
     }
 }

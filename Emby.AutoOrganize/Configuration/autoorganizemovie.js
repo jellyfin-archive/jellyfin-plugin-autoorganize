@@ -139,6 +139,8 @@
 
         view.querySelector('#txtDeleteLeftOverMovieFiles').value = movieOptions.LeftOverFileExtensionsToDelete.join(';');
 
+        view.querySelector('#chkExtendedClean').checked = movieOptions.ExtendedClean;
+
         view.querySelector('#chkEnableMovieAutoDetect').checked = movieOptions.AutoDetectMovie;
         view.querySelector('#selectMovieFolder').value = movieOptions.DefaultMovieLibraryPath;
 
@@ -160,6 +162,8 @@
             movieOptions.MinFileSizeMb = view.querySelector('#txtMovieMinFileSize').value;
             movieOptions.MoviePattern = view.querySelector('#txtMoviePattern').value;
             movieOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverMovieFiles').value.split(';');
+
+            movieOptions.ExtendedClean = view.querySelector('#chkExtendedClean').checked;
 
             movieOptions.AutoDetectMovie = view.querySelector('#chkEnableMovieAutoDetect').checked;
             movieOptions.DefaultMovieLibraryPath = view.querySelector('#selectMovieFolder').value;

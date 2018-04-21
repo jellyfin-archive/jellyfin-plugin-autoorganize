@@ -170,8 +170,11 @@ namespace Emby.AutoOrganize.Core
                         }
                     }
                 }
-
-                await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (OrganizationException ex)
+            {
+                result.Status = FileSortingStatus.Failure;
+                result.StatusMessage = ex.Message;
             }
             catch (Exception ex)
             {
@@ -179,6 +182,8 @@ namespace Emby.AutoOrganize.Core
                 result.StatusMessage = ex.Message;
                 _logger.ErrorException("Error organizing file", ex);
             }
+            
+            await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
 
             return result;
         }
@@ -467,7 +472,7 @@ namespace Emby.AutoOrganize.Core
 
             if (!_organizationService.AddToInProgressList(result, isNew))
             {
-                throw new Exception("File is currently processed otherwise. Please try again later.");
+                throw new OrganizationException("File is currently processed otherwise. Please try again later.");
             }
 
             try
@@ -478,7 +483,7 @@ namespace Emby.AutoOrganize.Core
                 if (string.IsNullOrEmpty(newPath))
                 {
                     var msg = string.Format("Unable to sort {0} because target path could not be determined.", sourcePath);
-                    throw new Exception(msg);
+                    throw new OrganizationException(msg);
                 }
 
                 _logger.Info("Sorting file {0} to new path {1}", sourcePath, newPath);
@@ -790,7 +795,7 @@ namespace Emby.AutoOrganize.Core
                         var msg = string.Format("No season found for {0} season {1} episode {2}", series.Name,
                             episode.ParentIndexNumber, episode.IndexNumber);
                         _logger.Warn(msg);
-                        throw new Exception(msg);
+                        throw new OrganizationException(msg);
                     }
 
                     season = new Season
@@ -930,7 +935,7 @@ namespace Emby.AutoOrganize.Core
             {
                 var msg = string.Format("No provider metadata found for {0} season {1} episode {2}", series.Name, seasonNumber, episodeNumber);
                 _logger.Warn(msg);
-                throw new Exception(msg);
+                throw new OrganizationException(msg);
             }
 
             seasonNumber = seasonNumber ?? episodeSearch.ParentIndexNumber;
@@ -1000,7 +1005,7 @@ namespace Emby.AutoOrganize.Core
 
             if (!episode.IndexNumber.HasValue || !season.IndexNumber.HasValue)
             {
-                throw new Exception("GetEpisodeFileName: Mandatory param as missing!");
+                throw new OrganizationException("GetEpisodeFileName: Mandatory param as missing!");
             }
 
             var endingEpisodeNumber = episode.IndexNumberEnd;
@@ -1013,7 +1018,7 @@ namespace Emby.AutoOrganize.Core
 
             if (string.IsNullOrWhiteSpace(pattern))
             {
-                throw new Exception("GetEpisodeFileName: Configured episode name pattern is empty!");
+                throw new OrganizationException("GetEpisodeFileName: Configured episode name pattern is empty!");
             }
 
             var result = pattern.Replace("%sn", seriesName)

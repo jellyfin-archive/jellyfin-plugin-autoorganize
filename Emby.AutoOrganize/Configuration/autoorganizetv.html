@@ -197,7 +197,7 @@
                 </div>
                 <div class="inputContainer">
                     <input is="emby-input" id="txtDeleteLeftOverFiles" type="text" label="Delete left over files" />
-                    <div class="fieldDescription">&nbsp;</div>
+                    <div class="fieldDescription">Each value separated by ;</div>
                 </div>
                 <div class="checkboxContainer checkboxContainer-withDescription">
                     <label>
@@ -205,6 +205,13 @@
                         <span>Delete empty folders</span>
                     </label>
                     <div class="fieldDescription checkboxFieldDescription">Empty folders will be deleted</div>
+                </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input type="checkbox" is="emby-checkbox" id="chkExtendedClean" />
+                        <span>Extended Clean</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">Extended clean of left over files and empty folders</div>
                 </div>
                 <div class="checkboxContainer checkboxContainer-withDescription">
                     <label>

@@ -119,7 +119,7 @@ namespace Emby.AutoOrganize.Core
 
             if (!AddToInProgressList(result, false))
             {
-                throw new Exception("Path is currently processed otherwise. Please try again later.");
+                throw new OrganizationException("Path is currently processed otherwise. Please try again later.");
             }
 
             try
@@ -175,12 +175,12 @@ namespace Emby.AutoOrganize.Core
                         .ConfigureAwait(false);
                     break;
                 default:
-                    throw new Exception("No organizer exist for the type " + result.Type);
+                    throw new OrganizationException("No organizer exist for the type " + result.Type);
             }
 
             if (organizeResult.Status != FileSortingStatus.Success)
             {
-                throw new Exception(result.StatusMessage);
+                throw new OrganizationException(result.StatusMessage);
             }
         }
 
