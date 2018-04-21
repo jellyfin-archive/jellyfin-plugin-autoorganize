@@ -412,7 +412,7 @@ namespace Emby.AutoOrganize.Core
                 var movieInfo = new MovieInfo
                 {
                     Name = nameWithoutYear,
-                    Year = yearInName
+                    Year = yearInName,
                 };
 
                 var searchResultsTask = await _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>

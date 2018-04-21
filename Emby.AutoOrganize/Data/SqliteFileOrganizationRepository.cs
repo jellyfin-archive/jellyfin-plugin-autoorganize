@@ -131,6 +131,24 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        public async Task DeleteCompleted()
+        {
+            using (WriteLock.Write())
+            {
+                using (var connection = CreateConnection())
+                {
+                    connection.RunInTransaction(db =>
+                    {
+                        using (var statement = db.PrepareStatement("delete from FileOrganizerResults where Status = @Status"))
+                        {
+                            statement.TryBind("@Status", FileSortingStatus.Success.ToString());
+                            statement.MoveNext();
+                        }
+                    }, TransactionMode);
+                }
+            }
+        }
+
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)
         {
             if (query == null)

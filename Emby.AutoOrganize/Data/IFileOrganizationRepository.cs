@@ -44,6 +44,12 @@ namespace Emby.AutoOrganize.Data
         /// <returns>Task.</returns>
         Task DeleteAll();
 
+        /// <summary>
+        /// Deletes all.
+        /// </summary>
+        /// <returns>Task.</returns>
+        Task DeleteCompleted();
+
         #endregion
 
         #region SmartMatch

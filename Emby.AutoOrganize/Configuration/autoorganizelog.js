@@ -28,6 +28,16 @@
         });
     };
 
+    ApiClient.clearOrganizationCompletedLog = function () {
+
+        var url = this.getUrl("Library/FileOrganizations/Completed");
+
+        return this.ajax({
+            type: "DELETE",
+            url: url
+        });
+    };
+
     ApiClient.performOrganization = function (id) {
 
         var url = this.getUrl("Library/FileOrganizations/" + id + "/Organize");
@@ -469,6 +479,14 @@
         view.querySelector('.btnClearLog').addEventListener('click', function () {
 
             ApiClient.clearOrganizationLog().then(function () {
+                query.StartIndex = 0;
+                reloadItems(view, true);
+            }, Dashboard.processErrorResponse);
+        });
+
+        view.querySelector('.btnClearCompleted').addEventListener('click', function () {
+
+            ApiClient.clearOrganizationCompletedLog().then(function () {
                 query.StartIndex = 0;
                 reloadItems(view, true);
             }, Dashboard.processErrorResponse);

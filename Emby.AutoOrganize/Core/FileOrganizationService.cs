@@ -190,6 +190,12 @@ namespace Emby.AutoOrganize.Core
             EventHelper.FireEventIfNotNull(LogReset, this, EventArgs.Empty, _logger);
         }
 
+        public async Task ClearCompleted()
+        {
+            await _repo.DeleteCompleted();
+            EventHelper.FireEventIfNotNull(LogReset, this, EventArgs.Empty, _logger);
+        }
+
         public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
         {
             var organizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,

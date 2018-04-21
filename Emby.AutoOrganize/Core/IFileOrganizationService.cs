@@ -31,7 +31,13 @@ namespace Emby.AutoOrganize.Core
         /// </summary>
         /// <returns>Task.</returns>
         Task ClearLog();
-        
+
+        /// <summary>
+        /// Clears the log.
+        /// </summary>
+        /// <returns>Task.</returns>
+        Task ClearCompleted();
+
         /// <summary>
         /// Performs the organization.
         /// </summary>
