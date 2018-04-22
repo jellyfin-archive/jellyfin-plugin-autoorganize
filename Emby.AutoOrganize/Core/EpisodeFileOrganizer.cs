@@ -308,12 +308,6 @@ namespace Emby.AutoOrganize.Core
                     _fileSystem.CreateDirectory(series.Path);
 
                     series.ProviderIds = request.NewSeriesProviderIds;
-
-                    // Temporary : Waiting for a core fix : Correctly set the parent of the Series
-                    if (_libraryManager.FindByPath(request.TargetFolder, true) is Folder baseFolder)
-                    {
-                        baseFolder.AddChild(series, cancellationToken);
-                    }
                 }
             }
 
