@@ -88,7 +88,7 @@ namespace Emby.AutoOrganize.Api
         public string NewSeriesName { get; set; }
 
         [ApiMember(Name = "NewSeriesYear", Description = "Year of a series to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
-        public string NewSeriesYear { get; set; }
+        public int? NewSeriesYear { get; set; }
 
         [ApiMember(Name = "TargetFolder", Description = "Target Folder", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string TargetFolder { get; set; }
@@ -110,7 +110,7 @@ namespace Emby.AutoOrganize.Api
         public string NewMovieName { get; set; }
 
         [ApiMember(Name = "NewMovieYear", Description = "Year of a movie to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
-        public string NewMovieYear { get; set; }
+        public int? NewMovieYear { get; set; }
 
         [ApiMember(Name = "TargetFolder", Description = "Target Folder", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string TargetFolder { get; set; }

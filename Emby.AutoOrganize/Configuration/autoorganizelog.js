@@ -175,7 +175,8 @@
 
             fileorganizer.show(item).then(function () {
                 reloadItems(page, false);
-            });
+            },
+            function () { /* Do nothing on reject */ });
         });
     }
 
@@ -335,11 +336,14 @@
             }
 
             var btnClearLog = page.querySelector('.btnClearLog');
+            var btnClearCompleted = page.querySelector('.btnClearCompleted');
 
             if (result.TotalRecordCount) {
                 btnClearLog.classList.remove('hide');
+                btnClearCompleted.classList.remove('hide');
             } else {
                 btnClearLog.classList.add('hide');
+                btnClearCompleted.classList.add('hide');
             }
         }
     }

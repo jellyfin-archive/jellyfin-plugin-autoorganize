@@ -131,14 +131,8 @@ namespace Emby.AutoOrganize.Core
 
         private Movie CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
         {
-            int? newMovieYear = null;
-            if (int.TryParse(request.NewMovieYear, out var year))
-            {
-                newMovieYear = year;
-            }
-
             // To avoid Movie duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-            var movie = GetMatchingMovie(request.NewMovieName, newMovieYear, null, options);
+            var movie = GetMatchingMovie(request.NewMovieName, request.NewMovieYear, null, options);
 
             if (movie == null)
             {
@@ -147,7 +141,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     Id = Guid.NewGuid(),
                     Name = request.NewMovieName,
-                    ProductionYear = newMovieYear,
+                    ProductionYear = request.NewMovieYear,
                     IsInMixedFolder = !options.MovieFolder,
                     ProviderIds = request.NewMovieProviderIds,
                 };
@@ -439,8 +433,8 @@ namespace Emby.AutoOrganize.Core
                         .Where(i => i.Score > 0)
                         .OrderByDescending(i => i.Score)
                         .Select(i => i.Ref)
-                        .First();
-                    finalResult = filtredResult.Result.First();
+                        .FirstOrDefault();
+                    finalResult = filtredResult?.Result.First();
                 }
 
                 if (finalResult != null)
@@ -450,7 +444,7 @@ namespace Emby.AutoOrganize.Core
                     {
                         NewMovieName = finalResult.Name,
                         NewMovieProviderIds = finalResult.ProviderIds,
-                        NewMovieYear = finalResult.ProductionYear.ToString(),
+                        NewMovieYear = finalResult.ProductionYear,
                         TargetFolder = options.DefaultMovieLibraryPath
                     };
 

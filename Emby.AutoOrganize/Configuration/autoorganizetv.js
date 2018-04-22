@@ -371,6 +371,7 @@
 
             ApiClient.getNamedConfiguration('autoorganize').then(function (config) {
                 loadPage(view, config);
+                updateSeriesPatternHelp();
                 updateSeasonPatternHelp();
                 updateEpisodePatternHelp();
                 updateMultiEpisodePatternHelp();
