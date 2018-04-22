@@ -10,36 +10,41 @@ namespace Emby.AutoOrganize.Core
     {
         private static readonly CultureInfo UsCulture = new CultureInfo("en-US");
 
-        internal static Tuple<T, int> GetMatchScore<T>(string sortedName, int? year, T series)
-            where T : BaseItem
+        internal static int GetMatchScore(string sortedName, int? year, string itemName, int? itemProductionYear)
         {
             var score = 0;
 
-            var seriesNameWithoutYear = series.Name;
-            if (series.ProductionYear.HasValue)
+            var seriesNameWithoutYear = itemName;
+            if (itemProductionYear.HasValue)
             {
-                seriesNameWithoutYear = seriesNameWithoutYear.Replace(series.ProductionYear.Value.ToString(UsCulture), String.Empty);
+                seriesNameWithoutYear = seriesNameWithoutYear.Replace(itemProductionYear.Value.ToString(UsCulture), String.Empty);
             }
 
             if (IsNameMatch(sortedName, seriesNameWithoutYear))
             {
                 score++;
 
-                if (year.HasValue && series.ProductionYear.HasValue)
+                if (year.HasValue && itemProductionYear.HasValue)
                 {
-                    if (year.Value == series.ProductionYear.Value)
+                    if (year.Value == itemProductionYear.Value)
                     {
                         score++;
                     }
                     else
                     {
                         // Regardless of name, return a 0 score if the years don't match
-                        return new Tuple<T, int>(series, 0);
+                        return 0;
                     }
                 }
             }
 
-            return new Tuple<T, int>(series, score);
+            return score;
+        }
+
+        internal static Tuple<T, int> GetMatchScore<T>(string sortedName, int? year, T item)
+            where T : BaseItem
+        {
+            return new Tuple<T, int>(item, GetMatchScore(sortedName, year, item.Name, item.ProductionYear));
         }
 
 

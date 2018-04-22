@@ -428,9 +428,19 @@ namespace Emby.AutoOrganize.Core
                     p => p,
                     (key, g) => new { Key = key, Result = g.ToList() }).ToList();
 
-                if (groupedResult.Count() == 1)
+                if (groupedResult.Count == 1)
                 {
                     finalResult = groupedResult.First().Result.First();
+                }
+                else if (groupedResult.Count > 1)
+                {
+                    var filtredResult = groupedResult
+                        .Select(i => new { Ref = i, Score = NameUtils.GetMatchScore(nameWithoutYear, yearInName, i.Key.Name, i.Key.ProductionYear) })
+                        .Where(i => i.Score > 0)
+                        .OrderByDescending(i => i.Score)
+                        .Select(i => i.Ref)
+                        .First();
+                    finalResult = filtredResult.Result.First();
                 }
 
                 if (finalResult != null)
