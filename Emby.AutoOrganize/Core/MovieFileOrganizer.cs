@@ -56,6 +56,8 @@ namespace Emby.AutoOrganize.Core
             return _namingOptions;
         }
 
+        private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Movie;
+
         public async Task<FileOrganizationResult> OrganizeMovieFile(string path, MovieFileOrganizationOptions options, bool overwriteExisting, CancellationToken cancellationToken)
         {
             _logger.Info("Sorting file {0}", path);
@@ -65,7 +67,7 @@ namespace Emby.AutoOrganize.Core
                 Date = DateTime.UtcNow,
                 OriginalPath = path,
                 OriginalFileName = Path.GetFileName(path),
-                Type = FileOrganizerType.Movie,
+                Type = FileOrganizerType.Unknown,
                 FileSize = _fileSystem.GetFileInfo(path).Length
             };
 
@@ -109,15 +111,16 @@ namespace Emby.AutoOrganize.Core
                     _logger.Warn(msg);
                 }
 
+                // Handle previous result
                 var previousResult = _organizationService.GetResultBySourcePath(path);
 
-                // Don't keep saving the same result over and over if nothing has changed
-                if (previousResult?.Status == result.Status && previousResult?.StatusMessage == result.StatusMessage && result.Status != FileSortingStatus.Success)
+                if ((previousResult != null && result.Type == FileOrganizerType.Unknown) || (previousResult?.Status == result.Status &&
+                                                                                             previousResult?.StatusMessage == result.StatusMessage &&
+                                                                                             result.Status != FileSortingStatus.Success))
                 {
+                    // Don't keep saving the same result over and over if nothing has changed
                     return previousResult;
                 }
-
-                await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -125,6 +128,8 @@ namespace Emby.AutoOrganize.Core
                 result.StatusMessage = ex.Message;
                 _logger.ErrorException("Error organizing file", ex);
             }
+
+            await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
 
             return result;
         }
@@ -180,6 +185,9 @@ namespace Emby.AutoOrganize.Core
                     movie = (Movie)_libraryManager.GetItemById(new Guid(request.MovieId));
                 }
 
+                // We manually set the media as Movie 
+                result.Type = CurrentFileOrganizerType;
+
                 await OrganizeMovie(result.OriginalPath,
                     movie,
                     options,
@@ -228,6 +236,10 @@ namespace Emby.AutoOrganize.Core
                     return;
                 }
             }
+
+            // We detected an Movie (either auto-detect or in library)
+            // We have all the chance that the media type is an Movie
+            result.Type = CurrentFileOrganizerType;
 
             await OrganizeMovie(sourcePath,
                 movie,

@@ -59,6 +59,8 @@ namespace Emby.AutoOrganize.Core
             return _namingOptions;
         }
 
+        private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Episode;
+
         public async Task<FileOrganizationResult> OrganizeEpisodeFile(
             string path,
             TvFileOrganizationOptions options,
@@ -71,7 +73,7 @@ namespace Emby.AutoOrganize.Core
                 Date = DateTime.UtcNow,
                 OriginalPath = path,
                 OriginalFileName = Path.GetFileName(path),
-                Type = FileOrganizerType.Episode,
+                Type = FileOrganizerType.Unknown,
                 FileSize = _fileSystem.GetFileInfo(path).Length
             };
 
@@ -107,8 +109,6 @@ namespace Emby.AutoOrganize.Core
                     seriesName = episodeInfo.SeriesName;
                 }
 
-                var forceEpisodeType = false;
-
                 if (!string.IsNullOrEmpty(seriesName))
                 {
                     var seasonNumber = episodeInfo.SeasonNumber;
@@ -138,7 +138,7 @@ namespace Emby.AutoOrganize.Core
                         // We detected an airdate or (an season number and an episode number)
                         // We have all the chance that the media type is an Episode
                         // if an earlier result exist with an different type, we update it
-                        forceEpisodeType = true;
+                        result.Type = CurrentFileOrganizerType;
 
                         var endingEpisodeNumber = episodeInfo.EndingEpsiodeNumber;
 
@@ -172,20 +172,17 @@ namespace Emby.AutoOrganize.Core
                     _logger.Warn(msg);
                 }
 
+                // Handle previous result
                 var previousResult = _organizationService.GetResultBySourcePath(path);
 
-                if (previousResult != null)
+                if ((previousResult != null && result.Type == FileOrganizerType.Unknown) || (previousResult?.Status == result.Status &&
+                                                                                             previousResult?.StatusMessage == result.StatusMessage &&
+                                                                                             result.Status != FileSortingStatus.Success))
                 {
-                    // if an earlier result exist with an different type, an we are pretty sure it was an Episode, we update it
-                    if (previousResult.Type == FileOrganizerType.Episode || !forceEpisodeType)
-                    {
-                        // Don't keep saving the same result over and over if nothing has changed
-                        if (previousResult.Status == result.Status && previousResult.StatusMessage == result.StatusMessage && result.Status != FileSortingStatus.Success)
-                        {
-                            return previousResult;
-                        }
-                    }
+                    // Don't keep saving the same result over and over if nothing has changed
+                    return previousResult;
                 }
+
             }
             catch (OrganizationException ex)
             {
@@ -336,6 +333,9 @@ namespace Emby.AutoOrganize.Core
                     // Existing Series
                     series = (Series)_libraryManager.GetItemById(new Guid(request.SeriesId));
                 }
+
+                // We manually set the media as Series 
+                result.Type = CurrentFileOrganizerType;
 
                 await OrganizeEpisode(result.OriginalPath,
                     series,
@@ -588,7 +588,7 @@ namespace Emby.AutoOrganize.Core
                 info = new SmartMatchResult
                 {
                     ItemName = series.Name,
-                    OrganizerType = FileOrganizerType.Episode,
+                    OrganizerType = CurrentFileOrganizerType,
                     DisplayName = series.Name
                 };
             }

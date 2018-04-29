@@ -88,12 +88,12 @@ namespace Emby.AutoOrganize.Core
             {
                 var numComplete = 0;
 
+                var organizer = new EpisodeFileOrganizer(_organizationService, _config, _fileSystem, _logger, _libraryManager,
+                    _libraryMonitor, _providerManager);
+
                 foreach (var file in eligibleFiles)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-
-                    var organizer = new EpisodeFileOrganizer(_organizationService, _config, _fileSystem, _logger, _libraryManager,
-                        _libraryMonitor, _providerManager);
 
                     try
                     {
