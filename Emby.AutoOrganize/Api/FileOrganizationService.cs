@@ -166,7 +166,7 @@ namespace Emby.AutoOrganize.Api
                 StartIndex = request.StartIndex
             });
 
-            return _resultFactory.GetOptimizedResult(Request, result);
+            return _resultFactory.GetResult(Request, result);
         }
 
         public void Delete(DeleteOriginalFile request)
@@ -264,7 +264,7 @@ namespace Emby.AutoOrganize.Api
                 StartIndex = request.StartIndex
             });
 
-            return _resultFactory.GetOptimizedResult(Request, result);
+            return _resultFactory.GetResult(Request, result);
         }
 
         public void Post(DeleteSmartMatchEntry request)
