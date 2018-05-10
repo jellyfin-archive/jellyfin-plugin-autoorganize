@@ -17,7 +17,7 @@ namespace Emby.AutoOrganize.Model
         public bool RememberCorrection { get; set; }
         public string NewSeriesName { get; set; }
 
-        public string NewSeriesYear { get; set; }
+        public int? NewSeriesYear { get; set; }
 
         public string TargetFolder { get; set; }
 

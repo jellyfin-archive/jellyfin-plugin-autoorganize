@@ -10,7 +10,7 @@ namespace Emby.AutoOrganize.Model
 
         public string NewMovieName { get; set; }
 
-        public string NewMovieYear { get; set; }
+        public int? NewMovieYear { get; set; }
 
         public string TargetFolder { get; set; }
 

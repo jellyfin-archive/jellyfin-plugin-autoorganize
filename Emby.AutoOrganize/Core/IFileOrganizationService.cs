@@ -31,7 +31,13 @@ namespace Emby.AutoOrganize.Core
         /// </summary>
         /// <returns>Task.</returns>
         Task ClearLog();
-        
+
+        /// <summary>
+        /// Clears the log.
+        /// </summary>
+        /// <returns>Task.</returns>
+        Task ClearCompleted();
+
         /// <summary>
         /// Performs the organization.
         /// </summary>
@@ -83,18 +89,33 @@ namespace Emby.AutoOrganize.Core
         Task SaveResult(FileOrganizationResult result, CancellationToken cancellationToken);
 
         /// <summary>
+        /// Saves the result.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Task.</returns>
+        Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Returns a list of smart match entries
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>IEnumerable{SmartMatchInfo}.</returns>
-        QueryResult<SmartMatchInfo> GetSmartMatchInfos(FileOrganizationResultQuery query);
+        QueryResult<SmartMatchResult> GetSmartMatchInfos(FileOrganizationResultQuery query);
+
+        /// <summary>
+        /// Returns a list of smart match entries
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>IEnumerable{SmartMatchInfo}.</returns>
+        QueryResult<SmartMatchResult> GetSmartMatchInfos();
 
         /// <summary>
         /// Deletes a smart match entry.
         /// </summary>
         /// <param name="ItemName">Item name.</param>
         /// <param name="matchString">The match string to delete.</param>
-        void DeleteSmartMatchEntry(string ItemName, string matchString);
+        void DeleteSmartMatchEntry(string id, string matchString);
 
         /// <summary>
         /// Attempts to add a an item to the list of currently processed items.

@@ -250,7 +250,7 @@
                 var info = currentResult.Items[index];
                 var entries = [
                     {
-                        Name: info.ItemName,
+                        Name: info.Id,
                         Value: info.MatchStrings[matchIndex]
                     }];
 

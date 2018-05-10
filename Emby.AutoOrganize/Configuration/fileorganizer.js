@@ -226,7 +226,7 @@
 
         if (mediaId == "##NEW##" && currentNewItem != null) {
             mediaId = null;
-            newProviderIds = JSON.stringify(currentNewItem.ProviderIds);
+            newProviderIds = currentNewItem.ProviderIds;
             newMediaName = currentNewItem.Name;
             newMediaYear = currentNewItem.ProductionYear;
             targetFolder = dlg.querySelector('#selectMediaFolder').value;

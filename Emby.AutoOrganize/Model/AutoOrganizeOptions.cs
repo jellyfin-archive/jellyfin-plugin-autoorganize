@@ -21,11 +21,14 @@ namespace Emby.AutoOrganize.Model
         /// <value>The smart match entries.</value>
         public SmartMatchInfo[] SmartMatchInfos { get; set; }
 
+        public bool Converted { get; set; }
+
         public AutoOrganizeOptions()
         {
             TvOptions = new TvFileOrganizationOptions();
             MovieOptions = new MovieFileOrganizationOptions();
-            SmartMatchInfos = new SmartMatchInfo[]{};
+            SmartMatchInfos = new SmartMatchInfo[] { };
+            Converted = false;
         }
     }
 }

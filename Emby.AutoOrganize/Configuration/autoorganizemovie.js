@@ -139,10 +139,14 @@
 
         view.querySelector('#txtDeleteLeftOverMovieFiles').value = movieOptions.LeftOverFileExtensionsToDelete.join(';');
 
+        view.querySelector('#chkExtendedClean').checked = movieOptions.ExtendedClean;
+
         view.querySelector('#chkEnableMovieAutoDetect').checked = movieOptions.AutoDetectMovie;
         view.querySelector('#selectMovieFolder').value = movieOptions.DefaultMovieLibraryPath;
 
         view.querySelector('#copyOrMoveMovieFile').value = movieOptions.CopyOriginalFile.toString();
+
+        view.querySelector('#chkQueueLibScan').checked = movieOptions.QueueLibraryScan;
     }
 
     function onSubmit(view) {
@@ -159,6 +163,8 @@
             movieOptions.MoviePattern = view.querySelector('#txtMoviePattern').value;
             movieOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverMovieFiles').value.split(';');
 
+            movieOptions.ExtendedClean = view.querySelector('#chkExtendedClean').checked;
+
             movieOptions.AutoDetectMovie = view.querySelector('#chkEnableMovieAutoDetect').checked;
             movieOptions.DefaultMovieLibraryPath = view.querySelector('#selectMovieFolder').value;
 
@@ -169,6 +175,8 @@
             movieOptions.WatchLocations = watchLocation ? [watchLocation] : [];
 
             movieOptions.CopyOriginalFile = view.querySelector('#copyOrMoveMovieFile').value;
+
+            movieOptions.QueueLibraryScan = view.querySelector('#chkQueueLibScan').checked;
 
             ApiClient.updateNamedConfiguration('autoorganize', config).then(Dashboard.processServerConfigurationUpdateResult, Dashboard.processErrorResponse);
         });

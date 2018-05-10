@@ -155,11 +155,15 @@
         view.querySelector('#chkEnableSeriesAutoDetect').checked = tvOptions.AutoDetectSeries;
         view.querySelector('#selectSeriesFolder').value = tvOptions.DefaultSeriesLibraryPath;
 
-        view.querySelector('#txtSeriesPattern').value = tvOptions.SeriesFolderPattern; 
+        view.querySelector('#txtSeriesPattern').value = tvOptions.SeriesFolderPattern;
 
         view.querySelector('#txtDeleteLeftOverFiles').value = tvOptions.LeftOverFileExtensionsToDelete.join(';');
 
+        view.querySelector('#chkExtendedClean').checked = tvOptions.ExtendedClean;
+
         view.querySelector('#copyOrMoveFile').value = tvOptions.CopyOriginalFile.toString();
+
+        view.querySelector('#chkQueueLibScan').checked = tvOptions.QueueLibraryScan;
     }
 
     function onSubmit(view) {
@@ -182,14 +186,18 @@
             tvOptions.AutoDetectSeries = view.querySelector('#chkEnableSeriesAutoDetect').checked;
             tvOptions.DefaultSeriesLibraryPath = view.querySelector('#selectSeriesFolder').value;
 
-            tvOptions.SeriesFolderPattern = view.querySelector('#txtSeriesPattern').value; 
+            tvOptions.SeriesFolderPattern = view.querySelector('#txtSeriesPattern').value;
 
             tvOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverFiles').value.split(';');
+
+            tvOptions.ExtendedClean = view.querySelector('#chkExtendedClean').checked;
 
             var watchLocation = view.querySelector('#txtWatchFolder').value;
             tvOptions.WatchLocations = watchLocation ? [watchLocation] : [];
 
             tvOptions.CopyOriginalFile = view.querySelector('#copyOrMoveFile').value;
+
+            tvOptions.QueueLibraryScan = view.querySelector('#chkQueueLibScan').checked;
 
             ApiClient.updateNamedConfiguration('autoorganize', config).then(Dashboard.processServerConfigurationUpdateResult, Dashboard.processErrorResponse);
         });
@@ -239,7 +247,7 @@
             var replacementHtmlResult = 'Result: ' + value;
 
             view.querySelector('.seriesPatternDescription').innerHTML = replacementHtmlResult;
-        } 
+        }
 
         function updateSeasonPatternHelp() {
 
@@ -339,7 +347,7 @@
         }
 
         view.querySelector('#txtSeriesPattern').addEventListener('change', updateSeriesPatternHelp);
-        view.querySelector('#txtSeriesPattern').addEventListener('keyup', updateSeriesPatternHelp); 
+        view.querySelector('#txtSeriesPattern').addEventListener('keyup', updateSeriesPatternHelp);
         view.querySelector('#txtSeasonFolderPattern').addEventListener('change', updateSeasonPatternHelp);
         view.querySelector('#txtSeasonFolderPattern').addEventListener('keyup', updateSeasonPatternHelp);
         view.querySelector('#txtEpisodePattern').addEventListener('change', updateEpisodePatternHelp);
@@ -363,6 +371,7 @@
 
             ApiClient.getNamedConfiguration('autoorganize').then(function (config) {
                 loadPage(view, config);
+                updateSeriesPatternHelp();
                 updateSeasonPatternHelp();
                 updateEpisodePatternHelp();
                 updateMultiEpisodePatternHelp();

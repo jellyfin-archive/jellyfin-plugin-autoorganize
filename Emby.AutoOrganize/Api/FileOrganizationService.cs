@@ -33,6 +33,11 @@ namespace Emby.AutoOrganize.Api
     {
     }
 
+    [Route("/Library/FileOrganizations/Completed", "DELETE", Summary = "Clears the activity log")]
+    public class ClearOrganizationCompletedLog : IReturnVoid
+    {
+    }
+
     [Route("/Library/FileOrganizations/{Id}/File", "DELETE", Summary = "Deletes the original file of a organizer result")]
     public class DeleteOriginalFile : IReturnVoid
     {
@@ -83,7 +88,7 @@ namespace Emby.AutoOrganize.Api
         public string NewSeriesName { get; set; }
 
         [ApiMember(Name = "NewSeriesYear", Description = "Year of a series to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
-        public string NewSeriesYear { get; set; }
+        public int? NewSeriesYear { get; set; }
 
         [ApiMember(Name = "TargetFolder", Description = "Target Folder", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string TargetFolder { get; set; }
@@ -105,7 +110,7 @@ namespace Emby.AutoOrganize.Api
         public string NewMovieName { get; set; }
 
         [ApiMember(Name = "NewMovieYear", Description = "Year of a movie to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
-        public string NewMovieYear { get; set; }
+        public int? NewMovieYear { get; set; }
 
         [ApiMember(Name = "TargetFolder", Description = "Target Folder", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string TargetFolder { get; set; }
@@ -177,6 +182,15 @@ namespace Emby.AutoOrganize.Api
 
             Task.WaitAll(task);
         }
+
+
+        public void Delete(ClearOrganizationCompletedLog request)
+        {
+            var task = InternalFileOrganizationService.ClearCompleted();
+
+            Task.WaitAll(task);
+        }
+
 
         public void Post(PerformOrganization request)
         {

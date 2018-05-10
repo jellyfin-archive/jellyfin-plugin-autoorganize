@@ -28,6 +28,16 @@
         });
     };
 
+    ApiClient.clearOrganizationCompletedLog = function () {
+
+        var url = this.getUrl("Library/FileOrganizations/Completed");
+
+        return this.ajax({
+            type: "DELETE",
+            url: url
+        });
+    };
+
     ApiClient.performOrganization = function (id) {
 
         var url = this.getUrl("Library/FileOrganizations/" + id + "/Organize");
@@ -165,7 +175,8 @@
 
             fileorganizer.show(item).then(function () {
                 reloadItems(page, false);
-            });
+            },
+            function () { /* Do nothing on reject */ });
         });
     }
 
@@ -257,77 +268,83 @@
 
     function renderResults(page, result) {
 
-        var rows = result.Items.map(function (item) {
+        if (Object.prototype.toString.call(page) !== "[object Window]") {
 
-            var html = '';
+            var rows = result.Items.map(function (item) {
 
-            html += '<tr class="detailTableBodyRow detailTableBodyRow-shaded" id="row' + item.Id + '">';
+                var html = '';
 
-            html += renderItemRow(item);
+                html += '<tr class="detailTableBodyRow detailTableBodyRow-shaded" id="row' + item.Id + '">';
 
-            html += '</tr>';
+                html += renderItemRow(item);
 
-            return html;
-        }).join('');
+                html += '</tr>';
 
-        var resultBody = page.querySelector('.resultBody');
-        resultBody.innerHTML = rows;
+                return html;
+            }).join('');
 
-        resultBody.addEventListener('click', handleItemClick);
+            var resultBody = page.querySelector('.resultBody');
+            resultBody.innerHTML = rows;
 
-        var pagingHtml = libraryBrowser.getQueryPagingHtml({
-            startIndex: query.StartIndex,
-            limit: query.Limit,
-            totalRecordCount: result.TotalRecordCount,
-            showLimit: false,
-            updatePageSizeSetting: false
-        });
+            resultBody.addEventListener('click', handleItemClick);
 
-        var topPaging = page.querySelector('.listTopPaging');
-        topPaging.innerHTML = pagingHtml;
-
-        var bottomPaging = page.querySelector('.listBottomPaging');
-        bottomPaging.innerHTML = pagingHtml;
-
-        var btnNextTop = topPaging.querySelector(".btnNextPage");
-        var btnNextBottom = bottomPaging.querySelector(".btnNextPage");
-        var btnPrevTop = topPaging.querySelector(".btnPreviousPage");
-        var btnPrevBottom = bottomPaging.querySelector(".btnPreviousPage");
-
-        if (btnNextTop) {
-            btnNextTop.addEventListener('click', function () {
-                query.StartIndex += query.Limit;
-                reloadItems(page, true);
+            var pagingHtml = libraryBrowser.getQueryPagingHtml({
+                startIndex: query.StartIndex,
+                limit: query.Limit,
+                totalRecordCount: result.TotalRecordCount,
+                showLimit: false,
+                updatePageSizeSetting: false
             });
-        }
 
-        if (btnNextBottom) {
-            btnNextBottom.addEventListener('click', function () {
-                query.StartIndex += query.Limit;
-                reloadItems(page, true);
-            });
-        }
+            var topPaging = page.querySelector('.listTopPaging');
+            topPaging.innerHTML = pagingHtml;
 
-        if (btnPrevTop) {
-            btnPrevTop.addEventListener('click', function () {
-                query.StartIndex -= query.Limit;
-                reloadItems(page, true);
-            });
-        }
+            var bottomPaging = page.querySelector('.listBottomPaging');
+            bottomPaging.innerHTML = pagingHtml;
 
-        if (btnPrevBottom) {
-            btnPrevBottom.addEventListener('click', function () {
-                query.StartIndex -= query.Limit;
-                reloadItems(page, true);
-            });
-        }
+            var btnNextTop = topPaging.querySelector(".btnNextPage");
+            var btnNextBottom = bottomPaging.querySelector(".btnNextPage");
+            var btnPrevTop = topPaging.querySelector(".btnPreviousPage");
+            var btnPrevBottom = bottomPaging.querySelector(".btnPreviousPage");
 
-        var btnClearLog = page.querySelector('.btnClearLog');
+            if (btnNextTop) {
+                btnNextTop.addEventListener('click', function () {
+                    query.StartIndex += query.Limit;
+                    reloadItems(page, true);
+                });
+            }
 
-        if (result.TotalRecordCount) {
-            btnClearLog.classList.remove('hide');
-        } else {
-            btnClearLog.classList.add('hide');
+            if (btnNextBottom) {
+                btnNextBottom.addEventListener('click', function () {
+                    query.StartIndex += query.Limit;
+                    reloadItems(page, true);
+                });
+            }
+
+            if (btnPrevTop) {
+                btnPrevTop.addEventListener('click', function () {
+                    query.StartIndex -= query.Limit;
+                    reloadItems(page, true);
+                });
+            }
+
+            if (btnPrevBottom) {
+                btnPrevBottom.addEventListener('click', function () {
+                    query.StartIndex -= query.Limit;
+                    reloadItems(page, true);
+                });
+            }
+
+            var btnClearLog = page.querySelector('.btnClearLog');
+            var btnClearCompleted = page.querySelector('.btnClearCompleted');
+
+            if (result.TotalRecordCount) {
+                btnClearLog.classList.remove('hide');
+                btnClearCompleted.classList.remove('hide');
+            } else {
+                btnClearLog.classList.add('hide');
+                btnClearCompleted.classList.add('hide');
+            }
         }
     }
 
@@ -466,6 +483,14 @@
         view.querySelector('.btnClearLog').addEventListener('click', function () {
 
             ApiClient.clearOrganizationLog().then(function () {
+                query.StartIndex = 0;
+                reloadItems(view, true);
+            }, Dashboard.processErrorResponse);
+        });
+
+        view.querySelector('.btnClearCompleted').addEventListener('click', function () {
+
+            ApiClient.clearOrganizationCompletedLog().then(function () {
                 query.StartIndex = 0;
                 reloadItems(view, true);
             }, Dashboard.processErrorResponse);

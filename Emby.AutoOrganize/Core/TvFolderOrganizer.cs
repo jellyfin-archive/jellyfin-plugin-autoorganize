@@ -66,17 +66,18 @@ namespace Emby.AutoOrganize.Core
             return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i, path));
         }
 
-        public async Task Organize(AutoOrganizeOptions options, CancellationToken cancellationToken, IProgress<double> progress)
+        public async Task Organize(TvFileOrganizationOptions options,
+            CancellationToken cancellationToken, IProgress<double> progress)
         {
             var libraryFolderPaths = _libraryManager.GetVirtualFolders().SelectMany(i => i.Locations).ToList();
 
-            var watchLocations = options.TvOptions.WatchLocations
+            var watchLocations = options.WatchLocations
                 .Where(i => IsValidWatchLocation(i, libraryFolderPaths))
                 .ToList();
 
             var eligibleFiles = watchLocations.SelectMany(GetFilesToOrganize)
                 .OrderBy(_fileSystem.GetCreationTimeUtc)
-                .Where(i => EnableOrganization(i, options.TvOptions))
+                .Where(i => EnableOrganization(i, options))
                 .ToList();
 
             var processedFolders = new HashSet<string>();
@@ -87,16 +88,16 @@ namespace Emby.AutoOrganize.Core
             {
                 var numComplete = 0;
 
+                var organizer = new EpisodeFileOrganizer(_organizationService, _config, _fileSystem, _logger, _libraryManager,
+                    _libraryMonitor, _providerManager);
+
                 foreach (var file in eligibleFiles)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var organizer = new EpisodeFileOrganizer(_organizationService, _config, _fileSystem, _logger, _libraryManager,
-                        _libraryMonitor, _providerManager);
-
                     try
                     {
-                        var result = await organizer.OrganizeEpisodeFile(file.FullName, options, options.TvOptions.OverwriteExistingEpisodes, cancellationToken).ConfigureAwait(false);
+                        var result = await organizer.OrganizeEpisodeFile(file.FullName, options, cancellationToken).ConfigureAwait(false);
 
                         if (result.Status == FileSortingStatus.Success && !processedFolders.Contains(file.DirectoryName, StringComparer.OrdinalIgnoreCase))
                         {
@@ -123,29 +124,39 @@ namespace Emby.AutoOrganize.Core
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report(99);
 
-            foreach (var path in processedFolders)
-            {
-                var deleteExtensions = options.TvOptions.LeftOverFileExtensionsToDelete
-                    .Select(i => i.Trim().TrimStart('.'))
-                    .Where(i => !string.IsNullOrEmpty(i))
-                    .Select(i => "." + i)
-                    .ToList();
+            var deleteExtensions = options.LeftOverFileExtensionsToDelete
+                .Select(i => i.Trim().TrimStart('.'))
+                .Where(i => !string.IsNullOrEmpty(i))
+                .Select(i => "." + i)
+                .ToList();
 
+            // Normal Clean
+            Clean(processedFolders, watchLocations, options.DeleteEmptyFolders, deleteExtensions);
+
+            // Extended Clean
+            if (options.ExtendedClean)
+            {
+                Clean(watchLocations, watchLocations, options.DeleteEmptyFolders, deleteExtensions);
+            }
+
+            progress.Report(100);
+        }
+
+        private void Clean(IEnumerable<string> paths, List<string> watchLocations, bool deleteEmptyFolders, List<string> deleteExtensions)
+        {
+            foreach (var path in paths)
+            {
                 if (deleteExtensions.Count > 0)
                 {
                     DeleteLeftOverFiles(path, deleteExtensions);
                 }
 
-                if (options.TvOptions.DeleteEmptyFolders)
+                if (deleteEmptyFolders)
                 {
-                    if (!IsWatchFolder(path, watchLocations))
-                    {
-                        DeleteEmptyFolders(path);
-                    }
+                    DeleteEmptyFolders(path, watchLocations);
                 }
-            }
 
-            progress.Report(100);
+            }
         }
 
         /// <summary>
@@ -195,18 +206,19 @@ namespace Emby.AutoOrganize.Core
         /// Deletes the empty folders.
         /// </summary>
         /// <param name="path">The path.</param>
-        private void DeleteEmptyFolders(string path)
+        /// <param name="watchLocations">The path.</param>
+        private void DeleteEmptyFolders(string path, List<string> watchLocations)
         {
             try
             {
                 foreach (var d in _fileSystem.GetDirectoryPaths(path))
                 {
-                    DeleteEmptyFolders(d);
+                    DeleteEmptyFolders(d, watchLocations);
                 }
 
                 var entries = _fileSystem.GetFileSystemEntryPaths(path);
 
-                if (!entries.Any())
+                if (!entries.Any() && !IsWatchFolder(path, watchLocations))
                 {
                     try
                     {

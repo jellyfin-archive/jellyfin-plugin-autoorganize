@@ -65,6 +65,16 @@ namespace Emby.AutoOrganize.Core
             return _repo.SaveResult(result, cancellationToken);
         }
 
+        public Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
+        {
+            if (result == null)
+            {
+                throw new ArgumentNullException("result");
+            }
+
+            return _repo.SaveResult(result, cancellationToken);
+        }
+
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)
         {
             var results = _repo.GetResults(query);
@@ -109,7 +119,7 @@ namespace Emby.AutoOrganize.Core
 
             if (!AddToInProgressList(result, false))
             {
-                throw new Exception("Path is currently processed otherwise. Please try again later.");
+                throw new OrganizationException("Path is currently processed otherwise. Please try again later.");
             }
 
             try
@@ -139,6 +149,8 @@ namespace Emby.AutoOrganize.Core
         {
             var result = _repo.GetResult(resultId);
 
+            var options = GetAutoOrganizeOptions();
+
             if (string.IsNullOrEmpty(result.TargetPath))
             {
                 throw new ArgumentException("No target path available.");
@@ -151,7 +163,7 @@ namespace Emby.AutoOrganize.Core
                     var episodeOrganizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
                         _libraryMonitor, _providerManager);
 
-                    organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, GetAutoOrganizeOptions(), true, CancellationToken.None)
+                    organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, options.TvOptions, CancellationToken.None)
                         .ConfigureAwait(false);
 
                     break;
@@ -159,16 +171,16 @@ namespace Emby.AutoOrganize.Core
                     var movieOrganizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
                         _libraryMonitor, _providerManager);
 
-                    organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, GetAutoOrganizeOptions(), true, CancellationToken.None)
+                    organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options.MovieOptions, true, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
                 default:
-                    throw new Exception("No organizer exist for the type " + result.Type);
+                    throw new OrganizationException("No organizer exist for the type " + result.Type);
             }
 
             if (organizeResult.Status != FileSortingStatus.Success)
             {
-                throw new Exception(result.StatusMessage);
+                throw new OrganizationException(result.StatusMessage);
             }
         }
 
@@ -178,12 +190,19 @@ namespace Emby.AutoOrganize.Core
             EventHelper.FireEventIfNotNull(LogReset, this, EventArgs.Empty, _logger);
         }
 
+        public async Task ClearCompleted()
+        {
+            await _repo.DeleteCompleted();
+            EventHelper.FireEventIfNotNull(LogReset, this, EventArgs.Empty, _logger);
+        }
+
         public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
         {
             var organizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
                 _libraryMonitor, _providerManager);
 
-            var result = await organizer.OrganizeWithCorrection(request, GetAutoOrganizeOptions(), CancellationToken.None).ConfigureAwait(false);
+            var options = GetAutoOrganizeOptions();
+            var result = await organizer.OrganizeWithCorrection(request, options.TvOptions, CancellationToken.None).ConfigureAwait(false);
 
             if (result.Status != FileSortingStatus.Success)
             {
@@ -196,7 +215,8 @@ namespace Emby.AutoOrganize.Core
             var organizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
                 _libraryMonitor, _providerManager);
 
-            var result = await organizer.OrganizeWithCorrection(request, GetAutoOrganizeOptions(), CancellationToken.None).ConfigureAwait(false);
+            var options = GetAutoOrganizeOptions();
+            var result = await organizer.OrganizeWithCorrection(request, options.MovieOptions, CancellationToken.None).ConfigureAwait(false);
 
             if (result.Status != FileSortingStatus.Success)
             {
@@ -204,55 +224,30 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
-        public QueryResult<SmartMatchInfo> GetSmartMatchInfos(FileOrganizationResultQuery query)
+        public QueryResult<SmartMatchResult> GetSmartMatchInfos(FileOrganizationResultQuery query)
         {
-            if (query == null)
-            {
-                throw new ArgumentNullException("query");
-            }
-
-            var options = GetAutoOrganizeOptions();
-
-            var items = options.SmartMatchInfos.Skip(query.StartIndex ?? 0).Take(query.Limit ?? Int32.MaxValue).ToArray();
-
-            return new QueryResult<SmartMatchInfo>()
-            {
-                Items = items,
-                TotalRecordCount = options.SmartMatchInfos.Length
-            };
+            return _repo.GetSmartMatch(query);
         }
 
-        public void DeleteSmartMatchEntry(string itemName, string matchString)
+
+        public QueryResult<SmartMatchResult> GetSmartMatchInfos()
         {
-            if (string.IsNullOrEmpty(itemName))
+            return _repo.GetSmartMatch(new FileOrganizationResultQuery());
+        }
+
+        public void DeleteSmartMatchEntry(string id, string matchString)
+        {
+            if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("itemName");
+                throw new ArgumentNullException(nameof(id));
             }
 
             if (string.IsNullOrEmpty(matchString))
             {
-                throw new ArgumentNullException("matchString");
+                throw new ArgumentNullException(nameof(matchString));
             }
 
-            var options = GetAutoOrganizeOptions();
-
-            SmartMatchInfo info = options.SmartMatchInfos.FirstOrDefault(i => string.Equals(i.ItemName, itemName));
-
-            if (info != null && info.MatchStrings.Contains(matchString))
-            {
-                var list = info.MatchStrings.ToList();
-                list.Remove(matchString);
-                info.MatchStrings = list.ToArray();
-
-                if (info.MatchStrings.Length == 0)
-                {
-                    var infos = options.SmartMatchInfos.ToList();
-                    infos.Remove(info);
-                    options.SmartMatchInfos = infos.ToArray();
-                }
-
-                _config.SaveAutoOrganizeOptions(options);
-            }
+            _repo.DeleteSmartMatch(id, matchString);
         }
 
         /// <summary>

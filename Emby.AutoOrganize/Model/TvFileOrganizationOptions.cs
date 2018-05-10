@@ -19,6 +19,8 @@ namespace Emby.AutoOrganize.Model
 
         public bool DeleteEmptyFolders { get; set; }
 
+        public bool ExtendedClean { get; set; }
+
         public bool CopyOriginalFile { get; set; }
 
         public bool AutoDetectSeries { get; set; }
@@ -26,6 +28,8 @@ namespace Emby.AutoOrganize.Model
         public string DefaultSeriesLibraryPath { get; set; }
 
         public string SeriesFolderPattern { get; set; }
+
+        public bool QueueLibraryScan { get; set; }
 
         public TvFileOrganizationOptions()
         {
@@ -42,6 +46,10 @@ namespace Emby.AutoOrganize.Model
             SeriesFolderPattern = "%fn";
 
             CopyOriginalFile = false;
+
+            QueueLibraryScan = false;
+
+            ExtendedClean = false;
         }
     }
 }
