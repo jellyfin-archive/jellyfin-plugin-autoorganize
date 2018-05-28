@@ -56,11 +56,11 @@ namespace Emby.AutoOrganize.Data
 
         Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
 
-        Task DeleteSmartMatch(string id);
+        void DeleteSmartMatch(string id);
 
         Task DeleteSmartMatch(string id, string matchString);
 
-        Task DeleteAllSmartMatch();
+        void DeleteAllSmartMatch();
 
         QueryResult<SmartMatchResult> GetSmartMatch(FileOrganizationResultQuery query);
 

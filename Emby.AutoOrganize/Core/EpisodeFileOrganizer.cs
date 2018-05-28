@@ -431,7 +431,7 @@ namespace Emby.AutoOrganize.Core
             Season season;
             season = !string.IsNullOrEmpty(episode.Season?.Path)
                 ? episode.Season
-                : await GetMatchingSeason(series, episode, options, cancellationToken);
+                : GetMatchingSeason(series, episode, options, cancellationToken);
 
             // Now we can check the episode Path
             if (string.IsNullOrEmpty(episode.Path))
@@ -774,7 +774,7 @@ namespace Emby.AutoOrganize.Core
             return new Tuple<Episode, RemoteSearchResult>(episode, null);
         }
 
-        private async Task<Season> GetMatchingSeason(Series series, Episode episode, TvFileOrganizationOptions options, CancellationToken cancellationToken)
+        private Season GetMatchingSeason(Series series, Episode episode, TvFileOrganizationOptions options, CancellationToken cancellationToken)
         {
             var season = episode.Season;
 

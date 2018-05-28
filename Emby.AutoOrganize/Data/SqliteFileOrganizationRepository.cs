@@ -341,7 +341,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public async Task DeleteSmartMatch(string id)
+        public void DeleteSmartMatch(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -381,11 +381,11 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                await DeleteSmartMatch(id);
+                DeleteSmartMatch(id);
             }
         }
 
-        public async Task DeleteAllSmartMatch()
+        public void DeleteAllSmartMatch()
         {
             using (WriteLock.Write())
             {
