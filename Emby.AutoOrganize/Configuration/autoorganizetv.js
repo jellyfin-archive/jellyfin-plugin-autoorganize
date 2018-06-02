@@ -153,7 +153,6 @@
         view.querySelector('#txtMultiEpisodePattern').value = tvOptions.MultiEpisodeNamePattern;
 
         view.querySelector('#chkEnableSeriesAutoDetect').checked = tvOptions.AutoDetectSeries;
-        view.querySelector('#selectSeriesFolder').value = tvOptions.DefaultSeriesLibraryPath;
 
         view.querySelector('#txtSeriesPattern').value = tvOptions.SeriesFolderPattern;
 
@@ -311,7 +310,10 @@
             }
         }
 
-        function populateSeriesLocation() {
+        function populateSeriesLocation(config) {
+
+            var tvOptions = config.TvOptions;
+
             ApiClient.getVirtualFolders().then(function (result) {
 
                 var mediasLocations = [];
@@ -342,6 +344,8 @@
                 }
 
                 view.querySelector('#selectSeriesFolder').innerHTML = mediasFolderHtml;
+
+                view.querySelector('#selectSeriesFolder').value = tvOptions.DefaultSeriesLibraryPath;
 
             }, onApiFailure);
         }

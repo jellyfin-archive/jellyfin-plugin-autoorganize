@@ -142,7 +142,6 @@
         view.querySelector('#chkExtendedClean').checked = movieOptions.ExtendedClean;
 
         view.querySelector('#chkEnableMovieAutoDetect').checked = movieOptions.AutoDetectMovie;
-        view.querySelector('#selectMovieFolder').value = movieOptions.DefaultMovieLibraryPath;
 
         view.querySelector('#copyOrMoveMovieFile').value = movieOptions.CopyOriginalFile.toString();
 
@@ -286,7 +285,10 @@
             }
         }
 
-        function populateMovieLocation() {
+        function populateMovieLocation(config) {
+
+            var movieOptions = config.MovieOptions;
+
             ApiClient.getVirtualFolders().then(function (result) {
 
                 var mediasLocations = [];
@@ -318,6 +320,8 @@
 
                 view.querySelector('#selectMovieFolder').innerHTML = mediasFolderHtml;
 
+                view.querySelector('#selectMovieFolder').value = movieOptions.DefaultMovieLibraryPath;
+
             }, onApiFailure);
         }
 
@@ -347,7 +351,7 @@
                 loadPage(view, config);
                 updateMoviePatternHelp();
                 updateMovieFolderPatternHelp();
-                populateMovieLocation();
+                populateMovieLocation(config);
                 toggleMovieLocation();
                 toggleMovieFolderPattern();
             });
