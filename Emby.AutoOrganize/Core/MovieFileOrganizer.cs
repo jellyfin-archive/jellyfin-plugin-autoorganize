@@ -134,11 +134,11 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private Movie CreateNewMovie(MovieFileOrganizationRequest request, string originalPath, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
+        private Movie CreateNewMovie(MovieFileOrganizationRequest request, FileOrganizationResult result, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
         {
             // To avoid Movie duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-            var movie = GetMatchingMovie(request.NewMovieName, request.NewMovieYear, null, options);
-
+            var movie = GetMatchingMovie(request.NewMovieName, request.NewMovieYear, request.TargetFolder, result, options);
+            
             if (movie == null)
             {
                 // We're having a new movie here
@@ -151,11 +151,11 @@ namespace Emby.AutoOrganize.Core
                     ProviderIds = request.NewMovieProviderIds,
                 };
 
-                var newPath = GetMoviePath(originalPath, movie, options);
+                var newPath = GetMoviePath(result.OriginalPath, movie, options);
 
                 if (string.IsNullOrEmpty(newPath))
                 {
-                    var msg = string.Format("Unable to sort {0} because target path could not be determined.", originalPath);
+                    var msg = string.Format("Unable to sort {0} because target path could not be determined.", result.OriginalPath);
                     throw new OrganizationException(msg);
                 }
 
@@ -176,7 +176,7 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewMovieProviderIds.Count > 0)
                 {
                     // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    movie = CreateNewMovie(request, result.OriginalPath, options, cancellationToken);
+                    movie = CreateNewMovie(request, result, options, cancellationToken);
                 }
 
                 if (movie == null)
@@ -217,7 +217,7 @@ namespace Emby.AutoOrganize.Core
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            var movie = GetMatchingMovie(movieName, movieYear, result, options);
+            var movie = GetMatchingMovie(movieName, movieYear, "", result, options);
             RemoteSearchResult searchResult = null;
 
             if (movie == null)
@@ -460,7 +460,7 @@ namespace Emby.AutoOrganize.Core
                         TargetFolder = options.DefaultMovieLibraryPath
                     };
 
-                    var movie = CreateNewMovie(organizationRequest, result.OriginalPath, options, cancellationToken);
+                    var movie = CreateNewMovie(organizationRequest, result, options, cancellationToken);
 
                     return new Tuple<Movie, RemoteSearchResult>(movie, finalResult);
                 }
@@ -469,7 +469,7 @@ namespace Emby.AutoOrganize.Core
             return null;
         }
 
-        private Movie GetMatchingMovie(string movieName, int? movieYear, FileOrganizationResult result, MovieFileOrganizationOptions options)
+        private Movie GetMatchingMovie(string movieName, int? movieYear, string targetFolder, FileOrganizationResult result, MovieFileOrganizationOptions options)
         {
             var parsedName = _libraryManager.ParseName(movieName);
 
@@ -486,24 +486,22 @@ namespace Emby.AutoOrganize.Core
                 yearInName = movieYear;
             }
 
-            if (result != null)
-            {
-                result.ExtractedName = nameWithoutYear;
-                result.ExtractedYear = yearInName;
-            }
+            result.ExtractedName = nameWithoutYear;
+            result.ExtractedYear = yearInName;
 
             var movie = _libraryManager.GetItemList(new InternalItemsQuery
             {
                 IncludeItemTypes = new[] { typeof(Movie).Name },
                 Recursive = true,
-                DtoOptions = new DtoOptions(true)
+                DtoOptions = new DtoOptions(true),
             })
                 .Cast<Movie>()
                 .Select(i => NameUtils.GetMatchScore(nameWithoutYear, yearInName, i))
                 .Where(i => i.Item2 > 0)
                 .OrderByDescending(i => i.Item2)
                 .Select(i => i.Item1)
-                .FirstOrDefault();
+                // Check For the right folder AND the right extension (to handle quality upgrade)
+                .FirstOrDefault(m => m.Path.StartsWith(targetFolder) && Path.GetExtension(m.Path)==Path.GetExtension(result.OriginalPath));
 
             return movie;
         }
