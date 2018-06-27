@@ -379,7 +379,7 @@
                 updateSeasonPatternHelp();
                 updateEpisodePatternHelp();
                 updateMultiEpisodePatternHelp();
-                populateSeriesLocation();
+                populateSeriesLocation(config);
                 toggleSeriesLocation();
             });
         });
