@@ -53,7 +53,7 @@ namespace Emby.AutoOrganize.Core
             _taskManager.CancelIfRunningAndQueue<OrganizerScheduledTask>();
         }
 
-        public Task SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
+        public void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
         {
             if (result == null || string.IsNullOrEmpty(result.OriginalPath))
             {
@@ -62,17 +62,17 @@ namespace Emby.AutoOrganize.Core
 
             result.Id = result.OriginalPath.GetMD5().ToString("N");
 
-            return _repo.SaveResult(result, cancellationToken);
+            _repo.SaveResult(result, cancellationToken);
         }
 
-        public Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
+        public void SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
         {
             if (result == null)
             {
                 throw new ArgumentNullException("result");
             }
 
-            return _repo.SaveResult(result, cancellationToken);
+            _repo.SaveResult(result, cancellationToken);
         }
 
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)

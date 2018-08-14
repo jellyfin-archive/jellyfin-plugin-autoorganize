@@ -129,7 +129,7 @@ namespace Emby.AutoOrganize.Core
                 _logger.ErrorException("Error organizing file", ex);
             }
 
-            await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
+            _organizationService.SaveResult(result, CancellationToken.None);
 
             return result;
         }
@@ -138,7 +138,7 @@ namespace Emby.AutoOrganize.Core
         {
             // To avoid Movie duplicate by mistake (Missing SmartMatch and wrong selection in UI)
             var movie = GetMatchingMovie(request.NewMovieName, request.NewMovieYear, request.TargetFolder, result, options);
-            
+
             if (movie == null)
             {
                 // We're having a new movie here
@@ -196,7 +196,7 @@ namespace Emby.AutoOrganize.Core
                     result,
                     cancellationToken).ConfigureAwait(false);
 
-                await _organizationService.SaveResult(result, CancellationToken.None).ConfigureAwait(false);
+                _organizationService.SaveResult(result, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -279,7 +279,7 @@ namespace Emby.AutoOrganize.Core
 
             if (isNew)
             {
-                await _organizationService.SaveResult(result, cancellationToken);
+                _organizationService.SaveResult(result, cancellationToken);
             }
 
             if (!_organizationService.AddToInProgressList(result, isNew))
@@ -501,7 +501,7 @@ namespace Emby.AutoOrganize.Core
                 .OrderByDescending(i => i.Item2)
                 .Select(i => i.Item1)
                 // Check For the right folder AND the right extension (to handle quality upgrade)
-                .FirstOrDefault(m => m.Path.StartsWith(targetFolder) && Path.GetExtension(m.Path)==Path.GetExtension(result.OriginalPath));
+                .FirstOrDefault(m => m.Path.StartsWith(targetFolder) && Path.GetExtension(m.Path) == Path.GetExtension(result.OriginalPath));
 
             return movie;
         }

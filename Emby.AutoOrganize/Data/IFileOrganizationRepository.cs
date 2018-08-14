@@ -15,7 +15,7 @@ namespace Emby.AutoOrganize.Data
         /// <param name="result">The result.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Task.</returns>
-        Task SaveResult(FileOrganizationResult result, CancellationToken cancellationToken);
+        void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken);
 
         /// <summary>
         /// Deletes the specified identifier.
@@ -54,7 +54,7 @@ namespace Emby.AutoOrganize.Data
 
         #region SmartMatch
 
-        Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
+        void SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
 
         void DeleteSmartMatch(string id);
 

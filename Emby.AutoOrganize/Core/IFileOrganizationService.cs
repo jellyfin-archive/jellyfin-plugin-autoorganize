@@ -79,14 +79,6 @@ namespace Emby.AutoOrganize.Core
         /// <param name="path">The path.</param>
         /// <returns>FileOrganizationResult.</returns>
         FileOrganizationResult GetResultBySourcePath(string path);
-        
-        /// <summary>
-        /// Saves the result.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Task.</returns>
-        Task SaveResult(FileOrganizationResult result, CancellationToken cancellationToken);
 
         /// <summary>
         /// Saves the result.
@@ -94,7 +86,15 @@ namespace Emby.AutoOrganize.Core
         /// <param name="result">The result.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Task.</returns>
-        Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
+        void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Saves the result.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Task.</returns>
+        void SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns a list of smart match entries

@@ -50,7 +50,7 @@ namespace Emby.AutoOrganize.Data
 
         #region FileOrganizationResult
 
-        public async Task SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
+        public void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
         {
             if (result == null)
             {
@@ -308,7 +308,7 @@ namespace Emby.AutoOrganize.Data
 
         #region SmartMatch
 
-        public async Task SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
+        public void SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
         {
             if (result == null)
             {
@@ -377,7 +377,7 @@ namespace Emby.AutoOrganize.Data
 
             if (match.MatchStrings.Any())
             {
-                await SaveResult(match, CancellationToken.None);
+                SaveResult(match, CancellationToken.None);
             }
             else
             {
