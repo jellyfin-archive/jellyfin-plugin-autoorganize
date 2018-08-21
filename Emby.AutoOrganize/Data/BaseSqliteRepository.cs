@@ -108,37 +108,50 @@ namespace Emby.AutoOrganize.Data
 
                 var db = SQLite3.Open(DbFilePath, connectionFlags, null);
 
-                if (string.IsNullOrWhiteSpace(_defaultWal))
+                try
                 {
-                    _defaultWal = db.Query("PRAGMA journal_mode").SelectScalarString().First();
+                    if (string.IsNullOrWhiteSpace(_defaultWal))
+                    {
+                        _defaultWal = db.Query("PRAGMA journal_mode").SelectScalarString().First();
 
-                    Logger.Info("Default journal_mode for {0} is {1}", DbFilePath, _defaultWal);
+                        Logger.Info("Default journal_mode for {0} is {1}", DbFilePath, _defaultWal);
+                    }
+
+                    var queries = new List<string>
+                    {
+                        //"PRAGMA cache size=-10000"
+                        //"PRAGMA read_uncommitted = true",
+                        "PRAGMA synchronous=Normal"
+                    };
+
+                    if (CacheSize.HasValue)
+                    {
+                        queries.Add("PRAGMA cache_size=" + CacheSize.Value.ToString(CultureInfo.InvariantCulture));
+                    }
+
+                    if (EnableTempStoreMemory)
+                    {
+                        queries.Add("PRAGMA temp_store = memory");
+                    }
+                    else
+                    {
+                        queries.Add("PRAGMA temp_store = file");
+                    }
+
+                    //foreach (var query in queries)
+                    //{
+                    //    db.Execute(query);
+                    //}
+                    db.ExecuteAll(string.Join(";", queries.ToArray()));
                 }
+                catch
+                {
+                    using (db)
+                    {
 
-                var queries = new List<string>
-                {
-                    //"PRAGMA cache size=-10000"
-                    //"PRAGMA read_uncommitted = true",
-                    "PRAGMA synchronous=Normal"
-                };
+                    }
 
-                if (CacheSize.HasValue)
-                {
-                    queries.Add("PRAGMA cache_size=" + CacheSize.Value.ToString(CultureInfo.InvariantCulture));
-                }
-
-                if (EnableTempStoreMemory)
-                {
-                    queries.Add("PRAGMA temp_store = memory");
-                }
-                else
-                {
-                    queries.Add("PRAGMA temp_store = file");
-                }
-
-                foreach (var query in queries)
-                {
-                    db.Execute(query);
+                    throw;
                 }
 
                 _connection = new ManagedConnection(db, false);
@@ -175,6 +188,31 @@ namespace Emby.AutoOrganize.Data
         public List<IStatement> PrepareAllSafe(IDatabaseConnection connection, IEnumerable<string> sql)
         {
             return sql.Select(connection.PrepareStatement).ToList();
+        }
+
+        protected bool TableExists(ManagedConnection connection, string name)
+        {
+            return connection.RunInTransaction(db =>
+            {
+                return TableExists(db, name);
+
+            }, ReadTransactionMode);
+        }
+
+        protected bool TableExists(IDatabaseConnection db, string name)
+        {
+            using (var statement = PrepareStatement(db, "select DISTINCT tbl_name from sqlite_master"))
+            {
+                foreach (var row in statement.ExecuteQuery())
+                {
+                    if (string.Equals(name, row.GetString(0), StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         protected void RunDefaultInitialization(ManagedConnection db)
@@ -252,7 +290,6 @@ namespace Emby.AutoOrganize.Data
         {
             _disposed = true;
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         private readonly object _disposeLock = new object();
@@ -265,29 +302,34 @@ namespace Emby.AutoOrganize.Data
         {
             if (dispose)
             {
-                try
+                DisposeConnection();
+            }
+        }
+
+        private void DisposeConnection()
+        {
+            try
+            {
+                lock (_disposeLock)
                 {
-                    lock (_disposeLock)
+                    using (WriteLock.Write())
                     {
-                        using (WriteLock.Write())
+                        if (_connection != null)
                         {
-                            if (_connection != null)
+                            using (_connection)
                             {
-                                using (_connection)
-                                {
-
-                                }
-                                _connection = null;
+                                _connection.Close();
                             }
-
-                            CloseConnection();
+                            _connection = null;
                         }
+
+                        CloseConnection();
                     }
                 }
-                catch (Exception ex)
-                {
-                    Logger.ErrorException("Error disposing database", ex);
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.ErrorException("Error disposing database", ex);
             }
         }
 

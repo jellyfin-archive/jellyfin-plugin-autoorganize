@@ -331,7 +331,7 @@ namespace Emby.AutoOrganize.Core
                 if (series == null)
                 {
                     // Existing Series
-                    series = (Series)_libraryManager.GetItemById(new Guid(request.SeriesId));
+                    series = (Series)_libraryManager.GetItemById(request.SeriesId);
                 }
 
                 // We manually set the media as Series 

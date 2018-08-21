@@ -182,7 +182,7 @@ namespace Emby.AutoOrganize.Core
                 if (movie == null)
                 {
                     // Existing movie
-                    movie = (Movie)_libraryManager.GetItemById(new Guid(request.MovieId));
+                    movie = (Movie)_libraryManager.GetItemById(request.MovieId);
                 }
 
                 // We manually set the media as Movie 
