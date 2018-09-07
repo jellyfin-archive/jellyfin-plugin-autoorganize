@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
-    <AssemblyVersion>1.3.1.0</AssemblyVersion>
-    <FileVersion>1.3.1.0</FileVersion>
+    <AssemblyVersion>1.3.2.0</AssemblyVersion>
+    <FileVersion>1.3.2.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +17,7 @@
     <None Remove="Configuration\autoorganizetv.js" />
     <None Remove="Configuration\fileorganizer.js" />
     <None Remove="Configuration\fileorganizer.template.html" />
+    <None Remove="thumb.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,12 +31,14 @@
     <EmbeddedResource Include="Configuration\autoorganizetv.js" />
     <EmbeddedResource Include="Configuration\fileorganizer.js" />
     <EmbeddedResource Include="Configuration\fileorganizer.template.html" />
+    <EmbeddedResource Include="thumb.jpg" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MediaBrowser.Naming" Version="1.1.7-beta" />
-    <PackageReference Include="mediabrowser.server.core" Version="3.6.0.26-beta" />
+    <PackageReference Include="mediabrowser.server.core" Version="3.6.0.36-beta" />
     <PackageReference Include="SQLitePCL.pretty.core" Version="1.1.8" />
+    <PackageReference Include="System.Memory" Version="4.5.1" />
   </ItemGroup>
 
 </Project>
