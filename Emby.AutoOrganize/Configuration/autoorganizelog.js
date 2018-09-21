@@ -1,4 +1,4 @@
-﻿define(['globalize', 'serverNotifications', 'events', 'scripts/taskbutton', 'datetime', 'loading', 'libraryMenu', 'libraryBrowser', 'paper-icon-button-light', 'emby-linkbutton', 'detailtablecss'], function (globalize, serverNotifications, events, taskButton, datetime, loading, libraryMenu, libraryBrowser) {
+﻿define(['globalize', 'serverNotifications', 'events', 'scripts/taskbutton', 'datetime', 'loading', 'libraryMenu', 'paper-icon-button-light', 'emby-linkbutton', 'detailtablecss'], function (globalize, serverNotifications, events, taskButton, datetime, loading, libraryMenu) {
     'use strict';
 
     ApiClient.getFileOrganizationResults = function (options) {
@@ -266,6 +266,40 @@
         return status;
     }
 
+    function getQueryPagingHtml(options) {
+        var startIndex = options.startIndex;
+        var limit = options.limit;
+        var totalRecordCount = options.totalRecordCount;
+
+        var html = '';
+
+        var recordsEnd = Math.min(startIndex + limit, totalRecordCount);
+
+        var showControls = limit < totalRecordCount;
+
+        html += '<div class="listPaging">';
+
+        if (showControls) {
+            html += '<span style="vertical-align:middle;">';
+
+            var startAtDisplay = totalRecordCount ? startIndex + 1 : 0;
+            html += startAtDisplay + '-' + recordsEnd + ' of ' + totalRecordCount;
+
+            html += '</span>';
+
+            html += '<div style="display:inline-block;">';
+
+            html += '<button is="paper-icon-button-light" class="btnPreviousPage autoSize" ' + (startIndex ? '' : 'disabled') + '><i class="md-icon">&#xE5C4;</i></button>';
+            html += '<button is="paper-icon-button-light" class="btnNextPage autoSize" ' + (startIndex + limit >= totalRecordCount ? 'disabled' : '') + '><i class="md-icon">&#xE5C8;</i></button>';
+
+            html += '</div>';
+        }
+
+        html += '</div>';
+
+        return html;
+    }
+
     function renderResults(page, result) {
 
         if (Object.prototype.toString.call(page) !== "[object Window]") {
@@ -288,7 +322,7 @@
 
             resultBody.addEventListener('click', handleItemClick);
 
-            var pagingHtml = libraryBrowser.getQueryPagingHtml({
+            var pagingHtml = getQueryPagingHtml({
                 startIndex: query.StartIndex,
                 limit: query.Limit,
                 totalRecordCount: result.TotalRecordCount,
