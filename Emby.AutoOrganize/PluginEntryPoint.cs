@@ -10,9 +10,9 @@ using MediaBrowser.Controller.Providers;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Events;
 using MediaBrowser.Model.IO;
-using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize
 {
@@ -34,11 +34,20 @@ namespace Emby.AutoOrganize
 
         public IFileOrganizationRepository Repository;
 
-        public PluginEntryPoint(ISessionManager sessionManager, ITaskManager taskManager, ILogger logger, ILibraryMonitor libraryMonitor, ILibraryManager libraryManager, IServerConfigurationManager config, IFileSystem fileSystem, IProviderManager providerManager, IJsonSerializer json)
+        public PluginEntryPoint(
+            ISessionManager sessionManager,
+            ITaskManager taskManager,
+            ILoggerFactory loggerFactory,
+            ILibraryMonitor libraryMonitor,
+            ILibraryManager libraryManager,
+            IServerConfigurationManager config,
+            IFileSystem fileSystem,
+            IProviderManager providerManager,
+            IJsonSerializer json)
         {
             _sessionManager = sessionManager;
             _taskManager = taskManager;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger("AutoOrganize");
             _libraryMonitor = libraryMonitor;
             _libraryManager = libraryManager;
             _config = config;
@@ -55,7 +64,7 @@ namespace Emby.AutoOrganize
             }
             catch (Exception ex)
             {
-                _logger.ErrorException("Error initializing auto-organize database", ex);
+                _logger.LogError(ex, "Error initializing auto-organize database");
             }
 
             Current = this;

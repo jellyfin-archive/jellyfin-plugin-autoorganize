@@ -1,10 +1,3 @@
-using MediaBrowser.Controller.Configuration;
-using MediaBrowser.Controller.Entities.TV;
-using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.Entities;
-using MediaBrowser.Model.Extensions;
-using MediaBrowser.Model.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,12 +6,19 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
-using MediaBrowser.Controller.Dto;
-using MediaBrowser.Controller.Entities;
-using MediaBrowser.Model.IO;
 using Emby.Naming.Common;
 using Emby.Naming.TV;
+using MediaBrowser.Controller.Configuration;
+using MediaBrowser.Controller.Dto;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Entities.TV;
+using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.Extensions;
+using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Providers;
+using Microsoft.Extensions.Logging;
 using EpisodeInfo = MediaBrowser.Controller.Providers.EpisodeInfo;
 
 namespace Emby.AutoOrganize.Core
@@ -35,7 +35,14 @@ namespace Emby.AutoOrganize.Core
 
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
 
-        public EpisodeFileOrganizer(IFileOrganizationService organizationService, IServerConfigurationManager config, IFileSystem fileSystem, ILogger logger, ILibraryManager libraryManager, ILibraryMonitor libraryMonitor, IProviderManager providerManager)
+        public EpisodeFileOrganizer(
+            IFileOrganizationService organizationService,
+            IServerConfigurationManager config,
+            IFileSystem fileSystem,
+            ILogger logger,
+            ILibraryManager libraryManager,
+            ILibraryMonitor libraryMonitor,
+            IProviderManager providerManager)
         {
             _organizationService = organizationService;
             _config = config;
@@ -66,7 +73,7 @@ namespace Emby.AutoOrganize.Core
             TvFileOrganizationOptions options,
             CancellationToken cancellationToken)
         {
-            _logger.Info("Sorting file {0}", path);
+            _logger.LogInformation("Sorting file {0}", path);
 
             var result = new FileOrganizationResult
             {
@@ -83,7 +90,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = "Path is locked by other processes. Please try again later.";
-                    _logger.Info("Auto-organize Path is locked by other processes. Please try again later.");
+                    _logger.LogInformation("Auto-organize Path is locked by other processes. Please try again later.");
                     return result;
                 }
 
@@ -128,11 +135,13 @@ namespace Emby.AutoOrganize.Core
                     {
                         if (episodeInfo.IsByDate)
                         {
-                            _logger.Debug("Extracted information from {0}. Series name {1}, Date {2}", path, seriesName, premiereDate.Value);
+                            _logger.LogDebug("Extracted information from {0}. Series name {1}, Date {2}",
+                                path, seriesName, premiereDate.Value);
                         }
                         else
                         {
-                            _logger.Debug("Extracted information from {0}. Series name {1}, Season {2}, Episode {3}", path, seriesName, seasonNumber, episodeNumber);
+                            _logger.LogDebug("Extracted information from {0}. Series name {1}, Season {2}, Episode {3}",
+                                path, seriesName, seasonNumber, episodeNumber);
                         }
 
                         // We detected an airdate or (an season number and an episode number)
@@ -161,7 +170,7 @@ namespace Emby.AutoOrganize.Core
                         var msg = string.Format("Unable to determine episode number from {0}", path);
                         result.Status = FileSortingStatus.Failure;
                         result.StatusMessage = msg;
-                        _logger.Warn(msg);
+                        _logger.LogWarning(msg);
                     }
                 }
                 else
@@ -169,7 +178,7 @@ namespace Emby.AutoOrganize.Core
                     var msg = string.Format("Unable to determine series name from {0}", path);
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.Warn(msg);
+                    _logger.LogWarning(msg);
                 }
 
                 // Handle previous result
@@ -193,7 +202,7 @@ namespace Emby.AutoOrganize.Core
             {
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = ex.Message;
-                _logger.ErrorException("Error organizing file", ex);
+                _logger.LogError(ex, "Error organizing file");
             }
 
             _organizationService.SaveResult(result, CancellationToken.None);
@@ -382,7 +391,7 @@ namespace Emby.AutoOrganize.Core
                     var msg = string.Format("Unable to find series in library matching name {0}", seriesName);
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.Warn(msg);
+                    _logger.LogWarning(msg);
                     return Task.FromResult(true);
                 }
             }
@@ -455,7 +464,7 @@ namespace Emby.AutoOrganize.Core
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            _logger.Info("Sorting file {0} into series {1}", sourcePath, series.Path);
+            _logger.LogInformation("Sorting file {0} into series {1}", sourcePath, series.Path);
 
             var originalExtractedSeriesString = result.ExtractedName;
 
@@ -482,7 +491,7 @@ namespace Emby.AutoOrganize.Core
                     throw new OrganizationException(msg);
                 }
 
-                _logger.Info("Sorting file {0} to new path {1}", sourcePath, newPath);
+                _logger.LogInformation("Sorting file {0} to new path {1}", sourcePath, newPath);
                 result.TargetPath = newPath;
 
                 var fileExists = _fileSystem.FileExists(result.TargetPath);
@@ -493,7 +502,7 @@ namespace Emby.AutoOrganize.Core
                     if (options.CopyOriginalFile && fileExists && IsSameEpisode(sourcePath, newPath))
                     {
                         var msg = string.Format("File '{0}' already copied to new path '{1}', stopping organization", sourcePath, newPath);
-                        _logger.Info(msg);
+                        _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         return;
@@ -502,7 +511,7 @@ namespace Emby.AutoOrganize.Core
                     if (fileExists)
                     {
                         var msg = string.Format("File '{0}' already exists as '{1}', stopping organization", sourcePath, newPath);
-                        _logger.Info(msg);
+                        _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.TargetPath = newPath;
@@ -512,7 +521,7 @@ namespace Emby.AutoOrganize.Core
                     if (otherDuplicatePaths.Count > 0)
                     {
                         var msg = string.Format("File '{0}' already exists as these:'{1}'. Stopping organization", sourcePath, string.Join("', '", otherDuplicatePaths));
-                        _logger.Info(msg);
+                        _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.DuplicatePaths = otherDuplicatePaths;
@@ -528,7 +537,7 @@ namespace Emby.AutoOrganize.Core
 
                     foreach (var path in otherDuplicatePaths)
                     {
-                        _logger.Debug("Removing duplicate episode {0}", path);
+                        _logger.LogDebug("Removing duplicate episode {0}", path);
 
                         _libraryMonitor.ReportFileSystemChangeBeginning(path);
 
@@ -546,7 +555,7 @@ namespace Emby.AutoOrganize.Core
                         }
                         catch (IOException ex)
                         {
-                            _logger.ErrorException("Error removing duplicate episode", ex, path);
+                            _logger.LogError(ex, "Error removing duplicate episode: {0}", path);
                         }
                         finally
                         {
@@ -559,7 +568,7 @@ namespace Emby.AutoOrganize.Core
             {
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = ex.Message;
-                _logger.Warn(ex.Message);
+                _logger.LogError(ex, "Caught a generic exception while organizing an episode");
                 return;
             }
             finally
@@ -729,7 +738,7 @@ namespace Emby.AutoOrganize.Core
 
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = errorMsg;
-                _logger.ErrorException(errorMsg, ex);
+                _logger.LogError(ex, errorMsg);
 
                 return;
             }
@@ -746,7 +755,7 @@ namespace Emby.AutoOrganize.Core
                 }
                 catch (Exception ex)
                 {
-                    _logger.ErrorException("Error deleting {0}", ex, result.OriginalPath);
+                    _logger.LogError(ex, "Error deleting {0}", result.OriginalPath);
                 }
             }
         }
@@ -792,7 +801,7 @@ namespace Emby.AutoOrganize.Core
                     {
                         var msg = string.Format("No season found for {0} season {1} episode {2}", series.Name,
                             episode.ParentIndexNumber, episode.IndexNumber);
-                        _logger.Warn(msg);
+                        _logger.LogWarning(msg);
                         throw new OrganizationException(msg);
                     }
 
@@ -922,7 +931,7 @@ namespace Emby.AutoOrganize.Core
             if (episodeSearch == null)
             {
                 var msg = string.Format("No provider metadata found for {0} season {1} episode {2}", series.Name, seasonNumber, episodeNumber);
-                _logger.Warn(msg);
+                _logger.LogWarning(msg);
                 throw new OrganizationException(msg);
             }
 

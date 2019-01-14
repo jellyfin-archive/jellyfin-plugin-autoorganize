@@ -9,7 +9,7 @@ using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
-using MediaBrowser.Model.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
@@ -44,7 +44,7 @@ namespace Emby.AutoOrganize.Core
             }
             catch (Exception ex)
             {
-                _logger.ErrorException("Error organizing file {0}", ex, fileInfo.Name);
+                _logger.LogError(ex, "Error organizing file {0}", ex, fileInfo.Name);
             }
 
             return false;
@@ -54,7 +54,7 @@ namespace Emby.AutoOrganize.Core
         {
             if (IsPathAlreadyInMediaLibrary(path, libraryFolderPaths))
             {
-                _logger.Info("Folder {0} is not eligible for auto-organize because it is also part of an Emby library", path);
+                _logger.LogInformation("Folder {0} is not eligible for auto-organize because it is also part of an Emby library", path);
                 return false;
             }
 
@@ -110,7 +110,7 @@ namespace Emby.AutoOrganize.Core
                     }
                     catch (Exception ex)
                     {
-                        _logger.ErrorException("Error organizing episode {0}", ex, file.FullName);
+                        _logger.LogError(ex, "Error organizing episode {0}", file.FullName);
                     }
 
                     numComplete++;
@@ -173,7 +173,7 @@ namespace Emby.AutoOrganize.Core
             }
             catch (IOException ex)
             {
-                _logger.ErrorException("Error getting files from {0}", ex, path);
+                _logger.LogError(ex, "Error getting files from {0}", path);
 
                 return new List<FileSystemMetadata>();
             }
@@ -197,7 +197,7 @@ namespace Emby.AutoOrganize.Core
                 }
                 catch (Exception ex)
                 {
-                    _logger.ErrorException("Error deleting file {0}", ex, file);
+                    _logger.LogError(ex, "Error deleting file {0}", file);
                 }
             }
         }
@@ -222,7 +222,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     try
                     {
-                        _logger.Debug("Deleting empty directory {0}", path);
+                        _logger.LogDebug("Deleting empty directory {0}", path);
                         _fileSystem.DeleteDirectory(path, false);
                     }
                     catch (UnauthorizedAccessException) { }
