@@ -1,7 +1,3 @@
-using MediaBrowser.Controller.Configuration;
-using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,13 +6,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
-using MediaBrowser.Controller.Dto;
-using MediaBrowser.Controller.Entities;
-using MediaBrowser.Model.IO;
 using Emby.Naming.Common;
 using Emby.Naming.Video;
+using MediaBrowser.Controller.Configuration;
+using MediaBrowser.Controller.Dto;
+using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
+using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Providers;
+using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
@@ -58,9 +58,13 @@ namespace Emby.AutoOrganize.Core
 
         private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Movie;
 
-        public async Task<FileOrganizationResult> OrganizeMovieFile(string path, MovieFileOrganizationOptions options, bool overwriteExisting, CancellationToken cancellationToken)
+        public async Task<FileOrganizationResult> OrganizeMovieFile(
+            string path,
+            MovieFileOrganizationOptions options,
+            bool overwriteExisting,
+            CancellationToken cancellationToken)
         {
-            _logger.Info("Sorting file {0}", path);
+            _logger.LogInformation("Sorting file {0}", path);
 
             var result = new FileOrganizationResult
             {
@@ -77,7 +81,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = "Path is locked by other processes. Please try again later.";
-                    _logger.Info("Auto-organize Path is locked by other processes. Please try again later.");
+                    _logger.LogInformation("Auto-organize Path is locked by other processes. Please try again later.");
                     return result;
                 }
 
@@ -93,7 +97,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     var movieYear = movieInfo.Year;
 
-                    _logger.Debug("Extracted information from {0}. Movie {1}, Year {2}", path, movieName, movieYear);
+                    _logger.LogDebug("Extracted information from {0}. Movie {1}, Year {2}", path, movieName, movieYear);
 
                     await OrganizeMovie(path,
                         movieName,
@@ -108,7 +112,7 @@ namespace Emby.AutoOrganize.Core
                     var msg = string.Format("Unable to determine movie name from {0}", path);
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.Warn(msg);
+                    _logger.LogWarning(msg);
                 }
 
                 // Handle previous result
@@ -126,7 +130,7 @@ namespace Emby.AutoOrganize.Core
             {
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = ex.Message;
-                _logger.ErrorException("Error organizing file", ex);
+                _logger.LogError(ex, "Error organizing file {0}", path);
             }
 
             _organizationService.SaveResult(result, CancellationToken.None);
@@ -232,7 +236,7 @@ namespace Emby.AutoOrganize.Core
                     var msg = string.Format("Unable to find movie in library matching name {0}", movieName);
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.Warn(msg);
+                    _logger.LogWarning(msg);
                     return;
                 }
             }
@@ -266,14 +270,15 @@ namespace Emby.AutoOrganize.Core
                 cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task OrganizeMovie(string sourcePath,
+        private async Task OrganizeMovie(
+            string sourcePath,
             Movie movie,
             MovieFileOrganizationOptions options,
             bool overwriteExisting,
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            _logger.Info("Sorting file {0} into movie {1}", sourcePath, movie.Path);
+            _logger.LogInformation("Sorting file {0} into movie {1}", sourcePath, movie.Path);
 
             bool isNew = string.IsNullOrWhiteSpace(result.Id);
 
@@ -291,7 +296,7 @@ namespace Emby.AutoOrganize.Core
             {
                 // Proceed to sort the file
                 var newPath = movie.Path;
-                _logger.Info("Sorting file {0} to new path {1}", sourcePath, newPath);
+                _logger.LogInformation("Sorting file {0} to new path {1}", sourcePath, newPath);
                 result.TargetPath = newPath;
 
                 var fileExists = _fileSystem.FileExists(result.TargetPath);
@@ -301,7 +306,7 @@ namespace Emby.AutoOrganize.Core
                     if (options.CopyOriginalFile && fileExists && IsSameMovie(sourcePath, newPath))
                     {
                         var msg = string.Format("File '{0}' already copied to new path '{1}', stopping organization", sourcePath, newPath);
-                        _logger.Info(msg);
+                        _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         return;
@@ -310,7 +315,7 @@ namespace Emby.AutoOrganize.Core
                     if (fileExists)
                     {
                         var msg = string.Format("File '{0}' already exists as '{1}', stopping organization", sourcePath, newPath);
-                        _logger.Info(msg);
+                        _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.TargetPath = newPath;
@@ -329,7 +334,7 @@ namespace Emby.AutoOrganize.Core
             {
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = ex.Message;
-                _logger.Warn(ex.Message);
+                _logger.LogError(ex, "Caught a generic exception while organizing {0}", sourcePath);
             }
             finally
             {
@@ -371,7 +376,7 @@ namespace Emby.AutoOrganize.Core
 
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = errorMsg;
-                _logger.ErrorException(errorMsg, ex);
+                _logger.LogError(ex, errorMsg);
 
                 return;
             }
@@ -388,7 +393,7 @@ namespace Emby.AutoOrganize.Core
                 }
                 catch (Exception ex)
                 {
-                    _logger.ErrorException("Error deleting {0}", ex, result.OriginalPath);
+                    _logger.LogError(ex, "Error deleting {0}", result.OriginalPath);
                 }
             }
         }

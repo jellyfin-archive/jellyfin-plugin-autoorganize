@@ -13,9 +13,9 @@ using MediaBrowser.Controller.Persistence;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Events;
 using MediaBrowser.Model.IO;
-using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Querying;
 using MediaBrowser.Model.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
@@ -36,7 +36,15 @@ namespace Emby.AutoOrganize.Core
         public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
         public event EventHandler LogReset;
 
-        public FileOrganizationService(ITaskManager taskManager, IFileOrganizationRepository repo, ILogger logger, ILibraryMonitor libraryMonitor, ILibraryManager libraryManager, IServerConfigurationManager config, IFileSystem fileSystem, IProviderManager providerManager)
+        public FileOrganizationService(
+            ITaskManager taskManager,
+            IFileOrganizationRepository repo,
+            ILogger logger,
+            ILibraryMonitor libraryMonitor,
+            ILibraryManager libraryManager,
+            IServerConfigurationManager config,
+            IFileSystem fileSystem,
+            IProviderManager providerManager)
         {
             _taskManager = taskManager;
             _repo = repo;
@@ -115,7 +123,7 @@ namespace Emby.AutoOrganize.Core
         {
             var result = _repo.GetResult(resultId);
 
-            _logger.Info("Requested to delete {0}", result.OriginalPath);
+            _logger.LogInformation("Requested to delete {0}", result.OriginalPath);
 
             if (!AddToInProgressList(result, false))
             {
@@ -128,7 +136,7 @@ namespace Emby.AutoOrganize.Core
             }
             catch (Exception ex)
             {
-                _logger.ErrorException("Error deleting {0}", ex, result.OriginalPath);
+                _logger.LogError(ex, "Error deleting {0}", result.OriginalPath);
             }
             finally
             {
@@ -160,7 +168,8 @@ namespace Emby.AutoOrganize.Core
             switch (result.Type)
             {
                 case FileOrganizerType.Episode:
-                    var episodeOrganizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
+                    var episodeOrganizer = new EpisodeFileOrganizer(
+                        this, _config, _fileSystem, _logger, _libraryManager,
                         _libraryMonitor, _providerManager);
 
                     organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, options.TvOptions, CancellationToken.None)
