@@ -145,7 +145,7 @@ namespace Emby.AutoOrganize.Core
 
             await _repo.Delete(resultId);
 
-            EventHelper.FireEventIfNotNull(ItemRemoved, this, new GenericEventArgs<FileOrganizationResult>(result), _logger);
+            ItemRemoved?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
         }
 
         private AutoOrganizeOptions GetAutoOrganizeOptions()
@@ -196,13 +196,13 @@ namespace Emby.AutoOrganize.Core
         public async Task ClearLog()
         {
             await _repo.DeleteAll();
-            EventHelper.FireEventIfNotNull(LogReset, this, EventArgs.Empty, _logger);
+            LogReset?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task ClearCompleted()
         {
             await _repo.DeleteCompleted();
-            EventHelper.FireEventIfNotNull(LogReset, this, EventArgs.Empty, _logger);
+            LogReset?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
@@ -281,11 +281,11 @@ namespace Emby.AutoOrganize.Core
 
             if (isNewItem)
             {
-                EventHelper.FireEventIfNotNull(ItemAdded, this, new GenericEventArgs<FileOrganizationResult>(result), _logger);
+                ItemAdded?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
             }
             else
             {
-                EventHelper.FireEventIfNotNull(ItemUpdated, this, new GenericEventArgs<FileOrganizationResult>(result), _logger);
+                ItemUpdated?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
             }
 
             return true;
@@ -303,7 +303,7 @@ namespace Emby.AutoOrganize.Core
 
             result.IsInProgress = false;
 
-            EventHelper.FireEventIfNotNull(ItemUpdated, this, new GenericEventArgs<FileOrganizationResult>(result), _logger);
+            ItemUpdated.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
 
             return retval;
         }
