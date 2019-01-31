@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Emby.AutoOrganize.Configuration;
 using MediaBrowser.Common.Configuration;

@@ -1,4 +1,3 @@
-﻿
 namespace Emby.AutoOrganize.Model
 {
     public class TvFileOrganizationOptions
