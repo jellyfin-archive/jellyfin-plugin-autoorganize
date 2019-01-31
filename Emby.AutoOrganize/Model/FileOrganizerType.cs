@@ -1,4 +1,4 @@
-﻿namespace Emby.AutoOrganize.Model
+namespace Emby.AutoOrganize.Model
 {
     public enum FileOrganizerType
     {

@@ -1,4 +1,4 @@
-﻿using MediaBrowser.Model.Querying;
+using MediaBrowser.Model.Querying;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
