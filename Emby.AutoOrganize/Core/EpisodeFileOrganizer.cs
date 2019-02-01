@@ -808,7 +808,7 @@ namespace Emby.AutoOrganize.Core
                     season = new Season
                     {
                         Id = Guid.NewGuid(),
-                        SeriesId = series.InternalId,
+                        SeriesId = series.Id,
                         IndexNumber = episode.ParentIndexNumber,
                     };
                 }
@@ -942,7 +942,7 @@ namespace Emby.AutoOrganize.Core
             var episode = new Episode
             {
                 ParentIndexNumber = seasonNumber,
-                SeriesId = series.InternalId,
+                SeriesId = series.Id,
                 IndexNumber = episodeNumber,
                 IndexNumberEnd = endingEpisodeNumber,
                 ProviderIds = episodeSearch.ProviderIds,
