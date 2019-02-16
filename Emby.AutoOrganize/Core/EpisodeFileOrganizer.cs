@@ -305,7 +305,7 @@ namespace Emby.AutoOrganize.Core
                     series.Path = Path.Combine(request.TargetFolder, seriesFolderName);
 
                     // Create the folder
-                    _fileSystem.CreateDirectory(series.Path);
+                    Directory.CreateDirectory(series.Path);
 
                     series.ProviderIds = request.NewSeriesProviderIds;
                 }
@@ -494,7 +494,7 @@ namespace Emby.AutoOrganize.Core
                 _logger.LogInformation("Sorting file {0} to new path {1}", sourcePath, newPath);
                 result.TargetPath = newPath;
 
-                var fileExists = _fileSystem.FileExists(result.TargetPath);
+                var fileExists = File.Exists(result.TargetPath);
                 var otherDuplicatePaths = GetOtherDuplicatePaths(result.TargetPath, series, episode);
 
                 if (!options.OverwriteExistingEpisodes)
@@ -542,7 +542,7 @@ namespace Emby.AutoOrganize.Core
                         _libraryMonitor.ReportFileSystemChangeBeginning(path);
 
                         var renameRelatedFiles = !hasRenamedFiles &&
-                            string.Equals(_fileSystem.GetDirectoryName(path), _fileSystem.GetDirectoryName(result.TargetPath), StringComparison.OrdinalIgnoreCase);
+                            string.Equals(Path.GetDirectoryName(path), Path.GetDirectoryName(result.TargetPath), StringComparison.OrdinalIgnoreCase);
 
                         if (renameRelatedFiles)
                         {
@@ -619,7 +619,7 @@ namespace Emby.AutoOrganize.Core
 
             // Now find other files
             var originalFilenameWithoutExtension = Path.GetFileNameWithoutExtension(path);
-            var directory = _fileSystem.GetDirectoryName(path);
+            var directory = Path.GetDirectoryName(path);
 
             if (!string.IsNullOrWhiteSpace(originalFilenameWithoutExtension) && !string.IsNullOrWhiteSpace(directory))
             {
@@ -632,7 +632,7 @@ namespace Emby.AutoOrganize.Core
 
                 foreach (var file in files)
                 {
-                    directory = _fileSystem.GetDirectoryName(file);
+                    directory = Path.GetDirectoryName(file);
                     var filename = Path.GetFileName(file);
 
                     filename = filename.Replace(originalFilenameWithoutExtension, targetFilenameWithoutExtension,
@@ -640,7 +640,7 @@ namespace Emby.AutoOrganize.Core
 
                     var destination = Path.Combine(directory, filename);
 
-                    _fileSystem.MoveFile(file, destination);
+                    File.Move(file, destination);
                 }
             }
         }
@@ -684,13 +684,13 @@ namespace Emby.AutoOrganize.Core
                 .Select(i => i.Path)
                 .ToList();
 
-            var folder = _fileSystem.GetDirectoryName(targetPath);
-            var targetFileNameWithoutExtension = _fileSystem.GetFileNameWithoutExtension(targetPath);
+            var folder = Path.GetDirectoryName(targetPath);
+            var targetFileNameWithoutExtension = Path.GetFileNameWithoutExtension(targetPath);
 
             try
             {
                 var filesOfOtherExtensions = _fileSystem.GetFilePaths(folder)
-                    .Where(i => _libraryManager.IsVideoFile(i) && string.Equals(_fileSystem.GetFileNameWithoutExtension(i), targetFileNameWithoutExtension, StringComparison.OrdinalIgnoreCase));
+                    .Where(i => _libraryManager.IsVideoFile(i) && string.Equals(Path.GetFileNameWithoutExtension(i), targetFileNameWithoutExtension, StringComparison.OrdinalIgnoreCase));
 
                 episodePaths.AddRange(filesOfOtherExtensions);
             }
@@ -714,19 +714,19 @@ namespace Emby.AutoOrganize.Core
 
             _libraryMonitor.ReportFileSystemChangeBeginning(result.TargetPath);
 
-            _fileSystem.CreateDirectory(_fileSystem.GetDirectoryName(result.TargetPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(result.TargetPath));
 
-            var targetAlreadyExists = _fileSystem.FileExists(result.TargetPath);
+            var targetAlreadyExists = File.Exists(result.TargetPath);
 
             try
             {
                 if (targetAlreadyExists || options.CopyOriginalFile)
                 {
-                    _fileSystem.CopyFile(result.OriginalPath, result.TargetPath, true);
+                    File.Copy(result.OriginalPath, result.TargetPath, true);
                 }
                 else
                 {
-                    _fileSystem.MoveFile(result.OriginalPath, result.TargetPath);
+                    File.Move(result.OriginalPath, result.TargetPath);
                 }
 
                 result.Status = FileSortingStatus.Success;
@@ -818,7 +818,7 @@ namespace Emby.AutoOrganize.Core
             {
                 season.Path = GetSeasonFolderPath(series, episode.ParentIndexNumber.Value, options);
                 // Create the folder
-                _fileSystem.CreateDirectory(season.Path);
+                Directory.CreateDirectory(season.Path);
             }
 
             return season;

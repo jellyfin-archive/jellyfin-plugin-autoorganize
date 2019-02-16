@@ -299,7 +299,7 @@ namespace Emby.AutoOrganize.Core
                 _logger.LogInformation("Sorting file {0} to new path {1}", sourcePath, newPath);
                 result.TargetPath = newPath;
 
-                var fileExists = _fileSystem.FileExists(result.TargetPath);
+                var fileExists = File.Exists(result.TargetPath);
 
                 if (!overwriteExisting)
                 {
@@ -352,19 +352,19 @@ namespace Emby.AutoOrganize.Core
 
             _libraryMonitor.ReportFileSystemChangeBeginning(result.TargetPath);
 
-            _fileSystem.CreateDirectory(_fileSystem.GetDirectoryName(result.TargetPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(result.TargetPath));
 
-            var targetAlreadyExists = _fileSystem.FileExists(result.TargetPath);
+            var targetAlreadyExists = File.Exists(result.TargetPath);
 
             try
             {
                 if (targetAlreadyExists || options.CopyOriginalFile)
                 {
-                    _fileSystem.CopyFile(result.OriginalPath, result.TargetPath, true);
+                    File.Copy(result.OriginalPath, result.TargetPath, true);
                 }
                 else
                 {
-                    _fileSystem.MoveFile(result.OriginalPath, result.TargetPath);
+                    File.Move(result.OriginalPath, result.TargetPath);
                 }
 
                 result.Status = FileSortingStatus.Success;

@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Emby.AutoOrganize.Core;
 using Emby.AutoOrganize.Data;
 using Emby.AutoOrganize.Model;
@@ -56,7 +57,7 @@ namespace Emby.AutoOrganize
             _json = json;
         }
 
-        public void Run()
+        public Task RunAsync()
         {
             try
             {
@@ -77,6 +78,8 @@ namespace Emby.AutoOrganize
 
             // Convert Config
             _config.Convert(FileOrganizationService);
+
+            return Task.CompletedTask;
         }
 
         private IFileOrganizationRepository GetRepository()
