@@ -6,8 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.AutoOrganize.Model;
-using Jellyfin.Naming.Common;
-using Jellyfin.Naming.TV;
+using Emby.Naming.Common;
+using Emby.Naming.TV;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
@@ -98,7 +98,7 @@ namespace Jellyfin.AutoOrganize.Core
                 var resolver = new EpisodeResolver(namingOptions);
 
                 var episodeInfo = resolver.Resolve(path, false) ??
-                    new Naming.TV.EpisodeInfo();
+                    new Emby.Naming.TV.EpisodeInfo();
 
                 var seriesName = episodeInfo.SeriesName;
                 int? seriesYear = null;
