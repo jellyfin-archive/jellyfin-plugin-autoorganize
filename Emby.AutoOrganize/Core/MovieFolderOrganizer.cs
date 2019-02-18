@@ -231,7 +231,7 @@ namespace Emby.AutoOrganize.Core
                     try
                     {
                         _logger.LogDebug("Deleting empty directory {0}", path);
-                        _fileSystem.DeleteDirectory(path, false);
+                        Directory.Delete(path, false);
                     }
                     catch (UnauthorizedAccessException) { }
                     catch (IOException) { }
