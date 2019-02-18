@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
-using Emby.Naming.Common;
-using Emby.Naming.TV;
+using Jellyfin.AutoOrganize.Model;
+using Jellyfin.Naming.Common;
+using Jellyfin.Naming.TV;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
@@ -21,7 +21,7 @@ using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
 using EpisodeInfo = MediaBrowser.Controller.Providers.EpisodeInfo;
 
-namespace Emby.AutoOrganize.Core
+namespace Jellyfin.AutoOrganize.Core
 {
     public class EpisodeFileOrganizer
     {

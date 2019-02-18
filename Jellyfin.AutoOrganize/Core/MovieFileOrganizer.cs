@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
-using Emby.Naming.Common;
-using Emby.Naming.Video;
+using Jellyfin.AutoOrganize.Model;
+using Jellyfin.Naming.Common;
+using Jellyfin.Naming.Video;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
@@ -18,7 +18,7 @@ using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize.Core
+namespace Jellyfin.AutoOrganize.Core
 {
     public class MovieFileOrganizer
     {

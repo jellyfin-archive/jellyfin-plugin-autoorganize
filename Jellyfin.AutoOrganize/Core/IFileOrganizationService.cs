@@ -3,9 +3,9 @@ using MediaBrowser.Model.Querying;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
+using Jellyfin.AutoOrganize.Model;
 
-namespace Emby.AutoOrganize.Core
+namespace Jellyfin.AutoOrganize.Core
 {
     public interface IFileOrganizationService
     {

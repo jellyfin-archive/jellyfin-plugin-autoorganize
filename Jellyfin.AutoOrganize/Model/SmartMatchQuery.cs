@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Emby.AutoOrganize.Model
+namespace Jellyfin.AutoOrganize.Model
 {
     public class SmartMatchQuery
     {

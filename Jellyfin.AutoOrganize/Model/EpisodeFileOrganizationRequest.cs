@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Emby.AutoOrganize.Model
+namespace Jellyfin.AutoOrganize.Model
 {
     public class EpisodeFileOrganizationRequest
     {

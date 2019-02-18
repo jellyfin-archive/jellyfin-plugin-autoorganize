@@ -284,7 +284,7 @@
             require(['alert'], function (alert) {
                 alert({
                     title: 'Error',
-                    text: 'No TV libraries are configured in Emby library setup.'
+                    text: 'No TV libraries are configured in Jellyfin library setup.'
                 });
             });
             return;

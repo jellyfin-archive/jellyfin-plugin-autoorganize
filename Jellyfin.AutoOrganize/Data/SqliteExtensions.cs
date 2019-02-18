@@ -6,7 +6,7 @@ using MediaBrowser.Model.Serialization;
 using SQLitePCL.pretty;
 using System.IO;
 
-namespace Emby.AutoOrganize.Data
+namespace Jellyfin.AutoOrganize.Data
 {
     public static class SqliteExtensions
     {

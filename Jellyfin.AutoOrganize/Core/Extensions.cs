@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Emby.AutoOrganize.Model;
+using Jellyfin.AutoOrganize.Model;
 using MediaBrowser.Common.Configuration;
 
-namespace Emby.AutoOrganize.Core
+namespace Jellyfin.AutoOrganize.Core
 {
     public static class ConfigurationExtension
     {

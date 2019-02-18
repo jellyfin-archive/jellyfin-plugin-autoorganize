@@ -3,8 +3,8 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Data;
-using Emby.AutoOrganize.Model;
+using Jellyfin.AutoOrganize.Data;
+using Jellyfin.AutoOrganize.Model;
 using MediaBrowser.Common.Events;
 using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Configuration;
@@ -17,7 +17,7 @@ using MediaBrowser.Model.Querying;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize.Core
+namespace Jellyfin.AutoOrganize.Core
 {
     public class FileOrganizationService : IFileOrganizationService
     {

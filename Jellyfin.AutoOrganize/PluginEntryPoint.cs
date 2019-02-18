@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Core;
-using Emby.AutoOrganize.Data;
-using Emby.AutoOrganize.Model;
+using Jellyfin.AutoOrganize.Core;
+using Jellyfin.AutoOrganize.Data;
+using Jellyfin.AutoOrganize.Model;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
@@ -15,7 +15,7 @@ using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize
+namespace Jellyfin.AutoOrganize
 {
     public class PluginEntryPoint : IServerEntryPoint
     {

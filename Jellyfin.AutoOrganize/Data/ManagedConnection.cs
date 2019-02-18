@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SQLitePCL.pretty;
 
-namespace Emby.AutoOrganize.Data
+namespace Jellyfin.AutoOrganize.Data
 {
     public class ManagedConnection :  IDisposable
     {

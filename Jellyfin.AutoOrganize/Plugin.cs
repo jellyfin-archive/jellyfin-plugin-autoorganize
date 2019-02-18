@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Emby.AutoOrganize.Configuration;
+using Jellyfin.AutoOrganize.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
@@ -8,7 +8,7 @@ using MediaBrowser.Model.Serialization;
 using System.IO;
 using MediaBrowser.Model.Drawing;
 
-namespace Emby.AutoOrganize
+namespace Jellyfin.AutoOrganize
 {
     public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     {

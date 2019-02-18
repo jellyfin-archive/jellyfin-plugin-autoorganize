@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
+using Jellyfin.AutoOrganize.Model;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize.Core
+namespace Jellyfin.AutoOrganize.Core
 {
     public class TvFolderOrganizer
     {
@@ -54,7 +54,7 @@ namespace Emby.AutoOrganize.Core
         {
             if (IsPathAlreadyInMediaLibrary(path, libraryFolderPaths))
             {
-                _logger.LogInformation("Folder {0} is not eligible for auto-organize because it is also part of an Emby library", path);
+                _logger.LogInformation("Folder {0} is not eligible for auto-organize because it is also part of an Jellyfin library", path);
                 return false;
             }
 

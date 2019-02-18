@@ -1,4 +1,4 @@
-namespace Emby.AutoOrganize.Model
+namespace Jellyfin.AutoOrganize.Model
 {
     public class AutoOrganizeOptions
     {
