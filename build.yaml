@@ -1,0 +1,13 @@
+---
+name: "jellyfin-plugin-autoorganize"
+guid: "70b7b43b-471b-4159-b4be-56750c795499"
+version: "1.0.0"
+nicename: "Auto Organize"
+description: "Automatically organize your media"
+overview: "Automatically organize your media"
+category: "General"
+artifacts:
+  - "Emby.AutoOrganize.dll"
+build_type: "dotnet"
+dotnet_configuration: "Release"
+dotnet_framework: "netstandard2.0"
