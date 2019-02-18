@@ -25,7 +25,7 @@ namespace Emby.AutoOrganize
 
         public PluginConfiguration PluginConfiguration => Configuration;
 
-        private Guid _id = new Guid("14f5f69e-4c8d-491b-8917-8e90e8317530");
+        private Guid _id = new Guid("70b7b43b-471b-4159-b4be-56750c795499");
         public override Guid Id
         {
             get { return _id; }
