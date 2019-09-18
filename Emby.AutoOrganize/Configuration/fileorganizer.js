@@ -132,7 +132,7 @@
     function populateMedias(context) {
 
         loading.show();
-        ApiClient.getItems(null, {
+        ApiClient.getItems(ApiClient.getCurrentUserId(), {
             recursive: true,
             includeItemTypes: chosenType,
             sortBy: 'SortName'
