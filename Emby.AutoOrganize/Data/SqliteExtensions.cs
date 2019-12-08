@@ -65,38 +65,38 @@ namespace Emby.AutoOrganize.Data
         /// An array of ISO-8601 DateTime formats that we support parsing.
         /// </summary>
         private static string[] _datetimeFormats = new string[] {
-            "THHmmssK",
-            "THHmmK",
-            "HH:mm:ss.FFFFFFFK",
-            "HH:mm:ssK",
-            "HH:mmK",
-            "yyyy-MM-dd HH:mm:ss.FFFFFFFK", /* NOTE: UTC default (5). */
-            "yyyy-MM-dd HH:mm:ssK",
-            "yyyy-MM-dd HH:mmK",
-            "yyyy-MM-ddTHH:mm:ss.FFFFFFFK",
-            "yyyy-MM-ddTHH:mmK",
-            "yyyy-MM-ddTHH:mm:ssK",
-            "yyyyMMddHHmmssK",
-            "yyyyMMddHHmmK",
-            "yyyyMMddTHHmmssFFFFFFFK",
-            "THHmmss",
-            "THHmm",
-            "HH:mm:ss.FFFFFFF",
-            "HH:mm:ss",
-            "HH:mm",
-            "yyyy-MM-dd HH:mm:ss.FFFFFFF", /* NOTE: Non-UTC default (19). */
-            "yyyy-MM-dd HH:mm:ss",
-            "yyyy-MM-dd HH:mm",
-            "yyyy-MM-ddTHH:mm:ss.FFFFFFF",
-            "yyyy-MM-ddTHH:mm",
-            "yyyy-MM-ddTHH:mm:ss",
-            "yyyyMMddHHmmss",
-            "yyyyMMddHHmm",
-            "yyyyMMddTHHmmssFFFFFFF",
-            "yyyy-MM-dd",
-            "yyyyMMdd",
-            "yy-MM-dd"
-        };
+      "THHmmssK",
+      "THHmmK",
+      "HH:mm:ss.FFFFFFFK",
+      "HH:mm:ssK",
+      "HH:mmK",
+      "yyyy-MM-dd HH:mm:ss.FFFFFFFK", /* NOTE: UTC default (5). */
+      "yyyy-MM-dd HH:mm:ssK",
+      "yyyy-MM-dd HH:mmK",
+      "yyyy-MM-ddTHH:mm:ss.FFFFFFFK",
+      "yyyy-MM-ddTHH:mmK",
+      "yyyy-MM-ddTHH:mm:ssK",
+      "yyyyMMddHHmmssK",
+      "yyyyMMddHHmmK",
+      "yyyyMMddTHHmmssFFFFFFFK",
+      "THHmmss",
+      "THHmm",
+      "HH:mm:ss.FFFFFFF",
+      "HH:mm:ss",
+      "HH:mm",
+      "yyyy-MM-dd HH:mm:ss.FFFFFFF", /* NOTE: Non-UTC default (19). */
+      "yyyy-MM-dd HH:mm:ss",
+      "yyyy-MM-dd HH:mm",
+      "yyyy-MM-ddTHH:mm:ss.FFFFFFF",
+      "yyyy-MM-ddTHH:mm",
+      "yyyy-MM-ddTHH:mm:ss",
+      "yyyyMMddHHmmss",
+      "yyyyMMddHHmm",
+      "yyyyMMddTHHmmssFFFFFFF",
+      "yyyy-MM-dd",
+      "yyyyMMdd",
+      "yy-MM-dd"
+    };
 
         private static string _datetimeFormatUtc = _datetimeFormats[5];
         private static string _datetimeFormatLocal = _datetimeFormats[19];
