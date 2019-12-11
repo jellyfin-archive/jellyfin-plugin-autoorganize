@@ -104,10 +104,13 @@ define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button',
         loading.hide();
 
         require(['alert'], function (alert) {
-            alert({
-                title: 'Error',
-                text: 'Error: ' + (e.headers.get("X-Application-Error-Code") || "No message provided.")
-            });
+            // Get message from server or display a default message
+            var message =
+                e.headers.get("X-Application-Error-Code") ||
+                "Server returned status code " + e.status + " (" + e.statusText + ") but did not provide a more specific error message.";
+
+            // Show the error using an alert dialog
+            alert({ title: 'Error', text: 'Error: ' + message });
         });
     }
 
