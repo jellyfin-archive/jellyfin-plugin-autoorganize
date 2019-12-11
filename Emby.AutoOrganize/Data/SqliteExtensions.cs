@@ -39,7 +39,7 @@ namespace Emby.AutoOrganize.Data
 
         public static Guid ReadGuidFromBlob(this IResultSetValue result)
         {
-            return new Guid(result.ToBlob());
+            return new Guid(result.ToBlob().ToArray());
         }
 
         public static string ToDateTimeParamValue(this DateTime dateValue)
