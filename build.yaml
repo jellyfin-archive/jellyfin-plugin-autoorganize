@@ -2,7 +2,7 @@
 name: "jellyfin-plugin-autoorganize"
 guid: "70b7b43b-471b-4159-b4be-56750c795499"
 version: "5" # Please increment with each pull request
-jellyfin_version: "10.3.0" # The earliest binary-compatible version
+jellyfin_version: "10.4.3" # The earliest binary-compatible version
 owner: "jellyfin"
 nicename: "Auto Organize"
 description: "Automatically organize your media"
