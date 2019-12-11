@@ -392,8 +392,7 @@ define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button',
 
                     dlg.querySelector('.formDialogHeaderTitle').innerHTML = 'Organize';
 
-                    dialogHelper.open(dlg);
-
+                    // Add event listeners to dialog
                     dlg.addEventListener('close', function () {
 
                         if (dlg.submitted) {
@@ -435,7 +434,10 @@ define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button',
 
                     // Init media type
                     selectedMediaTypeChanged(dlg, item);
-                }
+
+                    // Show dialog
+                    dialogHelper.open(dlg);
+                };
 
                 xhr.send();
             });
