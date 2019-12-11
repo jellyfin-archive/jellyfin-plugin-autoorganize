@@ -106,7 +106,7 @@ define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button',
         require(['alert'], function (alert) {
             alert({
                 title: 'Error',
-                text: 'Error: ' + e.headers.get("X-Application-Error-Code")
+                text: 'Error: ' + (e.headers.get("X-Application-Error-Code") || "No message provided.")
             });
         });
     }
