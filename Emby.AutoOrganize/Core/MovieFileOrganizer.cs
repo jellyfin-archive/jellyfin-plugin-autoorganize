@@ -254,7 +254,7 @@ namespace Emby.AutoOrganize.Core
                 cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task OrganizeMovie(
+        private Task OrganizeMovie(
             string sourcePath,
             Movie movie,
             MovieFileOrganizationOptions options,
@@ -293,7 +293,7 @@ namespace Emby.AutoOrganize.Core
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     if (fileExists)
@@ -303,7 +303,7 @@ namespace Emby.AutoOrganize.Core
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.TargetPath = newPath;
-                        return;
+                        return Task.CompletedTask;
                     }
                 }
 
@@ -324,6 +324,8 @@ namespace Emby.AutoOrganize.Core
             {
                 _organizationService.RemoveFromInprogressList(result);
             }
+
+            return Task.CompletedTask;
         }
 
         private void PerformFileSorting(MovieFileOrganizationOptions options, FileOrganizationResult result)

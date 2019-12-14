@@ -92,7 +92,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public async Task Delete(string id)
+        public Task Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -113,9 +113,11 @@ namespace Emby.AutoOrganize.Data
                     }, TransactionMode);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteAll()
+        public Task DeleteAll()
         {
             using (WriteLock.Write())
             {
@@ -129,9 +131,11 @@ namespace Emby.AutoOrganize.Data
                     }, TransactionMode);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteCompleted()
+        public Task DeleteCompleted()
         {
             using (WriteLock.Write())
             {
@@ -147,6 +151,8 @@ namespace Emby.AutoOrganize.Data
                     }, TransactionMode);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)
@@ -364,7 +370,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public async Task DeleteSmartMatch(string id, string matchString)
+        public Task DeleteSmartMatch(string id, string matchString)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -383,6 +389,8 @@ namespace Emby.AutoOrganize.Data
             {
                 DeleteSmartMatch(id);
             }
+
+            return Task.CompletedTask;
         }
 
         public void DeleteAllSmartMatch()

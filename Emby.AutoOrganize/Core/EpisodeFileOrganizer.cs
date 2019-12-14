@@ -459,7 +459,7 @@ namespace Emby.AutoOrganize.Core
             ).ConfigureAwait(false);
         }
 
-        private async Task OrganizeEpisode(string sourcePath,
+        private Task OrganizeEpisode(string sourcePath,
             Series series,
             Episode episode,
             TvFileOrganizationOptions options,
@@ -508,7 +508,7 @@ namespace Emby.AutoOrganize.Core
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     if (fileExists)
@@ -518,7 +518,7 @@ namespace Emby.AutoOrganize.Core
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.TargetPath = newPath;
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     if (otherDuplicatePaths.Count > 0)
@@ -528,7 +528,7 @@ namespace Emby.AutoOrganize.Core
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.DuplicatePaths = otherDuplicatePaths;
-                        return;
+                        return Task.CompletedTask;
                     }
                 }
 
@@ -572,7 +572,7 @@ namespace Emby.AutoOrganize.Core
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = ex.Message;
                 _logger.LogError(ex, "Caught a generic exception while organizing an episode");
-                return;
+                return Task.CompletedTask;
             }
             finally
             {
@@ -583,6 +583,8 @@ namespace Emby.AutoOrganize.Core
             {
                 SaveSmartMatchString(originalExtractedSeriesString, series, cancellationToken);
             }
+
+            return Task.CompletedTask;
         }
 
         private void SaveSmartMatchString(string matchString, Series series, CancellationToken cancellationToken)
