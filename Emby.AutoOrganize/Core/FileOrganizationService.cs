@@ -167,17 +167,12 @@ namespace Emby.AutoOrganize.Core
             switch (result.Type)
             {
                 case FileOrganizerType.Episode:
-                    var episodeOrganizer = new EpisodeFileOrganizer(
-                        this, _config, _fileSystem, _logger, _libraryManager,
-                        _libraryMonitor, _providerManager);
-
+                    var episodeOrganizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
                     organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, options.TvOptions, CancellationToken.None)
                         .ConfigureAwait(false);
-
                     break;
                 case FileOrganizerType.Movie:
                     var movieOrganizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
-
                     organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options.MovieOptions, true, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
@@ -205,8 +200,7 @@ namespace Emby.AutoOrganize.Core
 
         public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
         {
-            var organizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
-                _libraryMonitor, _providerManager);
+            var organizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
             var options = GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.TvOptions, CancellationToken.None).ConfigureAwait(false);

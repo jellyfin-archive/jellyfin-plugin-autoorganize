@@ -30,14 +30,12 @@ namespace Emby.AutoOrganize.Core
         private readonly ILogger _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
-        private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
 
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
 
         public EpisodeFileOrganizer(
             IFileOrganizationService organizationService,
-            IServerConfigurationManager config,
             IFileSystem fileSystem,
             ILogger logger,
             ILibraryManager libraryManager,
@@ -45,7 +43,6 @@ namespace Emby.AutoOrganize.Core
             IProviderManager providerManager)
         {
             _organizationService = organizationService;
-            _config = config;
             _fileSystem = fileSystem;
             _logger = logger;
             _libraryManager = libraryManager;
@@ -415,7 +412,6 @@ namespace Emby.AutoOrganize.Core
         /// <param name="endingEpiosdeNumber"></param>
         /// <param name="premiereDate"></param>
         /// <param name="options"></param>
-        /// <param name="smartMatch"></param>
         /// <param name="rememberCorrection"></param>
         /// <param name="result"></param>
         /// <param name="cancellationToken"></param>
