@@ -172,7 +172,7 @@ namespace Emby.AutoOrganize.Core
                 }
                 else
                 {
-                    var msg = "Unable to determine series name from {0}" + path;
+                    var msg = "Unable to determine series name from " + path;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
                     _logger.LogWarning(msg);
