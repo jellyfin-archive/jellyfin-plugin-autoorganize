@@ -55,6 +55,7 @@ namespace Emby.AutoOrganize.Data
         private static bool _versionLogged;
 
         private string _defaultWal;
+        private SQLiteDatabaseConnection _dbConnection;
         private ManagedConnection _connection;
 
         protected virtual bool EnableSingleConnection
@@ -137,24 +138,16 @@ namespace Emby.AutoOrganize.Data
                         queries.Add("PRAGMA temp_store = file");
                     }
 
-                    //foreach (var query in queries)
-                    //{
-                    //    db.Execute(query);
-                    //}
                     db.ExecuteAll(string.Join(";", queries.ToArray()));
                 }
                 catch
                 {
-                    using (db)
-                    {
-
-                    }
-
+                    db.Dispose();
                     throw;
                 }
 
-                _connection = new ManagedConnection(db, false);
-
+                _dbConnection = db;
+                _connection = new ManagedConnection(db);
                 return _connection;
             }
         }
@@ -313,16 +306,11 @@ namespace Emby.AutoOrganize.Data
                 {
                     using (WriteLock.Write())
                     {
-                        if (_connection != null)
+                        if (_dbConnection != null)
                         {
-                            using (_connection)
-                            {
-                                _connection.Close();
-                            }
-                            _connection = null;
+                            _dbConnection.Dispose();
+                            _dbConnection = null;
                         }
-
-                        CloseConnection();
                     }
                 }
             }
@@ -330,11 +318,6 @@ namespace Emby.AutoOrganize.Data
             {
                 _logger.LogError(ex, "Error disposing database", ex);
             }
-        }
-
-        protected virtual void CloseConnection()
-        {
-
         }
 
         protected List<string> GetColumnNames(IDatabaseConnection connection, string table)
