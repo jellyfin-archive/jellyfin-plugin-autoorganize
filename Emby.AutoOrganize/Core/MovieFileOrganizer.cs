@@ -140,7 +140,7 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private Movie CreateNewMovie(MovieFileOrganizationRequest request, FileOrganizationResult result, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
+        private Movie CreateNewMovie(MovieFileOrganizationRequest request, FileOrganizationResult result, MovieFileOrganizationOptions options)
         {
             // To avoid Movie duplicate by mistake (Missing SmartMatch and wrong selection in UI)
             var movie = GetMatchingMovie(request.NewMovieName, request.NewMovieYear, request.TargetFolder, result);
@@ -182,7 +182,7 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewMovieProviderIds.Count > 0)
                 {
                     // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    movie = CreateNewMovie(request, result, options, cancellationToken);
+                    movie = CreateNewMovie(request, result, options);
                 }
 
                 if (movie == null)
@@ -451,7 +451,7 @@ namespace Emby.AutoOrganize.Core
                         TargetFolder = options.DefaultMovieLibraryPath
                     };
 
-                    var movie = CreateNewMovie(organizationRequest, result, options, cancellationToken);
+                    var movie = CreateNewMovie(organizationRequest, result, options);
 
                     return new Tuple<Movie, RemoteSearchResult>(movie, finalResult);
                 }
