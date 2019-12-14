@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Core;
 using Emby.AutoOrganize.Model;
@@ -175,6 +176,7 @@ namespace Emby.AutoOrganize.Api
             Task.WaitAll(task);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", Justification = "Parameter is used to defined API route.")]
         public void Delete(ClearOrganizationLog request)
         {
             var task = InternalFileOrganizationService.ClearLog();
@@ -182,7 +184,7 @@ namespace Emby.AutoOrganize.Api
             Task.WaitAll(task);
         }
 
-
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", Justification = "Parameter is used to defined API route.")]
         public void Delete(ClearOrganizationCompletedLog request)
         {
             var task = InternalFileOrganizationService.ClearCompleted();
