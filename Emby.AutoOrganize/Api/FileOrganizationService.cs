@@ -81,8 +81,9 @@ namespace Emby.AutoOrganize.Api
         [ApiMember(Name = "RememberCorrection", Description = "Whether or not to apply the same correction to future episodes of the same series.", IsRequired = false, DataType = "bool", ParameterType = "query", Verb = "POST")]
         public bool RememberCorrection { get; set; }
 
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "API request collections must be writable")]
         [ApiMember(Name = "NewSeriesProviderIds", Description = "A list of provider IDs identifying a new series.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
-        public Dictionary<string, string> NewSeriesProviderIds { get; }
+        public Dictionary<string, string> NewSeriesProviderIds { get; set; }
 
         [ApiMember(Name = "NewSeriesName", Description = "Name of a series to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string NewSeriesName { get; set; }
@@ -103,8 +104,9 @@ namespace Emby.AutoOrganize.Api
         [ApiMember(Name = "MovieId", Description = "Movie Id", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string MovieId { get; set; }
 
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "API request collections must be writable")]
         [ApiMember(Name = "NewMovieProviderIds", Description = "A list of provider IDs identifying a new movie.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
-        public Dictionary<string, string> NewMovieProviderIds { get; }
+        public Dictionary<string, string> NewMovieProviderIds { get; set; }
 
         [ApiMember(Name = "NewMovieName", Description = "Name of a movie to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string NewMovieName { get; set; }
@@ -137,8 +139,9 @@ namespace Emby.AutoOrganize.Api
     [Route("/Library/FileOrganizations/SmartMatches/Delete", "POST", Summary = "Deletes a smart match entry")]
     public class DeleteSmartMatchEntry
     {
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "API request collections must be writable")]
         [ApiMember(Name = "Entries", Description = "SmartMatch Entry", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "POST")]
-        public List<NameValuePair> Entries { get; } = new List<NameValuePair>();
+        public List<NameValuePair> Entries { get; set; }
     }
 
     [Authenticated(Roles = "Admin")]
