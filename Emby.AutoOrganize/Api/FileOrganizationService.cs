@@ -81,7 +81,6 @@ namespace Emby.AutoOrganize.Api
         [ApiMember(Name = "RememberCorrection", Description = "Whether or not to apply the same correction to future episodes of the same series.", IsRequired = false, DataType = "bool", ParameterType = "query", Verb = "POST")]
         public bool RememberCorrection { get; set; }
 
-        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "API request collections must be writable")]
         [ApiMember(Name = "NewSeriesProviderIds", Description = "A list of provider IDs identifying a new series.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
         public Dictionary<string, string> NewSeriesProviderIds { get; set; }
 
@@ -104,7 +103,6 @@ namespace Emby.AutoOrganize.Api
         [ApiMember(Name = "MovieId", Description = "Movie Id", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string MovieId { get; set; }
 
-        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "API request collections must be writable")]
         [ApiMember(Name = "NewMovieProviderIds", Description = "A list of provider IDs identifying a new movie.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
         public Dictionary<string, string> NewMovieProviderIds { get; set; }
 
@@ -139,7 +137,6 @@ namespace Emby.AutoOrganize.Api
     [Route("/Library/FileOrganizations/SmartMatches/Delete", "POST", Summary = "Deletes a smart match entry")]
     public class DeleteSmartMatchEntry
     {
-        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "API request collections must be writable")]
         [ApiMember(Name = "Entries", Description = "SmartMatch Entry", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "POST")]
         public List<NameValuePair> Entries { get; set; }
     }
@@ -179,7 +176,7 @@ namespace Emby.AutoOrganize.Api
             Task.WaitAll(task);
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", Justification = "Parameter is used to defined API route.")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", Justification = "Parameter is used to define an API route.")]
         public void Delete(ClearOrganizationLog request)
         {
             var task = InternalFileOrganizationService.ClearLog();
@@ -187,7 +184,7 @@ namespace Emby.AutoOrganize.Api
             Task.WaitAll(task);
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", Justification = "Parameter is used to defined API route.")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", Justification = "Parameter is used to define an API route.")]
         public void Delete(ClearOrganizationCompletedLog request)
         {
             var task = InternalFileOrganizationService.ClearCompleted();

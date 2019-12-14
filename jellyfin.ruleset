@@ -7,6 +7,8 @@
     <Rule Id="SA1202" Action="Info" />
     <!-- disable warning SA1204: Static members must appear before non-static members -->
     <Rule Id="SA1204" Action="Info" />
+    <!-- disable warning CA2227: Collection properties should be read only -->
+    <Rule Id="CA2227" Action="Info" />
 
     <!-- disable warning SA1009: Closing parenthesis should be followed by a space. -->
     <Rule Id="SA1009" Action="None" />
