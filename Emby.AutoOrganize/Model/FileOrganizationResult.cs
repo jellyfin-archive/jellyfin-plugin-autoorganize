@@ -87,7 +87,7 @@ namespace Emby.AutoOrganize.Model
         /// Gets or sets the duplicate paths.
         /// </summary>
         /// <value>The duplicate paths.</value>
-        public List<string> DuplicatePaths { get; set; }
+        public List<string> DuplicatePaths { get; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the size of the file.

@@ -21,6 +21,11 @@ namespace Emby.AutoOrganize.Model
 
         public string TargetFolder { get; set; }
 
-        public Dictionary<string, string> NewSeriesProviderIds { get; set; }
+        public Dictionary<string, string> NewSeriesProviderIds { get; }
+
+        public EpisodeFileOrganizationRequest(Dictionary<string, string> newSeriesProviderIds)
+        {
+            NewSeriesProviderIds = newSeriesProviderIds ?? new Dictionary<string, string>();
+        }
     }
 }

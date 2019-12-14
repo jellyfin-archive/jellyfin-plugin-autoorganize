@@ -82,7 +82,7 @@ namespace Emby.AutoOrganize.Api
         public bool RememberCorrection { get; set; }
 
         [ApiMember(Name = "NewSeriesProviderIds", Description = "A list of provider IDs identifying a new series.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
-        public Dictionary<string, string> NewSeriesProviderIds { get; set; }
+        public Dictionary<string, string> NewSeriesProviderIds { get; }
 
         [ApiMember(Name = "NewSeriesName", Description = "Name of a series to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string NewSeriesName { get; set; }
@@ -104,7 +104,7 @@ namespace Emby.AutoOrganize.Api
         public string MovieId { get; set; }
 
         [ApiMember(Name = "NewMovieProviderIds", Description = "A list of provider IDs identifying a new movie.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
-        public Dictionary<string, string> NewMovieProviderIds { get; set; }
+        public Dictionary<string, string> NewMovieProviderIds { get; }
 
         [ApiMember(Name = "NewMovieName", Description = "Name of a movie to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
         public string NewMovieName { get; set; }
@@ -138,7 +138,7 @@ namespace Emby.AutoOrganize.Api
     public class DeleteSmartMatchEntry
     {
         [ApiMember(Name = "Entries", Description = "SmartMatch Entry", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "POST")]
-        public List<NameValuePair> Entries { get; set; }
+        public List<NameValuePair> Entries { get; } = new List<NameValuePair>();
     }
 
     [Authenticated(Roles = "Admin")]
@@ -213,7 +213,7 @@ namespace Emby.AutoOrganize.Api
             }
 
             // Don't await this
-            var task = InternalFileOrganizationService.PerformOrganization(new EpisodeFileOrganizationRequest
+            var task = InternalFileOrganizationService.PerformOrganization(new EpisodeFileOrganizationRequest(dicNewProviderIds)
             {
                 EndingEpisodeNumber = request.EndingEpisodeNumber,
                 EpisodeNumber = request.EpisodeNumber,
@@ -223,7 +223,6 @@ namespace Emby.AutoOrganize.Api
                 SeriesId = request.SeriesId,
                 NewSeriesName = request.NewSeriesName,
                 NewSeriesYear = request.NewSeriesYear,
-                NewSeriesProviderIds = dicNewProviderIds,
                 TargetFolder = request.TargetFolder
             });
 
@@ -242,13 +241,12 @@ namespace Emby.AutoOrganize.Api
             }
 
             // Don't await this
-            var task = InternalFileOrganizationService.PerformOrganization(new MovieFileOrganizationRequest
+            var task = InternalFileOrganizationService.PerformOrganization(new MovieFileOrganizationRequest(dicNewProviderIds)
             {
                 ResultId = request.Id,
                 MovieId = request.MovieId,
                 NewMovieName = request.NewMovieName,
                 NewMovieYear = request.NewMovieYear,
-                NewMovieProviderIds = dicNewProviderIds,
                 TargetFolder = request.TargetFolder
             });
 

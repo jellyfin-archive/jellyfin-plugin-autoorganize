@@ -14,6 +14,11 @@ namespace Emby.AutoOrganize.Model
 
         public string TargetFolder { get; set; }
 
-        public Dictionary<string, string> NewMovieProviderIds { get; set; }
+        public Dictionary<string, string> NewMovieProviderIds { get; }
+
+        public MovieFileOrganizationRequest(Dictionary<string, string> newMovieProviderIds = null)
+        {
+            NewMovieProviderIds = newMovieProviderIds ?? new Dictionary<string, string>();
+        }
     }
 }

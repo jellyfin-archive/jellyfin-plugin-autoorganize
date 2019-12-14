@@ -304,7 +304,8 @@ namespace Emby.AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.DuplicatePaths = reader[index].ToString().Split('|').Where(i => !string.IsNullOrEmpty(i)).ToList();
+                var duplicatePaths = reader[index].ToString().Split('|').Where(i => !string.IsNullOrEmpty(i));
+                result.DuplicatePaths.AddRange(duplicatePaths);
             }
 
             return result;
@@ -507,7 +508,8 @@ namespace Emby.AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.MatchStrings = _json.DeserializeFromString<List<string>>(reader[index].ToString());
+                var matchStrings = _json.DeserializeFromString<List<string>>(reader[index].ToString());
+                result.MatchStrings.AddRange(matchStrings);
             }
 
             return result;
