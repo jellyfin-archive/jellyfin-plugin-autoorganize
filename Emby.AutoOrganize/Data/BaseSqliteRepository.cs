@@ -252,23 +252,6 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        internal static void CheckOk(int rc)
-        {
-            string msg = "";
-
-            if (raw.SQLITE_OK != rc)
-            {
-                throw CreateException((ErrorCode)rc, msg);
-            }
-        }
-
-        internal static Exception CreateException(ErrorCode rc, string msg)
-        {
-            var exp = new Exception(msg);
-
-            return exp;
-        }
-
         #region IDisposable Support
         private bool _disposed = false;
         private readonly object _disposeLock = new object();
@@ -308,7 +291,7 @@ namespace Emby.AutoOrganize.Data
                         if (_dbConnection != null)
                         {
                             _dbConnection.Dispose();
-                            _dbConnection = null;
+                            _connection.Dispose();
                         }
                     }
                 }

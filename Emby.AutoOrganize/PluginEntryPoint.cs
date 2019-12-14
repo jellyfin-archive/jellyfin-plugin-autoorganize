@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize
 {
-    public class PluginEntryPoint : IServerEntryPoint
+    public sealed class PluginEntryPoint : IServerEntryPoint
     {
         public static PluginEntryPoint Current { get; private set; }
 

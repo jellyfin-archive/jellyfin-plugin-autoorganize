@@ -1,3 +1,5 @@
+using System;
+
 namespace Emby.AutoOrganize.Model
 {
     public class AutoOrganizeOptions

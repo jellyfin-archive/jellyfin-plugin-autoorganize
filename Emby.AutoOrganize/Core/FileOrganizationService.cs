@@ -6,11 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Data;
 using Emby.AutoOrganize.Model;
-using MediaBrowser.Common.Events;
 using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Persistence;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Events;
 using MediaBrowser.Model.IO;
@@ -268,7 +266,7 @@ namespace Emby.AutoOrganize.Core
         {
             if (string.IsNullOrWhiteSpace(result.Id))
             {
-                result.Id = result.OriginalPath.GetMD5().ToString("N");
+                result.Id = result.OriginalPath.GetMD5().ToString("N", CultureInfo.InvariantCulture);
             }
 
             if (!_inProgressItemIds.TryAdd(result.Id, false))
