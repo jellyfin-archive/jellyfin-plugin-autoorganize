@@ -1,4 +1,4 @@
-﻿define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button', 'emby-select', 'paper-icon-button-light', 'formDialogStyle'], function (dialogHelper, loading) {
+define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button', 'emby-select', 'paper-icon-button-light', 'formDialogStyle'], function (dialogHelper, loading) {
     'use strict';
 
     ApiClient.getFileOrganizationResults = function (options) {
@@ -104,10 +104,13 @@
         loading.hide();
 
         require(['alert'], function (alert) {
-            alert({
-                title: 'Error',
-                text: 'Error: ' + e.headers.get("X-Application-Error-Code")
-            });
+            // Get message from server or display a default message
+            var message =
+                e.headers.get("X-Application-Error-Code") ||
+                "Server returned status code " + e.status + " (" + e.statusText + ") but did not provide a more specific error message.";
+
+            // Show the error using an alert dialog
+            alert({ title: 'Error', text: 'Error: ' + message });
         });
     }
 
@@ -284,7 +287,7 @@
             require(['alert'], function (alert) {
                 alert({
                     title: 'Error',
-                    text: 'No TV libraries are configured in Emby library setup.'
+                    text: 'No TV libraries are configured in Jellyfin library setup.'
                 });
             });
             return;
@@ -319,7 +322,9 @@
     }
 
     function selectedMediaTypeChanged(dlg, item) {
+
         var mediaType = dlg.querySelector('#selectMediaType').value;
+        var mediaSelector = dlg.querySelector('#selectMedias');
 
         switch (mediaType) {
             case "":
@@ -328,8 +333,8 @@
                 dlg.querySelector('#divEpisodeChoice').classList.add('hide');
                 break;
             case "Movie":
-                dlg.querySelector('#selectMedias').setAttribute('label', 'Movie');
-                dlg.querySelector('[for="selectMedias"]').innerHTML =  'Movie';
+                mediaSelector.setAttribute('label', 'Movie');
+                if (mediaSelector && mediaSelector.setLabel) mediaSelector.setLabel('Movie');
 
                 dlg.querySelector('#divPermitChoice').classList.remove('hide');
                 dlg.querySelector('#divGlobalChoice').classList.remove('hide');
@@ -342,8 +347,8 @@
 
                 break;
             case "Episode":
-                dlg.querySelector('#selectMedias').setAttribute('label', 'Series');
-                dlg.querySelector('[for="selectMedias"]').innerHTML = 'Series';
+                mediaSelector.setAttribute('label', 'Series');
+                if (mediaSelector && mediaSelector.setLabel) mediaSelector.setLabel('Series');
 
                 dlg.querySelector('#divPermitChoice').classList.remove('hide');
                 dlg.querySelector('#divGlobalChoice').classList.remove('hide');
@@ -390,8 +395,7 @@
 
                     dlg.querySelector('.formDialogHeaderTitle').innerHTML = 'Organize';
 
-                    dialogHelper.open(dlg);
-
+                    // Add event listeners to dialog
                     dlg.addEventListener('close', function () {
 
                         if (dlg.submitted) {
@@ -433,7 +437,10 @@
 
                     // Init media type
                     selectedMediaTypeChanged(dlg, item);
-                }
+
+                    // Show dialog
+                    dialogHelper.open(dlg);
+                };
 
                 xhr.send();
             });
