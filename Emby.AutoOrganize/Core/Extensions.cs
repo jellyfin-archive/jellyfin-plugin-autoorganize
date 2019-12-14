@@ -19,14 +19,13 @@ namespace Emby.AutoOrganize.Core
 
                 foreach (SmartMatchInfo optionsSmartMatchInfo in options.SmartMatchInfos)
                 {
-                    var result = new SmartMatchResult
+                    service.SaveResult(new SmartMatchResult
                     {
                         DisplayName = optionsSmartMatchInfo.DisplayName,
                         ItemName = optionsSmartMatchInfo.ItemName,
-                        OrganizerType = optionsSmartMatchInfo.OrganizerType
-                    };
-                    result.MatchStrings.AddRange(optionsSmartMatchInfo.MatchStrings);
-                    service.SaveResult(result, CancellationToken.None);
+                        OrganizerType = optionsSmartMatchInfo.OrganizerType,
+                        MatchStrings = optionsSmartMatchInfo.MatchStrings.ToList(),
+                    }, CancellationToken.None);
                 }
 
                 manager.SaveAutoOrganizeOptions(options);

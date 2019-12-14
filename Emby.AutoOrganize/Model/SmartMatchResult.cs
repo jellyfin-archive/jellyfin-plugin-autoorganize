@@ -13,6 +13,6 @@ namespace Emby.AutoOrganize.Model
         
         public FileOrganizerType OrganizerType { get; set; }
 
-        public List<string> MatchStrings { get; } = new List<string>();
+        public List<string> MatchStrings { get; set; } = new List<string>();
     }
 }

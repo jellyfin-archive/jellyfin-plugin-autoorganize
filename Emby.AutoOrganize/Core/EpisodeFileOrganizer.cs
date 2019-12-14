@@ -253,9 +253,10 @@ namespace Emby.AutoOrganize.Core
                 if (finalResult != null)
                 {
                     // We are in the good position, we can create the item
-                    var organizationRequest = new EpisodeFileOrganizationRequest(finalResult.ProviderIds)
+                    var organizationRequest = new EpisodeFileOrganizationRequest
                     {
                         NewSeriesName = finalResult.Name,
+                        NewSeriesProviderIds = finalResult.ProviderIds,
                         NewSeriesYear = finalResult.ProductionYear,
                         TargetFolder = options.DefaultSeriesLibraryPath
                     };
@@ -526,8 +527,7 @@ namespace Emby.AutoOrganize.Core
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
-                        result.DuplicatePaths.Clear();
-                        result.DuplicatePaths.AddRange(otherDuplicatePaths);
+                        result.DuplicatePaths = otherDuplicatePaths;
                         return Task.CompletedTask;
                     }
                 }

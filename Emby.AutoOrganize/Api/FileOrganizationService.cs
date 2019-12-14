@@ -216,7 +216,7 @@ namespace Emby.AutoOrganize.Api
             }
 
             // Don't await this
-            var task = InternalFileOrganizationService.PerformOrganization(new EpisodeFileOrganizationRequest(dicNewProviderIds)
+            var task = InternalFileOrganizationService.PerformOrganization(new EpisodeFileOrganizationRequest
             {
                 EndingEpisodeNumber = request.EndingEpisodeNumber,
                 EpisodeNumber = request.EpisodeNumber,
@@ -226,6 +226,7 @@ namespace Emby.AutoOrganize.Api
                 SeriesId = request.SeriesId,
                 NewSeriesName = request.NewSeriesName,
                 NewSeriesYear = request.NewSeriesYear,
+                NewSeriesProviderIds = dicNewProviderIds,
                 TargetFolder = request.TargetFolder
             });
 
@@ -244,12 +245,13 @@ namespace Emby.AutoOrganize.Api
             }
 
             // Don't await this
-            var task = InternalFileOrganizationService.PerformOrganization(new MovieFileOrganizationRequest(dicNewProviderIds)
+            var task = InternalFileOrganizationService.PerformOrganization(new MovieFileOrganizationRequest
             {
                 ResultId = request.Id,
                 MovieId = request.MovieId,
                 NewMovieName = request.NewMovieName,
                 NewMovieYear = request.NewMovieYear,
+                NewMovieProviderIds = dicNewProviderIds,
                 TargetFolder = request.TargetFolder
             });
 
