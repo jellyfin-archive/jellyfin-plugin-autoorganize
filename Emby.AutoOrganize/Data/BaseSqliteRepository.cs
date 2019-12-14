@@ -13,14 +13,13 @@ namespace Emby.AutoOrganize.Data
     public abstract class BaseSqliteRepository : IDisposable
     {
         protected string DbFilePath { get; set; }
-        protected ReaderWriterLockSlim WriteLock;
+        protected ReaderWriterLockSlim WriteLock { get; }
 
-        protected ILogger _logger { get; private set; }
+        private readonly ILogger _logger;
 
         protected BaseSqliteRepository(ILogger logger)
         {
             _logger = logger;
-
             WriteLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }
 
@@ -56,7 +55,7 @@ namespace Emby.AutoOrganize.Data
         private static bool _versionLogged;
 
         private string _defaultWal;
-        protected ManagedConnection _connection;
+        private ManagedConnection _connection;
 
         protected virtual bool EnableSingleConnection
         {
@@ -75,8 +74,8 @@ namespace Emby.AutoOrganize.Data
                 if (!_versionLogged)
                 {
                     _versionLogged = true;
-                    _logger.LogInformation("Sqlite version: {ver}", SQLite3.Version);
-                    _logger.LogInformation("Sqlite compiler options: {opts}", string.Join(",", SQLite3.CompilerOptions.ToArray()));
+                    _logger.LogInformation("SQLite version: {Version}", SQLite3.Version);
+                    _logger.LogInformation("SQLite compiler options: {Options}", string.Join(",", SQLite3.CompilerOptions));
                 }
 
                 ConnectionFlags connectionFlags;
@@ -400,13 +399,6 @@ namespace Emby.AutoOrganize.Data
                     _sync.ExitWriteLock();
                     _sync = null;
                 }
-            }
-        }
-
-        public class DummyToken : IDisposable
-        {
-            public void Dispose()
-            {
             }
         }
 

@@ -27,15 +27,17 @@ namespace Emby.AutoOrganize.Core
         private readonly ILogger _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
-        private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
 
-        private readonly CultureInfo _usCulture = new CultureInfo("en-US");
-
-        public MovieFileOrganizer(IFileOrganizationService organizationService, IServerConfigurationManager config, IFileSystem fileSystem, ILogger logger, ILibraryManager libraryManager, ILibraryMonitor libraryMonitor, IProviderManager providerManager)
+        public MovieFileOrganizer(
+            IFileOrganizationService organizationService,
+            IFileSystem fileSystem,
+            ILogger logger,
+            ILibraryManager libraryManager,
+            ILibraryMonitor libraryMonitor,
+            IProviderManager providerManager)
         {
             _organizationService = organizationService;
-            _config = config;
             _fileSystem = fileSystem;
             _logger = logger;
             _libraryManager = libraryManager;

@@ -14,15 +14,11 @@ namespace Emby.AutoOrganize.Data
         {
             if (queries == null)
             {
-                throw new ArgumentNullException("queries");
+                throw new ArgumentNullException(nameof(queries));
             }
 
             connection.RunInTransaction(conn =>
             {
-                //foreach (var query in queries)
-                //{
-                //    conn.Execute(query);
-                //}
                 conn.ExecuteAll(string.Join(";", queries));
             });
         }
@@ -120,7 +116,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (obj == null)
             {
-                throw new ArgumentNullException("obj");
+                throw new ArgumentNullException(nameof(obj));
             }
 
             using (var stream = new MemoryStream())

@@ -167,7 +167,7 @@ namespace Emby.AutoOrganize.Core
                     }
                     else
                     {
-                        var msg = string.Format("Unable to determine episode number from {0}", path);
+                        var msg = "Unable to determine episode number from " + path;
                         result.Status = FileSortingStatus.Failure;
                         result.StatusMessage = msg;
                         _logger.LogWarning(msg);
@@ -175,7 +175,7 @@ namespace Emby.AutoOrganize.Core
                 }
                 else
                 {
-                    var msg = string.Format("Unable to determine series name from {0}", path);
+                    var msg = "Unable to determine series name from {0}" + path;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
                     _logger.LogWarning(msg);
@@ -388,7 +388,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (series == null)
                 {
-                    var msg = string.Format("Unable to find series in library matching name {0}", seriesName);
+                    var msg = "Unable to find series in library matching name " + seriesName;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
                     _logger.LogWarning(msg);
@@ -487,7 +487,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (string.IsNullOrEmpty(newPath))
                 {
-                    var msg = string.Format("Unable to sort {0} because target path could not be determined.", sourcePath);
+                    var msg = $"Unable to sort {sourcePath} because target path could not be determined.";
                     throw new OrganizationException(msg);
                 }
 
@@ -501,7 +501,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     if (options.CopyOriginalFile && fileExists && IsSameEpisode(sourcePath, newPath))
                     {
-                        var msg = string.Format("File '{0}' already copied to new path '{1}', stopping organization", sourcePath, newPath);
+                        var msg = $"File '{sourcePath}' already copied to new path '{newPath}', stopping organization";
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
@@ -510,7 +510,7 @@ namespace Emby.AutoOrganize.Core
 
                     if (fileExists)
                     {
-                        var msg = string.Format("File '{0}' already exists as '{1}', stopping organization", sourcePath, newPath);
+                        var msg = $"File '{sourcePath}' already exists as '{newPath}', stopping organization";
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
@@ -520,7 +520,7 @@ namespace Emby.AutoOrganize.Core
 
                     if (otherDuplicatePaths.Count > 0)
                     {
-                        var msg = string.Format("File '{0}' already exists as these:'{1}'. Stopping organization", sourcePath, string.Join("', '", otherDuplicatePaths));
+                        var msg = $"File '{sourcePath}' already exists as these:'{string.Join("', '", otherDuplicatePaths)}'. Stopping organization";
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
@@ -734,7 +734,7 @@ namespace Emby.AutoOrganize.Core
             }
             catch (Exception ex)
             {
-                var errorMsg = string.Format("Failed to move file from {0} to {1}: {2}", result.OriginalPath, result.TargetPath, ex.Message);
+                var errorMsg = $"Failed to move file from {result.OriginalPath} to {result.TargetPath}: {ex.Message}";
 
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = errorMsg;
@@ -799,8 +799,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     if (!episode.ParentIndexNumber.HasValue)
                     {
-                        var msg = string.Format("No season found for {0} season {1} episode {2}", series.Name,
-                            episode.ParentIndexNumber, episode.IndexNumber);
+                        var msg = $"No season found for {series.Name} season {episode.ParentIndexNumber} episode {episode.IndexNumber}.";
                         _logger.LogWarning(msg);
                         throw new OrganizationException(msg);
                     }
@@ -843,7 +842,7 @@ namespace Emby.AutoOrganize.Core
                 .Where(i => i.Item2 > 0)
                 .OrderByDescending(i => i.Item2)
                 .Select(i => i.Item1)
-                .FirstOrDefault(s => s.Path.StartsWith(targetFolder));
+                .FirstOrDefault(s => s.Path.StartsWith(targetFolder, StringComparison.Ordinal));
 
             if (series == null)
             {
@@ -858,7 +857,7 @@ namespace Emby.AutoOrganize.Core
                         Name = info.ItemName,
                         DtoOptions = new DtoOptions(true)
 
-                    }).Cast<Series>().FirstOrDefault(s => s.Path.StartsWith(targetFolder));
+                    }).Cast<Series>().FirstOrDefault(s => s.Path.StartsWith(targetFolder, StringComparison.Ordinal));
                 }
             }
 
@@ -878,7 +877,7 @@ namespace Emby.AutoOrganize.Core
             var seriesFullName = seriesName;
             if (series.ProductionYear.HasValue)
             {
-                seriesFullName = string.Format("{0} ({1})", seriesFullName, series.ProductionYear);
+                seriesFullName = $"{seriesFullName} ({series.ProductionYear})";
             }
 
             var seasonFolderName = options.SeriesFolderPattern.
@@ -930,7 +929,7 @@ namespace Emby.AutoOrganize.Core
 
             if (episodeSearch == null)
             {
-                var msg = string.Format("No provider metadata found for {0} season {1} episode {2}", series.Name, seasonNumber, episodeNumber);
+                var msg = $"No provider metadata found for {series.Name} season {seasonNumber} episode {episodeNumber}";
                 _logger.LogWarning(msg);
                 throw new OrganizationException(msg);
             }

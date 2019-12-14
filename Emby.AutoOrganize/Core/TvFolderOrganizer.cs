@@ -66,8 +66,10 @@ namespace Emby.AutoOrganize.Core
             return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i, path));
         }
 
-        public async Task Organize(TvFileOrganizationOptions options,
-            CancellationToken cancellationToken, IProgress<double> progress)
+        public async Task Organize(
+            TvFileOrganizationOptions options,
+            IProgress<double> progress,
+            CancellationToken cancellationToken)
         {
             var libraryFolderPaths = _libraryManager.GetVirtualFolders().SelectMany(i => i.Locations).ToList();
 

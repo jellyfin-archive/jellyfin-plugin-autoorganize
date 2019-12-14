@@ -15,12 +15,13 @@ using SQLitePCL.pretty;
 
 namespace Emby.AutoOrganize.Data
 {
-    public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository, IDisposable
+    public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository
     {
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
         private readonly IJsonSerializer _json;
 
-        public SqliteFileOrganizationRepository(ILogger logger, IServerApplicationPaths appPaths, IJsonSerializer json) : base(logger)
+        public SqliteFileOrganizationRepository(ILogger logger, IServerApplicationPaths appPaths, IJsonSerializer json)
+            : base(logger)
         {
             _json = json;
             DbFilePath = Path.Combine(appPaths.DataPath, "fileorganization.db");
@@ -54,7 +55,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -96,7 +97,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Write())
@@ -153,7 +154,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
 
             using (WriteLock.Read())
@@ -203,7 +204,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Read())
@@ -230,7 +231,7 @@ namespace Emby.AutoOrganize.Data
 
             var result = new FileOrganizationResult
             {
-                Id = reader[0].ReadGuidFromBlob().ToString("N")
+                Id = reader[0].ReadGuidFromBlob().ToString("N", CultureInfo.InvariantCulture)
             };
 
             index++;
@@ -312,7 +313,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -345,7 +346,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Write())
@@ -368,7 +369,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             var match = GetSmartMatch(id);
@@ -405,7 +406,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Read())
@@ -431,7 +432,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
 
             using (WriteLock.Read())

@@ -1,3 +1,5 @@
+using System;
+
 namespace Emby.AutoOrganize.Model
 {
     public class TvFileOrganizationOptions
@@ -34,9 +36,9 @@ namespace Emby.AutoOrganize.Model
         {
             MinFileSizeMb = 50;
 
-            LeftOverFileExtensionsToDelete = new string[] { };
+            LeftOverFileExtensionsToDelete = Array.Empty<string>();
 
-            WatchLocations = new string[] { };
+            WatchLocations = Array.Empty<string>();
 
             EpisodeNamePattern = "%sn - %sx%0e - %en.%ext";
             MultiEpisodeNamePattern = "%sn - %sx%0e-x%0ed - %en.%ext";

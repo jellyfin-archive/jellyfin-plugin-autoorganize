@@ -12,7 +12,7 @@ namespace Emby.AutoOrganize.Model
 
         public SmartMatchInfo()
         {
-            MatchStrings = new string[] { };
+            MatchStrings = Array.Empty<string>();
         }
     }
 }

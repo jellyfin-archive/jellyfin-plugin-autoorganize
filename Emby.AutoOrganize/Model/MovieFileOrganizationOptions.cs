@@ -1,3 +1,5 @@
+using System;
+
 namespace Emby.AutoOrganize.Model
 {
     public class MovieFileOrganizationOptions
@@ -31,11 +33,11 @@ namespace Emby.AutoOrganize.Model
         {
             MinFileSizeMb = 50;
 
-            LeftOverFileExtensionsToDelete = new string[] { };
+            LeftOverFileExtensionsToDelete = Array.Empty<string>();
 
             MoviePattern = "%fn.%ext";
 
-            WatchLocations = new string[] { };
+            WatchLocations = Array.Empty<string>();
 
             CopyOriginalFile = false;
 

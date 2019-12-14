@@ -26,7 +26,7 @@ namespace Emby.AutoOrganize.Model
         {
             TvOptions = new TvFileOrganizationOptions();
             MovieOptions = new MovieFileOrganizationOptions();
-            SmartMatchInfos = new SmartMatchInfo[] { };
+            SmartMatchInfos = Array.Empty<SmartMatchInfo>();
             Converted = false;
         }
     }

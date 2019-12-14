@@ -19,11 +19,11 @@ namespace Emby.AutoOrganize
 {
     public class PluginEntryPoint : IServerEntryPoint
     {
-        public static PluginEntryPoint Current;
+        public static PluginEntryPoint Current { get; private set; }
 
         public IFileOrganizationService FileOrganizationService { get; private set; }
+        
         private readonly ISessionManager _sessionManager;
-
         private readonly ITaskManager _taskManager;
         private readonly ILogger _logger;
         private readonly ILibraryMonitor _libraryMonitor;
@@ -33,7 +33,7 @@ namespace Emby.AutoOrganize
         private readonly IProviderManager _providerManager;
         private readonly IJsonSerializer _json;
 
-        public IFileOrganizationRepository Repository;
+        private IFileOrganizationRepository Repository;
 
         public PluginEntryPoint(
             ISessionManager sessionManager,

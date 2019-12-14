@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,10 +66,10 @@ namespace Emby.AutoOrganize.Core
         {
             if (result == null || string.IsNullOrEmpty(result.OriginalPath))
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
-            result.Id = result.OriginalPath.GetMD5().ToString("N");
+            result.Id = result.OriginalPath.GetMD5().ToString("N", CultureInfo.InvariantCulture);
 
             _repo.SaveResult(result, cancellationToken);
         }
@@ -77,7 +78,7 @@ namespace Emby.AutoOrganize.Core
         {
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             _repo.SaveResult(result, cancellationToken);
@@ -111,10 +112,10 @@ namespace Emby.AutoOrganize.Core
         {
             if (string.IsNullOrEmpty(path))
             {
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException(nameof(path));
             }
 
-            var id = path.GetMD5().ToString("N");
+            var id = path.GetMD5().ToString("N", CultureInfo.InvariantCulture);
 
             return GetResult(id);
         }
@@ -177,8 +178,7 @@ namespace Emby.AutoOrganize.Core
 
                     break;
                 case FileOrganizerType.Movie:
-                    var movieOrganizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
-                        _libraryMonitor, _providerManager);
+                    var movieOrganizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
                     organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options.MovieOptions, true, CancellationToken.None)
                         .ConfigureAwait(false);
@@ -221,8 +221,7 @@ namespace Emby.AutoOrganize.Core
 
         public async Task PerformOrganization(MovieFileOrganizationRequest request)
         {
-            var organizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
-                _libraryMonitor, _providerManager);
+            var organizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
             var options = GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.MovieOptions, CancellationToken.None).ConfigureAwait(false);
