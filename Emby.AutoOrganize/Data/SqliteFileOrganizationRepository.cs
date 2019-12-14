@@ -170,11 +170,11 @@ namespace Emby.AutoOrganize.Data
 
                     if (query.StartIndex.HasValue && query.StartIndex.Value > 0)
                     {
-                        commandText += string.Format(" WHERE ResultId NOT IN (SELECT ResultId FROM FileOrganizerResults ORDER BY OrganizationDate desc LIMIT {0})",
-                            query.StartIndex.Value.ToString(_usCulture));
+                        var startIndex = query.StartIndex.Value.ToString(_usCulture);
+                        commandText += $" WHERE ResultId NOT IN (SELECT ResultId FROM FileOrganizerResults ORDER BY OrganizationDate DESC LIMIT {startIndex})";
                     }
 
-                    commandText += " ORDER BY OrganizationDate desc";
+                    commandText += " ORDER BY OrganizationDate DESC";
 
                     if (query.Limit.HasValue)
                     {
@@ -450,11 +450,11 @@ namespace Emby.AutoOrganize.Data
 
                     if (query.StartIndex.HasValue && query.StartIndex.Value > 0)
                     {
-                        commandText += string.Format(" WHERE Id NOT IN (SELECT Id FROM SmartMatch ORDER BY ItemName desc LIMIT {0})",
-                            query.StartIndex.Value.ToString(_usCulture));
+                        var startIndex = query.StartIndex.Value.ToString(_usCulture);
+                        commandText += $" WHERE Id NOT IN (SELECT Id FROM SmartMatch ORDER BY ItemName DESC LIMIT {startIndex})";
                     }
 
-                    commandText += " ORDER BY ItemName desc";
+                    commandText += " ORDER BY ItemName DESC";
 
                     if (query.Limit.HasValue)
                     {

@@ -128,7 +128,7 @@ namespace Emby.AutoOrganize.Data
 
         public static void Attach(ManagedConnection db, string path, string alias)
         {
-            var commandText = string.Format("attach @path as {0};", alias);
+            var commandText = $"attach @path as {alias};";
 
             using (var statement = db.PrepareStatement(commandText))
             {
