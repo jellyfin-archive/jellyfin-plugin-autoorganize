@@ -269,32 +269,31 @@ namespace Emby.AutoOrganize.Data
             return exp;
         }
 
-        private bool _disposed;
-        protected void CheckDisposed()
-        {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(GetType().Name + " has been disposed and cannot be accessed.");
-            }
-        }
+        #region IDisposable Support
+        private bool _disposed = false;
+        private readonly object _disposeLock = new object();
 
         public void Dispose()
         {
-            _disposed = true;
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
-
-        private readonly object _disposeLock = new object();
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool dispose)
+        protected virtual void Dispose(bool disposing)
         {
-            if (dispose)
+            if (!_disposed)
             {
-                DisposeConnection();
+                if (disposing)
+                {
+                    // Dispose managed state
+                    DisposeConnection();
+                }
+
+                _disposed = true;
             }
         }
 
@@ -319,6 +318,7 @@ namespace Emby.AutoOrganize.Data
                 _logger.LogError(ex, "Error disposing database", ex);
             }
         }
+        #endregion
 
         protected List<string> GetColumnNames(IDatabaseConnection connection, string table)
         {
