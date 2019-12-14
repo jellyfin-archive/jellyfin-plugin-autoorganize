@@ -228,16 +228,13 @@ namespace Emby.AutoOrganize.Core
                     Year = seriesYear
                 };
 
-                var searchResultsTask = await _providerManager.GetRemoteSearchResults<Series, SeriesInfo>(new RemoteSearchQuery<SeriesInfo>
-                {
-                    SearchInfo = seriesInfo
-
-                }, cancellationToken);
+                var searchQuery = new RemoteSearchQuery<SeriesInfo> { SearchInfo = seriesInfo };
+                var searchResults = await _providerManager.GetRemoteSearchResults<Series, SeriesInfo>(searchQuery, cancellationToken).ConfigureAwait(false);
 
                 #endregion
 
                 // Group series by name and year (if 2 series with the exact same name, the same year ...)
-                var groupedResult = searchResultsTask.GroupBy(p => new { p.Name, p.ProductionYear },
+                var groupedResult = searchResults.GroupBy(p => new { p.Name, p.ProductionYear },
                     p => p,
                     (key, g) => new { Key = key, Result = g.ToList() }).ToList();
 
@@ -434,7 +431,15 @@ namespace Emby.AutoOrganize.Core
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            var episode = await GetMatchingEpisode(series, seasonNumber, episodeNumber, endingEpiosdeNumber, result, premiereDate, cancellationToken);
+            var episode = await GetMatchingEpisode(
+                series,
+                seasonNumber,
+                episodeNumber,
+                endingEpiosdeNumber,
+                result,
+                premiereDate,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             Season season;
             season = !string.IsNullOrEmpty(episode.Season?.Path)
@@ -447,13 +452,15 @@ namespace Emby.AutoOrganize.Core
                 SetEpisodeFileName(sourcePath, series, season, episode, options);
             }
 
-            await OrganizeEpisode(sourcePath,
+            await OrganizeEpisode(
+                sourcePath,
                 series,
                 episode,
                 options,
                 rememberCorrection,
                 result,
-                cancellationToken);
+                cancellationToken
+            ).ConfigureAwait(false);
         }
 
         private async Task OrganizeEpisode(string sourcePath,

@@ -142,7 +142,7 @@ namespace Emby.AutoOrganize.Core
                 RemoveFromInprogressList(result);
             }
 
-            await _repo.Delete(resultId);
+            await _repo.Delete(resultId).ConfigureAwait(false);
 
             ItemRemoved?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
         }
@@ -193,13 +193,13 @@ namespace Emby.AutoOrganize.Core
 
         public async Task ClearLog()
         {
-            await _repo.DeleteAll();
+            await _repo.DeleteAll().ConfigureAwait(false);
             LogReset?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task ClearCompleted()
         {
-            await _repo.DeleteCompleted();
+            await _repo.DeleteCompleted().ConfigureAwait(false);
             LogReset?.Invoke(this, EventArgs.Empty);
         }
 

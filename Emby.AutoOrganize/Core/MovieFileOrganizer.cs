@@ -414,7 +414,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     SearchInfo = movieInfo
 
-                }, cancellationToken);
+                }, cancellationToken).ConfigureAwait(false);
 
                 #endregion
 
