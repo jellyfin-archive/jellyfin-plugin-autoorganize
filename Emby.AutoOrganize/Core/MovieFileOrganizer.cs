@@ -443,10 +443,9 @@ namespace Emby.AutoOrganize.Core
                 if (finalResult != null)
                 {
                     // We are in the good position, we can create the item
-                    var organizationRequest = new MovieFileOrganizationRequest
+                    var organizationRequest = new MovieFileOrganizationRequest(finalResult.ProviderIds)
                     {
                         NewMovieName = finalResult.Name,
-                        NewMovieProviderIds = finalResult.ProviderIds,
                         NewMovieYear = finalResult.ProductionYear,
                         TargetFolder = options.DefaultMovieLibraryPath
                     };
