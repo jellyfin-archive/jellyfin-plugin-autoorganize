@@ -288,11 +288,8 @@ namespace Emby.AutoOrganize.Data
                 {
                     using (WriteLock.Write())
                     {
-                        if (_dbConnection != null)
-                        {
-                            _dbConnection.Dispose();
-                            _connection.Dispose();
-                        }
+                        _connection?.Dispose();
+                        _dbConnection?.Dispose();
                     }
                 }
             }
