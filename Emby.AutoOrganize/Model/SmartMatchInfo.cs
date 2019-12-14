@@ -8,11 +8,11 @@ namespace Emby.AutoOrganize.Model
         public string ItemName { get; set; }
         public string DisplayName { get; set; }
         public FileOrganizerType OrganizerType { get; set; }
-        public string[] MatchStrings { get; set; }
+        public List<string> MatchStrings { get; set; }
 
         public SmartMatchInfo()
         {
-            MatchStrings = Array.Empty<string>();
+            MatchStrings = new List<string>();
         }
     }
 }

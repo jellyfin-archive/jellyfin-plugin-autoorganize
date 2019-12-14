@@ -1,13 +1,17 @@
 using System;
+using System.Collections.Generic;
 
 namespace Emby.AutoOrganize.Model
 {
     public class MovieFileOrganizationOptions
     {
         public bool IsEnabled { get; set; }
+
         public int MinFileSizeMb { get; set; }
-        public string[] LeftOverFileExtensionsToDelete { get; set; }
-        public string[] WatchLocations { get; set; }
+
+        public List<string> LeftOverFileExtensionsToDelete { get; set; }
+
+        public List<string> WatchLocations { get; set; }
 
         public string MoviePattern { get; set; }
 
@@ -33,11 +37,11 @@ namespace Emby.AutoOrganize.Model
         {
             MinFileSizeMb = 50;
 
-            LeftOverFileExtensionsToDelete = Array.Empty<string>();
+            LeftOverFileExtensionsToDelete =  new List<string>();
 
             MoviePattern = "%fn.%ext";
 
-            WatchLocations = Array.Empty<string>();
+            WatchLocations = new List<string>();
 
             CopyOriginalFile = false;
 

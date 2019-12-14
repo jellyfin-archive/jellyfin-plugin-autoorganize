@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Emby.AutoOrganize.Model
 {
@@ -20,7 +21,7 @@ namespace Emby.AutoOrganize.Model
         /// Gets or sets a list of smart match entries.
         /// </summary>
         /// <value>The smart match entries.</value>
-        public SmartMatchInfo[] SmartMatchInfos { get; set; }
+        public List<SmartMatchInfo> SmartMatchInfos { get; set; }
 
         public bool Converted { get; set; }
 
@@ -28,7 +29,7 @@ namespace Emby.AutoOrganize.Model
         {
             TvOptions = new TvFileOrganizationOptions();
             MovieOptions = new MovieFileOrganizationOptions();
-            SmartMatchInfos = Array.Empty<SmartMatchInfo>();
+            SmartMatchInfos = new List<SmartMatchInfo>();
             Converted = false;
         }
     }
