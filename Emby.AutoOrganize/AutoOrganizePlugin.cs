@@ -5,20 +5,17 @@ using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
-using System.IO;
-using MediaBrowser.Model.Drawing;
 
 namespace Emby.AutoOrganize
 {
-    public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
+    public class AutoOrganizePlugin : BasePlugin<PluginConfiguration>, IHasWebPages
     {
-        public Plugin(IApplicationPaths appPaths, IXmlSerializer xmlSerializer)
+        public AutoOrganizePlugin(IApplicationPaths appPaths, IXmlSerializer xmlSerializer)
             : base(appPaths, xmlSerializer)
         {
         }
 
         public override string Name => "Auto Organize";
-
 
         public override string Description
             => "Automatically organize new media";
@@ -26,6 +23,7 @@ namespace Emby.AutoOrganize
         public PluginConfiguration PluginConfiguration => Configuration;
 
         private Guid _id = new Guid("70b7b43b-471b-4159-b4be-56750c795499");
+
         public override Guid Id
         {
             get { return _id; }

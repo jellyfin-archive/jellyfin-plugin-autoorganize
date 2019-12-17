@@ -5,7 +5,7 @@ namespace Emby.AutoOrganize.Model
     public class EpisodeFileOrganizationRequest
     {
         public string ResultId { get; set; }
-        
+
         public string SeriesId { get; set; }
 
         public int SeasonNumber { get; set; }
@@ -15,6 +15,7 @@ namespace Emby.AutoOrganize.Model
         public int? EndingEpisodeNumber { get; set; }
 
         public bool RememberCorrection { get; set; }
+
         public string NewSeriesName { get; set; }
 
         public int? NewSeriesYear { get; set; }

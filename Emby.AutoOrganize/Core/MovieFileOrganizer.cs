@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
 using Emby.Naming.Common;
 using Emby.Naming.Video;
-using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
@@ -46,6 +45,7 @@ namespace Emby.AutoOrganize.Core
         }
 
         private NamingOptions _namingOptions;
+
         private NamingOptions GetNamingOptionsInternal()
         {
             if (_namingOptions == null)
@@ -101,7 +101,8 @@ namespace Emby.AutoOrganize.Core
 
                     _logger.LogDebug("Extracted information from {0}. Movie {1}, Year {2}", path, movieName, movieYear);
 
-                    await OrganizeMovie(path,
+                    await OrganizeMovie(
+                        path,
                         movieName,
                         movieYear,
                         options,
@@ -191,7 +192,7 @@ namespace Emby.AutoOrganize.Core
                     movie = (Movie)_libraryManager.GetItemById(request.MovieId);
                 }
 
-                // We manually set the media as Movie 
+                // We manually set the media as Movie
                 result.Type = CurrentFileOrganizerType;
 
                 await OrganizeMovie(
@@ -213,7 +214,8 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private async Task OrganizeMovie(string sourcePath,
+        private async Task OrganizeMovie(
+            string sourcePath,
             string movieName,
             int? movieYear,
             MovieFileOrganizationOptions options,
@@ -404,24 +406,15 @@ namespace Emby.AutoOrganize.Core
                     yearInName = movieYear;
                 }
 
-                #region Search One
-
-                var movieInfo = new MovieInfo
-                {
-                    Name = nameWithoutYear,
-                    Year = yearInName,
-                };
-
-                var searchResultsTask = await _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(new RemoteSearchQuery<MovieInfo>
-                {
-                    SearchInfo = movieInfo
-
-                }, cancellationToken).ConfigureAwait(false);
-
-                #endregion
+                // Perform remote search
+                var movieInfo = new MovieInfo { Name = nameWithoutYear, Year = yearInName, };
+                var searchResultsTask = await _providerManager.GetRemoteSearchResults<Movie, MovieInfo>(
+                    new RemoteSearchQuery<MovieInfo> { SearchInfo = movieInfo },
+                    cancellationToken).ConfigureAwait(false);
 
                 // Group movies by name and year (if 2 movie with the exact same name, the same year ...)
-                var groupedResult = searchResultsTask.GroupBy(p => new { p.Name, p.ProductionYear },
+                var groupedResult = searchResultsTask.GroupBy(
+                    p => new { p.Name, p.ProductionYear },
                     p => p,
                     (key, g) => new { Key = key, Result = g.ToList() }).ToList();
 
@@ -491,8 +484,9 @@ namespace Emby.AutoOrganize.Core
                 .Where(i => i.Item2 > 0)
                 .OrderByDescending(i => i.Item2)
                 .Select(i => i.Item1)
-                // Check For the right folder AND the right extension (to handle quality upgrade)
                 .FirstOrDefault(m =>
+
+                    // Check For the right folder AND the right extension (to handle quality upgrade)
                     m.Path.StartsWith(targetFolder, StringComparison.Ordinal)
                     && Path.GetExtension(m.Path) == Path.GetExtension(result.OriginalPath));
 
@@ -506,11 +500,12 @@ namespace Emby.AutoOrganize.Core
         /// <param name="movie">The movie.</param>
         /// <param name="options">The options.</param>
         /// <returns>System.String.</returns>
-        private string GetMoviePath(string sourcePath,
+        private string GetMoviePath(
+            string sourcePath,
             Movie movie,
             MovieFileOrganizationOptions options)
         {
-            var movieFileName = "";
+            var movieFileName = string.Empty;
 
             if (options.MovieFolder)
             {

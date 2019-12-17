@@ -14,16 +14,14 @@ namespace Emby.AutoOrganize.Api
     public class GetFileOrganizationActivity : IReturn<QueryResult<FileOrganizationResult>>
     {
         /// <summary>
-        /// Skips over a given number of items within the results. Use for paging.
+        /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        /// <value>The start index.</value>
         [ApiMember(Name = "StartIndex", Description = "Optional. The record index to start at. All items with a lower index will be dropped from the results.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? StartIndex { get; set; }
 
         /// <summary>
-        /// The maximum number of items to return
+        /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        /// <value>The limit.</value>
         [ApiMember(Name = "Limit", Description = "Optional. The maximum number of records to return", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? Limit { get; set; }
     }
@@ -120,16 +118,15 @@ namespace Emby.AutoOrganize.Api
     public class GetSmartMatchInfos : IReturn<QueryResult<SmartMatchInfo>>
     {
         /// <summary>
-        /// Skips over a given number of items within the results. Use for paging.
+        /// Gets or sets a value indicating the number of items to skips over in the query. Use to specify a page
+        /// number.
         /// </summary>
-        /// <value>The start index.</value>
         [ApiMember(Name = "StartIndex", Description = "Optional. The record index to start at. All items with a lower index will be dropped from the results.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? StartIndex { get; set; }
 
         /// <summary>
-        /// The maximum number of items to return
+        /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        /// <value>The limit.</value>
         [ApiMember(Name = "Limit", Description = "Optional. The maximum number of records to return", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? Limit { get; set; }
     }
@@ -191,7 +188,6 @@ namespace Emby.AutoOrganize.Api
 
             Task.WaitAll(task);
         }
-
 
         public void Post(PerformOrganization request)
         {

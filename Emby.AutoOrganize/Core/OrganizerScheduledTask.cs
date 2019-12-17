@@ -66,7 +66,6 @@ namespace Emby.AutoOrganize.Core
                     .Organize(options.TvOptions, progress, cancellationToken).ConfigureAwait(false);
             }
 
-            //var queueMovie = false;
             if (options.MovieOptions.IsEnabled)
             {
                 queueMovie = options.MovieOptions.QueueLibraryScan;
@@ -83,15 +82,15 @@ namespace Emby.AutoOrganize.Core
         }
 
         /// <summary>
-        /// Creates the triggers that define when the task will run
+        /// Creates the triggers that define when the task will run.
         /// </summary>
         /// <returns>IEnumerable{BaseTaskTrigger}.</returns>
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
-            return new[] { 
-            
+            return new[]
+            {
                 // Every so often
-                new TaskTriggerInfo { Type = TaskTriggerInfo.TriggerInterval, IntervalTicks = TimeSpan.FromMinutes(5).Ticks}
+                new TaskTriggerInfo { Type = TaskTriggerInfo.TriggerInterval, IntervalTicks = TimeSpan.FromMinutes(5).Ticks }
             };
         }
 

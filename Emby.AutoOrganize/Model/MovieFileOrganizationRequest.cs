@@ -5,7 +5,7 @@ namespace Emby.AutoOrganize.Model
     public class MovieFileOrganizationRequest
     {
         public string ResultId { get; set; }
-        
+
         public string MovieId { get; set; }
 
         public string NewMovieName { get; set; }

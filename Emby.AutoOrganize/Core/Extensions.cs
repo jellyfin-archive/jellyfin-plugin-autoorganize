@@ -19,13 +19,14 @@ namespace Emby.AutoOrganize.Core
 
                 foreach (SmartMatchInfo optionsSmartMatchInfo in options.SmartMatchInfos)
                 {
-                    service.SaveResult(new SmartMatchResult
-                    {
-                        DisplayName = optionsSmartMatchInfo.DisplayName,
-                        ItemName = optionsSmartMatchInfo.ItemName,
-                        OrganizerType = optionsSmartMatchInfo.OrganizerType,
-                        MatchStrings = optionsSmartMatchInfo.MatchStrings.ToList(),
-                    }, CancellationToken.None);
+                    service.SaveResult(
+                        new SmartMatchResult
+                        {
+                            DisplayName = optionsSmartMatchInfo.DisplayName,
+                            ItemName = optionsSmartMatchInfo.ItemName,
+                            OrganizerType = optionsSmartMatchInfo.OrganizerType,
+                            MatchStrings = optionsSmartMatchInfo.MatchStrings.ToList(),
+                        }, CancellationToken.None);
                 }
 
                 manager.SaveAutoOrganizeOptions(options);
@@ -52,7 +53,7 @@ namespace Emby.AutoOrganize.Core
                 new ConfigurationStore
                 {
                     Key = ConfigurationExtension.AutoOrganizeOptionsKey,
-                    ConfigurationType = typeof (AutoOrganizeOptions)
+                    ConfigurationType = typeof(AutoOrganizeOptions)
                 }
             };
         }

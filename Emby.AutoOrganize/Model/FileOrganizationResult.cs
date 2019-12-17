@@ -10,7 +10,7 @@ namespace Emby.AutoOrganize.Model
         /// </summary>
         /// <value>The result identifier.</value>
         public string Id { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the original path.
         /// </summary>
@@ -52,7 +52,7 @@ namespace Emby.AutoOrganize.Model
         /// </summary>
         /// <value>The extracted ending episode number.</value>
         public int? ExtractedEndingEpisodeNumber { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the target path.
         /// </summary>
@@ -96,9 +96,9 @@ namespace Emby.AutoOrganize.Model
         public long FileSize { get; set; }
 
         /// <summary>
-        /// Indicates if the item is currently being processed.
+        /// Gets or sets a value indicating whether the item is currently being processed.
         /// </summary>
-        /// <remarks>Runtime property not persisted to the store.</remarks>
+        /// <remarks>This is a runtime property that is not persisted to the store.</remarks>
         public bool IsInProgress { get; set; }
 
         public FileOrganizationResult()

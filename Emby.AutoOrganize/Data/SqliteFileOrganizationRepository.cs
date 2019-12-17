@@ -27,28 +27,25 @@ namespace Emby.AutoOrganize.Data
         }
 
         /// <summary>
-        /// Opens the connection to the database
+        /// Opens the connection to the database.
         /// </summary>
-        /// <returns>Task.</returns>
         public void Initialize()
         {
             using (var connection = CreateConnection())
             {
                 RunDefaultInitialization(connection);
 
-                string[] queries = {
-
-                                "create table if not exists FileOrganizerResults (ResultId GUID PRIMARY KEY, OriginalPath TEXT, TargetPath TEXT, FileLength INT, OrganizationDate datetime, Status TEXT, OrganizationType TEXT, StatusMessage TEXT, ExtractedName TEXT, ExtractedYear int null, ExtractedSeasonNumber int null, ExtractedEpisodeNumber int null, ExtractedEndingEpisodeNumber, DuplicatePaths TEXT int null)",
-                                "create index if not exists idx_FileOrganizerResults on FileOrganizerResults(ResultId)",
-                                "create table if not exists SmartMatch (Id GUID PRIMARY KEY, ItemName TEXT, DisplayName TEXT, OrganizerType TEXT, MatchStrings TEXT null)",
-                                "create index if not exists idx_SmartMatch on SmartMatch(Id)",
-                               };
+                string[] queries =
+                {
+                    "create table if not exists FileOrganizerResults (ResultId GUID PRIMARY KEY, OriginalPath TEXT, TargetPath TEXT, FileLength INT, OrganizationDate datetime, Status TEXT, OrganizationType TEXT, StatusMessage TEXT, ExtractedName TEXT, ExtractedYear int null, ExtractedSeasonNumber int null, ExtractedEpisodeNumber int null, ExtractedEndingEpisodeNumber, DuplicatePaths TEXT int null)",
+                    "create index if not exists idx_FileOrganizerResults on FileOrganizerResults(ResultId)",
+                    "create table if not exists SmartMatch (Id GUID PRIMARY KEY, ItemName TEXT, DisplayName TEXT, OrganizerType TEXT, MatchStrings TEXT null)",
+                    "create index if not exists idx_SmartMatch on SmartMatch(Id)",
+                };
 
                 connection.RunQueries(queries);
             }
         }
-
-        #region FileOrganizationResult
 
         public void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
         {
@@ -103,14 +100,17 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        using (var statement = db.PrepareStatement("delete from FileOrganizerResults where ResultId = @ResultId"))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@ResultId", id.ToGuidBlob());
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                            string command = "delete from FileOrganizerResults where ResultId = @ResultId";
+                            using (var statement = db.PrepareStatement(command))
+                            {
+                                statement.TryBind("@ResultId", id.ToGuidBlob());
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
 
@@ -123,12 +123,9 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "delete from FileOrganizerResults";
-
-                        db.Execute(commandText);
-                    }, TransactionMode);
+                    connection.RunInTransaction(
+                        db => db.Execute("delete from FileOrganizerResults"),
+                        TransactionMode);
                 }
             }
 
@@ -141,14 +138,17 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        using (var statement = db.PrepareStatement("delete from FileOrganizerResults where Status = @Status"))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@Status", FileSortingStatus.Success.ToString());
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                            string command = "delete from FileOrganizerResults where Status = @Status";
+                            using (var statement = db.PrepareStatement(command))
+                            {
+                                statement.TryBind("@Status", FileSortingStatus.Success.ToString());
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
 
@@ -205,6 +205,7 @@ namespace Emby.AutoOrganize.Data
                 }
             }
         }
+
         public FileOrganizationResult GetResult(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -230,6 +231,7 @@ namespace Emby.AutoOrganize.Data
                 }
             }
         }
+
         public FileOrganizationResult GetResult(IReadOnlyList<IResultSetValue> reader)
         {
             var index = 0;
@@ -310,10 +312,6 @@ namespace Emby.AutoOrganize.Data
             return result;
         }
 
-        #endregion
-
-        #region SmartMatch
-
         public void SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
         {
             if (result == null)
@@ -358,14 +356,16 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        using (var statement = db.PrepareStatement("delete from SmartMatch where Id = @Id"))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@Id", id.ToGuidBlob());
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                            using (var statement = db.PrepareStatement("delete from SmartMatch where Id = @Id"))
+                            {
+                                statement.TryBind("@Id", id.ToGuidBlob());
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
         }
@@ -399,12 +399,9 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "delete from SmartMatch";
-
-                        db.Execute(commandText);
-                    }, TransactionMode);
+                    connection.RunInTransaction(
+                        db => db.Execute("delete from SmartMatch"),
+                        TransactionMode);
                 }
             }
         }
@@ -512,7 +509,5 @@ namespace Emby.AutoOrganize.Data
 
             return result;
         }
-
-        #endregion
     }
 }

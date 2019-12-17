@@ -22,7 +22,7 @@ namespace Emby.AutoOrganize
         public static PluginEntryPoint Current { get; private set; }
 
         public IFileOrganizationService FileOrganizationService { get; private set; }
-        
+
         private readonly ISessionManager _sessionManager;
         private readonly ITaskManager _taskManager;
         private readonly ILogger _logger;
@@ -71,10 +71,10 @@ namespace Emby.AutoOrganize
             Current = this;
             FileOrganizationService = new FileOrganizationService(_taskManager, _repository, _logger, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
 
-            FileOrganizationService.ItemAdded += _organizationService_ItemAdded;
-            FileOrganizationService.ItemRemoved += _organizationService_ItemRemoved;
-            FileOrganizationService.ItemUpdated += _organizationService_ItemUpdated;
-            FileOrganizationService.LogReset += _organizationService_LogReset;
+            FileOrganizationService.ItemAdded += OrganizationService_ItemAdded;
+            FileOrganizationService.ItemRemoved += OrganizationService_ItemRemoved;
+            FileOrganizationService.ItemUpdated += OrganizationService_ItemUpdated;
+            FileOrganizationService.LogReset += OrganizationService_LogReset;
 
             // Convert Config
             _config.Convert(FileOrganizationService);
@@ -91,32 +91,32 @@ namespace Emby.AutoOrganize
             return repo;
         }
 
-        private void _organizationService_LogReset(object sender, EventArgs e)
+        private void OrganizationService_LogReset(object sender, EventArgs e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_LogReset", (FileOrganizationResult)null, CancellationToken.None);
         }
 
-        private void _organizationService_ItemUpdated(object sender, GenericEventArgs<FileOrganizationResult> e)
+        private void OrganizationService_ItemUpdated(object sender, GenericEventArgs<FileOrganizationResult> e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemUpdated", e.Argument, CancellationToken.None);
         }
 
-        private void _organizationService_ItemRemoved(object sender, GenericEventArgs<FileOrganizationResult> e)
+        private void OrganizationService_ItemRemoved(object sender, GenericEventArgs<FileOrganizationResult> e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemRemoved", e.Argument, CancellationToken.None);
         }
 
-        private void _organizationService_ItemAdded(object sender, GenericEventArgs<FileOrganizationResult> e)
+        private void OrganizationService_ItemAdded(object sender, GenericEventArgs<FileOrganizationResult> e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemAdded", e.Argument, CancellationToken.None);
         }
 
         public void Dispose()
         {
-            FileOrganizationService.ItemAdded -= _organizationService_ItemAdded;
-            FileOrganizationService.ItemRemoved -= _organizationService_ItemRemoved;
-            FileOrganizationService.ItemUpdated -= _organizationService_ItemUpdated;
-            FileOrganizationService.LogReset -= _organizationService_LogReset;
+            FileOrganizationService.ItemAdded -= OrganizationService_ItemAdded;
+            FileOrganizationService.ItemRemoved -= OrganizationService_ItemRemoved;
+            FileOrganizationService.ItemUpdated -= OrganizationService_ItemUpdated;
+            FileOrganizationService.LogReset -= OrganizationService_LogReset;
 
             var repo = _repository as IDisposable;
             if (repo != null)

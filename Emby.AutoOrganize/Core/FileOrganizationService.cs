@@ -31,8 +31,11 @@ namespace Emby.AutoOrganize.Core
         private readonly ConcurrentDictionary<string, bool> _inProgressItemIds = new ConcurrentDictionary<string, bool>();
 
         public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
+        
         public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
+        
         public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
+        
         public event EventHandler LogReset;
 
         public FileOrganizationService(
@@ -229,7 +232,6 @@ namespace Emby.AutoOrganize.Core
             return _repo.GetSmartMatch(query);
         }
 
-
         public QueryResult<SmartMatchResult> GetSmartMatchInfos()
         {
             return _repo.GetSmartMatch(new FileOrganizationResultQuery());
@@ -298,6 +300,5 @@ namespace Emby.AutoOrganize.Core
 
             return retval;
         }
-
     }
 }

@@ -1,27 +1,24 @@
-using MediaBrowser.Model.Querying;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
+using MediaBrowser.Model.Querying;
 
 namespace Emby.AutoOrganize.Data
 {
     public interface IFileOrganizationRepository
     {
-        #region FileOrganizationResult
-
         /// <summary>
         /// Saves the result.
         /// </summary>
         /// <param name="result">The result.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Task.</returns>
         void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken);
 
         /// <summary>
         /// Deletes the specified identifier.
         /// </summary>
         /// <param name="id">The identifier.</param>
-        /// <returns>Task.</returns>
+        /// <returns>A task representing the delete operation.</returns>
         Task Delete(string id);
 
         /// <summary>
@@ -50,10 +47,6 @@ namespace Emby.AutoOrganize.Data
         /// <returns>Task.</returns>
         Task DeleteCompleted();
 
-        #endregion
-
-        #region SmartMatch
-
         void SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
 
         void DeleteSmartMatch(string id);
@@ -63,7 +56,5 @@ namespace Emby.AutoOrganize.Data
         void DeleteAllSmartMatch();
 
         QueryResult<SmartMatchResult> GetSmartMatch(FileOrganizationResultQuery query);
-
-        #endregion
     }
 }
