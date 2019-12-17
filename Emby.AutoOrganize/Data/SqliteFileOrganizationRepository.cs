@@ -17,12 +17,21 @@ namespace Emby.AutoOrganize.Data
     public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository
     {
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
-        private readonly IJsonSerializer _json;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public SqliteFileOrganizationRepository(ILogger logger, IServerApplicationPaths appPaths, IJsonSerializer json)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqliteFileOrganizationRepository"/> class.
+        /// </summary>
+        /// <param name="logger">The application logger.</param>
+        /// <param name="appPaths">The server application paths.</param>
+        /// <param name="jsonSerializer">A JSON serializer.</param>
+        public SqliteFileOrganizationRepository(
+            ILogger logger,
+            IServerApplicationPaths appPaths,
+            IJsonSerializer jsonSerializer)
             : base(logger)
         {
-            _json = json;
+            _jsonSerializer = jsonSerializer;
             DbFilePath = Path.Combine(appPaths.DataPath, "fileorganization.db");
         }
 
@@ -343,7 +352,7 @@ namespace Emby.AutoOrganize.Data
                             statement.TryBind("@ItemName", result.ItemName);
                             statement.TryBind("@DisplayName", result.DisplayName);
                             statement.TryBind("@OrganizerType", result.OrganizerType.ToString());
-                            statement.TryBind("@MatchStrings", _json.SerializeToString(result.MatchStrings));
+                            statement.TryBind("@MatchStrings", _jsonSerializer.SerializeToString(result.MatchStrings));
 
                             statement.MoveNext();
                         }
@@ -515,7 +524,7 @@ namespace Emby.AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.MatchStrings = _json.DeserializeFromString<List<string>>(reader[index].ToString());
+                result.MatchStrings = _jsonSerializer.DeserializeFromString<List<string>>(reader[index].ToString());
             }
 
             return result;

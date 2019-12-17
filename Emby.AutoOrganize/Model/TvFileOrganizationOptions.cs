@@ -18,6 +18,7 @@ namespace Emby.AutoOrganize.Model
         public string SeasonZeroFolderName { get; set; }
 
         public string EpisodeNamePattern { get; set; }
+
         public string MultiEpisodeNamePattern { get; set; }
 
         public bool OverwriteExistingEpisodes { get; set; }

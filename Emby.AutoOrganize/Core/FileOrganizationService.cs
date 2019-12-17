@@ -42,6 +42,9 @@ namespace Emby.AutoOrganize.Core
         /// <inheritdoc/>
         public event EventHandler LogReset;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileOrganizationService"/> class.
+        /// </summary>
         public FileOrganizationService(
             ITaskManager taskManager,
             IFileOrganizationRepository repo,
@@ -161,16 +164,12 @@ namespace Emby.AutoOrganize.Core
             ItemRemoved?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
         }
 
-        private AutoOrganizeOptions GetAutoOrganizeOptions()
-        {
-            return _config.GetAutoOrganizeOptions();
-        }
-
+        /// <inheritdoc/>
         public async Task PerformOrganization(string resultId)
         {
             var result = _repo.GetResult(resultId);
 
-            var options = GetAutoOrganizeOptions();
+            var options = _config.GetAutoOrganizeOptions();
 
             if (string.IsNullOrEmpty(result.TargetPath))
             {
@@ -219,7 +218,7 @@ namespace Emby.AutoOrganize.Core
         {
             var organizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
-            var options = GetAutoOrganizeOptions();
+            var options = _config.GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.TvOptions, CancellationToken.None).ConfigureAwait(false);
 
             if (result.Status != FileSortingStatus.Success)
@@ -233,7 +232,7 @@ namespace Emby.AutoOrganize.Core
         {
             var organizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
-            var options = GetAutoOrganizeOptions();
+            var options = _config.GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.MovieOptions, CancellationToken.None).ConfigureAwait(false);
 
             if (result.Status != FileSortingStatus.Success)
