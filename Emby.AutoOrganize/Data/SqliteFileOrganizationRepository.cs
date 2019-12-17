@@ -70,31 +70,33 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "replace into FileOrganizerResults (ResultId, OriginalPath, TargetPath, FileLength, OrganizationDate, Status, OrganizationType, StatusMessage, ExtractedName, ExtractedYear, ExtractedSeasonNumber, ExtractedEpisodeNumber, ExtractedEndingEpisodeNumber, DuplicatePaths) values (@ResultId, @OriginalPath, @TargetPath, @FileLength, @OrganizationDate, @Status, @OrganizationType, @StatusMessage, @ExtractedName, @ExtractedYear, @ExtractedSeasonNumber, @ExtractedEpisodeNumber, @ExtractedEndingEpisodeNumber, @DuplicatePaths)";
-
-                        using (var statement = db.PrepareStatement(commandText))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@ResultId", result.Id.ToGuidBlob());
-                            statement.TryBind("@OriginalPath", result.OriginalPath);
+                            var commandText = "replace into FileOrganizerResults (ResultId, OriginalPath, TargetPath, FileLength, OrganizationDate, Status, OrganizationType, StatusMessage, ExtractedName, ExtractedYear, ExtractedSeasonNumber, ExtractedEpisodeNumber, ExtractedEndingEpisodeNumber, DuplicatePaths) values (@ResultId, @OriginalPath, @TargetPath, @FileLength, @OrganizationDate, @Status, @OrganizationType, @StatusMessage, @ExtractedName, @ExtractedYear, @ExtractedSeasonNumber, @ExtractedEpisodeNumber, @ExtractedEndingEpisodeNumber, @DuplicatePaths)";
 
-                            statement.TryBind("@TargetPath", result.TargetPath);
-                            statement.TryBind("@FileLength", result.FileSize);
-                            statement.TryBind("@OrganizationDate", result.Date.ToDateTimeParamValue());
-                            statement.TryBind("@Status", result.Status.ToString());
-                            statement.TryBind("@OrganizationType", result.Type.ToString());
-                            statement.TryBind("@StatusMessage", result.StatusMessage);
-                            statement.TryBind("@ExtractedName", result.ExtractedName);
-                            statement.TryBind("@ExtractedYear", result.ExtractedYear);
-                            statement.TryBind("@ExtractedSeasonNumber", result.ExtractedSeasonNumber);
-                            statement.TryBind("@ExtractedEpisodeNumber", result.ExtractedEpisodeNumber);
-                            statement.TryBind("@ExtractedEndingEpisodeNumber", result.ExtractedEndingEpisodeNumber);
-                            statement.TryBind("@DuplicatePaths", string.Join("|", result.DuplicatePaths.ToArray()));
+                            using (var statement = db.PrepareStatement(commandText))
+                            {
+                                statement.TryBind("@ResultId", result.Id.ToGuidBlob());
+                                statement.TryBind("@OriginalPath", result.OriginalPath);
 
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                                statement.TryBind("@TargetPath", result.TargetPath);
+                                statement.TryBind("@FileLength", result.FileSize);
+                                statement.TryBind("@OrganizationDate", result.Date.ToDateTimeParamValue());
+                                statement.TryBind("@Status", result.Status.ToString());
+                                statement.TryBind("@OrganizationType", result.Type.ToString());
+                                statement.TryBind("@StatusMessage", result.StatusMessage);
+                                statement.TryBind("@ExtractedName", result.ExtractedName);
+                                statement.TryBind("@ExtractedYear", result.ExtractedYear);
+                                statement.TryBind("@ExtractedSeasonNumber", result.ExtractedSeasonNumber);
+                                statement.TryBind("@ExtractedEpisodeNumber", result.ExtractedEpisodeNumber);
+                                statement.TryBind("@ExtractedEndingEpisodeNumber", result.ExtractedEndingEpisodeNumber);
+                                statement.TryBind("@DuplicatePaths", string.Join("|", result.DuplicatePaths.ToArray()));
+
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
         }
@@ -341,22 +343,24 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "replace into SmartMatch (Id, ItemName, DisplayName, OrganizerType, MatchStrings) values (@Id, @ItemName, @DisplayName, @OrganizerType, @MatchStrings)";
-
-                        using (var statement = db.PrepareStatement(commandText))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@Id", result.Id.ToGuidBlob());
+                            var commandText = "replace into SmartMatch (Id, ItemName, DisplayName, OrganizerType, MatchStrings) values (@Id, @ItemName, @DisplayName, @OrganizerType, @MatchStrings)";
 
-                            statement.TryBind("@ItemName", result.ItemName);
-                            statement.TryBind("@DisplayName", result.DisplayName);
-                            statement.TryBind("@OrganizerType", result.OrganizerType.ToString());
-                            statement.TryBind("@MatchStrings", _jsonSerializer.SerializeToString(result.MatchStrings));
+                            using (var statement = db.PrepareStatement(commandText))
+                            {
+                                statement.TryBind("@Id", result.Id.ToGuidBlob());
 
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                                statement.TryBind("@ItemName", result.ItemName);
+                                statement.TryBind("@DisplayName", result.DisplayName);
+                                statement.TryBind("@OrganizerType", result.OrganizerType.ToString());
+                                statement.TryBind("@MatchStrings", _jsonSerializer.SerializeToString(result.MatchStrings));
+
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
         }
