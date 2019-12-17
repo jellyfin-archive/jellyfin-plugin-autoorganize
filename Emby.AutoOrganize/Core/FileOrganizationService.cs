@@ -30,12 +30,16 @@ namespace Emby.AutoOrganize.Core
         private readonly IProviderManager _providerManager;
         private readonly ConcurrentDictionary<string, bool> _inProgressItemIds = new ConcurrentDictionary<string, bool>();
 
+        /// <inheritdoc/>
         public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
-        
+
+        /// <inheritdoc/>
         public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
-        
+
+        /// <inheritdoc/>
         public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
-        
+
+        /// <inheritdoc/>
         public event EventHandler LogReset;
 
         public FileOrganizationService(
@@ -58,11 +62,13 @@ namespace Emby.AutoOrganize.Core
             _providerManager = providerManager;
         }
 
+        /// <inheritdoc/>
         public void BeginProcessNewFiles()
         {
             _taskManager.CancelIfRunningAndQueue<OrganizerScheduledTask>();
         }
 
+        /// <inheritdoc/>
         public void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
         {
             if (result == null || string.IsNullOrEmpty(result.OriginalPath))
@@ -75,6 +81,7 @@ namespace Emby.AutoOrganize.Core
             _repo.SaveResult(result, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public void SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
         {
             if (result == null)
@@ -85,6 +92,7 @@ namespace Emby.AutoOrganize.Core
             _repo.SaveResult(result, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)
         {
             var results = _repo.GetResults(query);
@@ -97,6 +105,7 @@ namespace Emby.AutoOrganize.Core
             return results;
         }
 
+        /// <inheritdoc/>
         public FileOrganizationResult GetResult(string id)
         {
             var result = _repo.GetResult(id);
@@ -109,6 +118,7 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
+        /// <inheritdoc/>
         public FileOrganizationResult GetResultBySourcePath(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -121,6 +131,7 @@ namespace Emby.AutoOrganize.Core
             return GetResult(id);
         }
 
+        /// <inheritdoc/>
         public async Task DeleteOriginalFile(string resultId)
         {
             var result = _repo.GetResult(resultId);
@@ -189,18 +200,21 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
+        /// <inheritdoc/>
         public async Task ClearLog()
         {
             await _repo.DeleteAll().ConfigureAwait(false);
             LogReset?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <inheritdoc/>
         public async Task ClearCompleted()
         {
             await _repo.DeleteCompleted().ConfigureAwait(false);
             LogReset?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <inheritdoc/>
         public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
         {
             var organizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
@@ -214,6 +228,7 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
+        /// <inheritdoc/>
         public async Task PerformOrganization(MovieFileOrganizationRequest request)
         {
             var organizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
@@ -227,16 +242,19 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
+        /// <inheritdoc/>
         public QueryResult<SmartMatchResult> GetSmartMatchInfos(FileOrganizationResultQuery query)
         {
             return _repo.GetSmartMatch(query);
         }
 
+        /// <inheritdoc/>
         public QueryResult<SmartMatchResult> GetSmartMatchInfos()
         {
             return _repo.GetSmartMatch(new FileOrganizationResultQuery());
         }
 
+        /// <inheritdoc/>
         public void DeleteSmartMatchEntry(string id, string matchString)
         {
             if (string.IsNullOrEmpty(id))
@@ -252,12 +270,7 @@ namespace Emby.AutoOrganize.Core
             _repo.DeleteSmartMatch(id, matchString);
         }
 
-        /// <summary>
-        /// Attempts to add a an item to the list of currently processed items.
-        /// </summary>
-        /// <param name="result">The result item.</param>
-        /// <param name="isNewItem">Passing true will notify the client to reload all items, otherwise only a single item will be refreshed.</param>
-        /// <returns>True if the item was added, False if the item is already contained in the list.</returns>
+        /// <inheritdoc/>
         public bool AddToInProgressList(FileOrganizationResult result, bool isNewItem)
         {
             if (string.IsNullOrWhiteSpace(result.Id))
@@ -284,11 +297,7 @@ namespace Emby.AutoOrganize.Core
             return true;
         }
 
-        /// <summary>
-        /// Removes an item from the list of currently processed items.
-        /// </summary>
-        /// <param name="result">The result item.</param>
-        /// <returns>True if the item was removed, False if the item was not contained in the list.</returns>
+        /// <inheritdoc/>
         public bool RemoveFromInprogressList(FileOrganizationResult result)
         {
             bool itemValue;

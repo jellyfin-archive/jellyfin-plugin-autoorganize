@@ -47,6 +47,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        /// <inheritdoc/>
         public void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
         {
             if (result == null)
@@ -89,6 +90,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        /// <inheritdoc/>
         public Task Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -117,6 +119,7 @@ namespace Emby.AutoOrganize.Data
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task DeleteAll()
         {
             using (WriteLock.Write())
@@ -132,6 +135,7 @@ namespace Emby.AutoOrganize.Data
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task DeleteCompleted()
         {
             using (WriteLock.Write())
@@ -155,6 +159,7 @@ namespace Emby.AutoOrganize.Data
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)
         {
             if (query == null)
@@ -206,6 +211,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        /// <inheritdoc/>
         public FileOrganizationResult GetResult(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -232,7 +238,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public FileOrganizationResult GetResult(IReadOnlyList<IResultSetValue> reader)
+        private FileOrganizationResult GetResult(IReadOnlyList<IResultSetValue> reader)
         {
             var index = 0;
 
@@ -312,6 +318,7 @@ namespace Emby.AutoOrganize.Data
             return result;
         }
 
+        /// <inheritdoc/>
         public void SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
         {
             if (result == null)
@@ -345,6 +352,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        /// <inheritdoc/>
         public void DeleteSmartMatch(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -370,6 +378,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        /// <inheritdoc/>
         public Task DeleteSmartMatch(string id, string matchString)
         {
             if (string.IsNullOrEmpty(id))
@@ -393,6 +402,7 @@ namespace Emby.AutoOrganize.Data
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public void DeleteAllSmartMatch()
         {
             using (WriteLock.Write())
@@ -406,7 +416,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public SmartMatchResult GetSmartMatch(string id)
+        private SmartMatchResult GetSmartMatch(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -432,6 +442,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        /// <inheritdoc/>
         public QueryResult<SmartMatchResult> GetSmartMatch(FileOrganizationResultQuery query)
         {
             if (query == null)
