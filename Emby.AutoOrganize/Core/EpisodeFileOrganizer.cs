@@ -434,8 +434,7 @@ namespace Emby.AutoOrganize.Core
                 endingEpiosdeNumber,
                 result,
                 premiereDate,
-                cancellationToken
-            ).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
 
             Season season;
             season = !string.IsNullOrEmpty(episode.Season?.Path)
@@ -455,8 +454,7 @@ namespace Emby.AutoOrganize.Core
                 options,
                 rememberCorrection,
                 result,
-                cancellationToken
-            ).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
         }
 
         private Task OrganizeEpisode(string sourcePath,
