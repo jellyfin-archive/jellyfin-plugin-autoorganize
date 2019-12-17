@@ -27,7 +27,11 @@ namespace Emby.AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
+        private NamingOptions _namingOptions;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MovieFileOrganizer"/> class.
+        /// </summary>
         public MovieFileOrganizer(
             IFileOrganizationService organizationService,
             IFileSystem fileSystem,
@@ -42,20 +46,6 @@ namespace Emby.AutoOrganize.Core
             _libraryManager = libraryManager;
             _libraryMonitor = libraryMonitor;
             _providerManager = providerManager;
-        }
-
-        private NamingOptions _namingOptions;
-
-        private NamingOptions GetNamingOptionsInternal()
-        {
-            if (_namingOptions == null)
-            {
-                var options = new NamingOptions();
-
-                _namingOptions = options;
-            }
-
-            return _namingOptions;
         }
 
         private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Movie;
@@ -87,8 +77,8 @@ namespace Emby.AutoOrganize.Core
                     return result;
                 }
 
-                var namingOptions = GetNamingOptionsInternal();
-                var resolver = new VideoResolver(namingOptions);
+                _namingOptions = _namingOptions ?? new NamingOptions();
+                var resolver = new VideoResolver(_namingOptions);
 
                 var movieInfo = resolver.Resolve(path, false) ??
                     new VideoFileInfo();

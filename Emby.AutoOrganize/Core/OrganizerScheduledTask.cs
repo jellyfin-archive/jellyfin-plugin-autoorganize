@@ -21,6 +21,9 @@ namespace Emby.AutoOrganize.Core
         private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizerScheduledTask"/> class.
+        /// </summary>
         public OrganizerScheduledTask(ILibraryMonitor libraryMonitor, ILibraryManager libraryManager, ILogger logger, IFileSystem fileSystem, IServerConfigurationManager config, IProviderManager providerManager)
         {
             _libraryMonitor = libraryMonitor;
@@ -31,31 +34,37 @@ namespace Emby.AutoOrganize.Core
             _providerManager = providerManager;
         }
 
-        public string Name
-        {
-            get { return "Organize new media files"; }
-        }
+        /// <inheritdoc/>
+        public string Key => "AutoOrganize";
 
-        public string Description
-        {
-            get { return "Processes new files available in the configured watch folder."; }
-        }
+        /// <inheritdoc/>
+        public string Name => "Organize new media files";
 
-        public string Category
-        {
-            get { return "Library"; }
-        }
+        /// <inheritdoc/>
+        public string Description => "Processes new files available in the configured watch folder.";
 
-        private AutoOrganizeOptions GetAutoOrganizeOptions()
-        {
-            return _config.GetAutoOrganizeOptions();
-        }
+        /// <inheritdoc/>
+        public string Category => "Library";
 
+        /// <inheritdoc/>
+        public bool IsHidden =>
+            !_config.GetAutoOrganizeOptions().TvOptions.IsEnabled
+            && !_config.GetAutoOrganizeOptions().MovieOptions.IsEnabled;
+
+        /// <inheritdoc/>
+        public bool IsEnabled =>
+            _config.GetAutoOrganizeOptions().TvOptions.IsEnabled
+            || _config.GetAutoOrganizeOptions().MovieOptions.IsEnabled;
+
+        /// <inheritdoc/>
+        public bool IsLogged => false;
+
+        /// <inheritdoc/>
         public async Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
         {
             bool queueTv = false, queueMovie = false;
 
-            var options = GetAutoOrganizeOptions();
+            var options = _config.GetAutoOrganizeOptions();
 
             if (options.TvOptions.IsEnabled)
             {
@@ -81,10 +90,7 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
-        /// <summary>
-        /// Creates the triggers that define when the task will run.
-        /// </summary>
-        /// <returns>IEnumerable{BaseTaskTrigger}.</returns>
+        /// <inheritdoc/>
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
             return new[]
@@ -92,26 +98,6 @@ namespace Emby.AutoOrganize.Core
                 // Every so often
                 new TaskTriggerInfo { Type = TaskTriggerInfo.TriggerInterval, IntervalTicks = TimeSpan.FromMinutes(5).Ticks }
             };
-        }
-
-        public bool IsHidden
-        {
-            get { return !GetAutoOrganizeOptions().TvOptions.IsEnabled && !GetAutoOrganizeOptions().MovieOptions.IsEnabled; }
-        }
-
-        public bool IsEnabled
-        {
-            get { return GetAutoOrganizeOptions().TvOptions.IsEnabled || GetAutoOrganizeOptions().MovieOptions.IsEnabled; }
-        }
-
-        public bool IsLogged
-        {
-            get { return false; }
-        }
-
-        public string Key
-        {
-            get { return "AutoOrganize"; }
         }
     }
 }

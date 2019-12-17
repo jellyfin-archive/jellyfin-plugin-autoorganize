@@ -6,6 +6,17 @@ namespace Emby.AutoOrganize.Model
     public class AutoOrganizeOptions
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AutoOrganizeOptions"/> class.
+        /// </summary>
+        public AutoOrganizeOptions()
+        {
+            TvOptions = new TvFileOrganizationOptions();
+            MovieOptions = new MovieFileOrganizationOptions();
+            SmartMatchInfos = new List<SmartMatchInfo>();
+            Converted = false;
+        }
+
+        /// <summary>
         /// Gets or sets the tv options.
         /// </summary>
         /// <value>The tv options.</value>
@@ -24,13 +35,5 @@ namespace Emby.AutoOrganize.Model
         public List<SmartMatchInfo> SmartMatchInfos { get; set; }
 
         public bool Converted { get; set; }
-
-        public AutoOrganizeOptions()
-        {
-            TvOptions = new TvFileOrganizationOptions();
-            MovieOptions = new MovieFileOrganizationOptions();
-            SmartMatchInfos = new List<SmartMatchInfo>();
-            Converted = false;
-        }
     }
 }

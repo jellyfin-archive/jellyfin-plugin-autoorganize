@@ -30,18 +30,6 @@ namespace Emby.AutoOrganize.Core
         private readonly IProviderManager _providerManager;
         private readonly ConcurrentDictionary<string, bool> _inProgressItemIds = new ConcurrentDictionary<string, bool>();
 
-        /// <inheritdoc/>
-        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
-
-        /// <inheritdoc/>
-        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
-
-        /// <inheritdoc/>
-        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
-
-        /// <inheritdoc/>
-        public event EventHandler LogReset;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FileOrganizationService"/> class.
         /// </summary>
@@ -64,6 +52,18 @@ namespace Emby.AutoOrganize.Core
             _fileSystem = fileSystem;
             _providerManager = providerManager;
         }
+
+        /// <inheritdoc/>
+        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
+
+        /// <inheritdoc/>
+        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
+
+        /// <inheritdoc/>
+        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
+
+        /// <inheritdoc/>
+        public event EventHandler LogReset;
 
         /// <inheritdoc/>
         public void BeginProcessNewFiles()

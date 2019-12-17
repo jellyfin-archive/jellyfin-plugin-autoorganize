@@ -5,6 +5,24 @@ namespace Emby.AutoOrganize.Model
 {
     public class TvFileOrganizationOptions
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TvFileOrganizationOptions"/> class.
+        /// </summary>
+        public TvFileOrganizationOptions()
+        {
+            MinFileSizeMb = 50;
+            LeftOverFileExtensionsToDelete = new List<string>();
+            WatchLocations = new List<string>();
+            EpisodeNamePattern = "%sn - %sx%0e - %en.%ext";
+            MultiEpisodeNamePattern = "%sn - %sx%0e-x%0ed - %en.%ext";
+            SeasonFolderPattern = "Season %s";
+            SeasonZeroFolderName = "Season 0";
+            SeriesFolderPattern = "%fn";
+            CopyOriginalFile = false;
+            QueueLibraryScan = false;
+            ExtendedClean = false;
+        }
+
         public bool IsEnabled { get; set; }
 
         public int MinFileSizeMb { get; set; }
@@ -36,26 +54,5 @@ namespace Emby.AutoOrganize.Model
         public string SeriesFolderPattern { get; set; }
 
         public bool QueueLibraryScan { get; set; }
-
-        public TvFileOrganizationOptions()
-        {
-            MinFileSizeMb = 50;
-
-            LeftOverFileExtensionsToDelete = new List<string>();
-
-            WatchLocations = new List<string>();
-
-            EpisodeNamePattern = "%sn - %sx%0e - %en.%ext";
-            MultiEpisodeNamePattern = "%sn - %sx%0e-x%0ed - %en.%ext";
-            SeasonFolderPattern = "Season %s";
-            SeasonZeroFolderName = "Season 0";
-            SeriesFolderPattern = "%fn";
-
-            CopyOriginalFile = false;
-
-            QueueLibraryScan = false;
-
-            ExtendedClean = false;
-        }
     }
 }

@@ -12,29 +12,14 @@ namespace Emby.AutoOrganize.Data
 {
     public abstract class BaseSqliteRepository : IDisposable
     {
-        protected string DbFilePath { get; set; }
-
-        protected ReaderWriterLockSlim WriteLock { get; }
-
         private readonly ILogger _logger;
+        private readonly object _disposeLock = new object();
 
-        protected BaseSqliteRepository(ILogger logger)
-        {
-            _logger = logger;
-            WriteLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-        }
-
-        protected TransactionMode TransactionMode
-        {
-            get { return TransactionMode.Deferred; }
-        }
-
-        protected TransactionMode ReadTransactionMode
-        {
-            get { return TransactionMode.Deferred; }
-        }
-
-        internal static int ThreadSafeMode { get; set; }
+        private static bool _versionLogged;
+        private string _defaultWal;
+        private SQLiteDatabaseConnection _dbConnection;
+        private ManagedConnection _connection;
+        private bool _disposed = false;
 
         static BaseSqliteRepository()
         {
@@ -49,16 +34,27 @@ namespace Emby.AutoOrganize.Data
             ThreadSafeMode = raw.sqlite3_threadsafe();
         }
 
-        private static bool _versionLogged;
-
-        private string _defaultWal;
-        private SQLiteDatabaseConnection _dbConnection;
-        private ManagedConnection _connection;
-
-        protected virtual bool EnableSingleConnection
+        protected BaseSqliteRepository(ILogger logger)
         {
-            get { return true; }
+            _logger = logger;
+            WriteLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }
+
+        protected string DbFilePath { get; set; }
+
+        protected ReaderWriterLockSlim WriteLock { get; }
+
+        protected TransactionMode TransactionMode => TransactionMode.Deferred;
+
+        protected TransactionMode ReadTransactionMode => TransactionMode.Deferred;
+
+        internal static int ThreadSafeMode { get; set; }
+
+        protected virtual bool EnableSingleConnection => true;
+
+        protected virtual bool EnableTempStoreMemory => false;
+
+        protected virtual int? CacheSize => null;
 
         protected ManagedConnection CreateConnection(bool isReadOnly = false)
         {
@@ -229,25 +225,6 @@ namespace Emby.AutoOrganize.Data
             db.ExecuteAll(string.Join(";", queries.ToArray()));
             _logger.LogInformation("PRAGMA synchronous={sync}", db.Query("PRAGMA synchronous").SelectScalarString().First());
         }
-
-        protected virtual bool EnableTempStoreMemory
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        protected virtual int? CacheSize
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        private bool _disposed = false;
-        private readonly object _disposeLock = new object();
 
         public void Dispose()
         {

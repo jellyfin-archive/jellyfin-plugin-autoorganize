@@ -19,10 +19,6 @@ namespace Emby.AutoOrganize
 {
     public sealed class PluginEntryPoint : IServerEntryPoint
     {
-        public static PluginEntryPoint Current { get; private set; }
-
-        public IFileOrganizationService FileOrganizationService { get; private set; }
-
         private readonly ISessionManager _sessionManager;
         private readonly ITaskManager _taskManager;
         private readonly ILogger _logger;
@@ -57,6 +53,11 @@ namespace Emby.AutoOrganize
             _json = json;
         }
 
+        public static PluginEntryPoint Current { get; private set; }
+
+        public IFileOrganizationService FileOrganizationService { get; private set; }
+
+        /// <inheritdoc/>
         public Task RunAsync()
         {
             try
@@ -111,6 +112,7 @@ namespace Emby.AutoOrganize
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemAdded", e.Argument, CancellationToken.None);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             FileOrganizationService.ItemAdded -= OrganizationService_ItemAdded;

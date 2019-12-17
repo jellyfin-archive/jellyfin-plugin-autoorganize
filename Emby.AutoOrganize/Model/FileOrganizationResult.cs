@@ -6,6 +6,14 @@ namespace Emby.AutoOrganize.Model
     public class FileOrganizationResult
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="FileOrganizationResult"/> class.
+        /// </summary>
+        public FileOrganizationResult()
+        {
+            DuplicatePaths = new List<string>();
+        }
+
+        /// <summary>
         /// Gets or sets the result identifier.
         /// </summary>
         /// <value>The result identifier.</value>
@@ -100,10 +108,5 @@ namespace Emby.AutoOrganize.Model
         /// </summary>
         /// <remarks>This is a runtime property that is not persisted to the store.</remarks>
         public bool IsInProgress { get; set; }
-
-        public FileOrganizationResult()
-        {
-            DuplicatePaths = new List<string>();
-        }
     }
 }

@@ -16,13 +16,13 @@ namespace Emby.AutoOrganize.Api
         /// <summary>
         /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        [ApiMember(Name = "StartIndex", Description = "Optional. The record index to start at. All items with a lower index will be dropped from the results.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
+        [ApiMember(Name = "StartIndex", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? StartIndex { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        [ApiMember(Name = "Limit", Description = "Optional. The maximum number of records to return", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
+        [ApiMember(Name = "Limit", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? Limit { get; set; }
     }
 
@@ -143,12 +143,16 @@ namespace Emby.AutoOrganize.Api
     {
         private readonly IHttpResultFactory _resultFactory;
 
-        public IRequest Request { get; set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileOrganizationService"/> class.
+        /// </summary>
+        /// <param name="resultFactory">HTTP result factory to use for making requests.</param>
         public FileOrganizationService(IHttpResultFactory resultFactory)
         {
             _resultFactory = resultFactory;
         }
+
+        public IRequest Request { get; set; }
 
         private IFileOrganizationService InternalFileOrganizationService
         {
