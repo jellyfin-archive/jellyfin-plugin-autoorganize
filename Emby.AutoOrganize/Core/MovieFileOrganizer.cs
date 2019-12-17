@@ -221,7 +221,7 @@ namespace Emby.AutoOrganize.Core
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            var movie = GetMatchingMovie(movieName, movieYear, "", result);
+            var movie = GetMatchingMovie(movieName, movieYear, string.Empty, result);
             RemoteSearchResult searchResult = null;
 
             if (movie == null)

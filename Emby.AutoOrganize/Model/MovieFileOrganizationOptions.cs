@@ -37,7 +37,7 @@ namespace Emby.AutoOrganize.Model
         {
             MinFileSizeMb = 50;
 
-            LeftOverFileExtensionsToDelete =  new List<string>();
+            LeftOverFileExtensionsToDelete = new List<string>();
 
             MoviePattern = "%fn.%ext";
 

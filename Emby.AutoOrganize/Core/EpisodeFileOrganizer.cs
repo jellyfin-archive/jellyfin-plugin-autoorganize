@@ -457,7 +457,8 @@ namespace Emby.AutoOrganize.Core
                 cancellationToken).ConfigureAwait(false);
         }
 
-        private Task OrganizeEpisode(string sourcePath,
+        private Task OrganizeEpisode(
+            string sourcePath,
             Series series,
             Episode episode,
             TvFileOrganizationOptions options,

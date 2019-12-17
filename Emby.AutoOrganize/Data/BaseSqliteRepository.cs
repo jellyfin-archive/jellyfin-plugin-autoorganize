@@ -268,16 +268,15 @@ namespace Emby.AutoOrganize.Data
         /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    // Dispose managed state
-                    DisposeConnection();
-                }
+            if (_disposed) return;
 
-                _disposed = true;
+            if (disposing)
+            {
+                // Dispose managed state
+                DisposeConnection();
             }
+
+            _disposed = true;
         }
 
         private void DisposeConnection()

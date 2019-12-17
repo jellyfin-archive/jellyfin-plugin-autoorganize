@@ -5,7 +5,7 @@ namespace Emby.AutoOrganize.Model
 {
     public class SmartMatchResult
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
 
         public string ItemName { get; set; }
         
@@ -13,6 +13,12 @@ namespace Emby.AutoOrganize.Model
         
         public FileOrganizerType OrganizerType { get; set; }
 
-        public List<string> MatchStrings { get; set; } = new List<string>();
+        public List<string> MatchStrings { get; set; }
+
+        public SmartMatchResult()
+        {
+            Id = Guid.NewGuid();
+            MatchStrings = new List<string>();
+        }
     }
 }
