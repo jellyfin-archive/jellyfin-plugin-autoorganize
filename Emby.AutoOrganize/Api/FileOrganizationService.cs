@@ -80,6 +80,7 @@ namespace Emby.AutoOrganize.Api
         public bool RememberCorrection { get; set; }
 
         [ApiMember(Name = "NewSeriesProviderIds", Description = "A list of provider IDs identifying a new series.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "ServiceStack cannot deserialize readonly dictionaries.")]
         public Dictionary<string, string> NewSeriesProviderIds { get; set; }
 
         [ApiMember(Name = "NewSeriesName", Description = "Name of a series to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
@@ -102,6 +103,7 @@ namespace Emby.AutoOrganize.Api
         public string MovieId { get; set; }
 
         [ApiMember(Name = "NewMovieProviderIds", Description = "A list of provider IDs identifying a new movie.", IsRequired = false, DataType = "Dictionary<string, string>", ParameterType = "query", Verb = "POST")]
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "ServiceStack cannot deserialize readonly dictionaries.")]
         public Dictionary<string, string> NewMovieProviderIds { get; set; }
 
         [ApiMember(Name = "NewMovieName", Description = "Name of a movie to add.", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "POST")]
@@ -135,7 +137,7 @@ namespace Emby.AutoOrganize.Api
     public class DeleteSmartMatchEntry
     {
         [ApiMember(Name = "Entries", Description = "SmartMatch Entry", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "POST")]
-        public List<NameValuePair> Entries { get; set; }
+        public IReadOnlyList<NameValuePair> Entries { get; set; }
     }
 
     [Authenticated(Roles = "Admin")]
@@ -205,13 +207,6 @@ namespace Emby.AutoOrganize.Api
 
         public void Post(OrganizeEpisode request)
         {
-            var dicNewProviderIds = new Dictionary<string, string>();
-
-            if (request.NewSeriesProviderIds != null)
-            {
-                dicNewProviderIds = request.NewSeriesProviderIds;
-            }
-
             // Don't await this
             var task = InternalFileOrganizationService.PerformOrganization(new EpisodeFileOrganizationRequest
             {
@@ -223,7 +218,7 @@ namespace Emby.AutoOrganize.Api
                 SeriesId = request.SeriesId,
                 NewSeriesName = request.NewSeriesName,
                 NewSeriesYear = request.NewSeriesYear,
-                NewSeriesProviderIds = dicNewProviderIds,
+                NewSeriesProviderIds = request.NewSeriesProviderIds ?? new Dictionary<string, string>(),
                 TargetFolder = request.TargetFolder
             });
 
@@ -234,13 +229,6 @@ namespace Emby.AutoOrganize.Api
 
         public void Post(OrganizeMovie request)
         {
-            var dicNewProviderIds = new Dictionary<string, string>();
-
-            if (request.NewMovieProviderIds != null)
-            {
-                dicNewProviderIds = request.NewMovieProviderIds;
-            }
-
             // Don't await this
             var task = InternalFileOrganizationService.PerformOrganization(new MovieFileOrganizationRequest
             {
@@ -248,7 +236,7 @@ namespace Emby.AutoOrganize.Api
                 MovieId = request.MovieId,
                 NewMovieName = request.NewMovieName,
                 NewMovieYear = request.NewMovieYear,
-                NewMovieProviderIds = dicNewProviderIds,
+                NewMovieProviderIds = request.NewMovieProviderIds ?? new Dictionary<string, string>(),
                 TargetFolder = request.TargetFolder
             });
 
