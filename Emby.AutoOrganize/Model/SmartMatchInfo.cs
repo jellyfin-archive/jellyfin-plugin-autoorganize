@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Emby.AutoOrganize.Model
 {
+    [Obsolete("This has been replaced by SmartMatchResult")]
     public class SmartMatchInfo
     {
         public SmartMatchInfo()

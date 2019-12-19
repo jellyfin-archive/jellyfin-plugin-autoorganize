@@ -117,7 +117,7 @@ namespace Emby.AutoOrganize.Api
     }
 
     [Route("/Library/FileOrganizations/SmartMatches", "GET", Summary = "Gets smart match entries")]
-    public class GetSmartMatchInfos : IReturn<QueryResult<SmartMatchInfo>>
+    public class GetSmartMatchInfos : IReturn<QueryResult<SmartMatchResult>>
     {
         /// <summary>
         /// Gets or sets a value indicating the number of items to skips over in the query. Use to specify a page

@@ -13,7 +13,6 @@ namespace Emby.AutoOrganize.Model
         {
             TvOptions = new TvFileOrganizationOptions();
             MovieOptions = new MovieFileOrganizationOptions();
-            SmartMatchInfos = new List<SmartMatchInfo>();
             Converted = false;
         }
 
@@ -33,8 +32,9 @@ namespace Emby.AutoOrganize.Model
         /// Gets or sets a list of smart match entries.
         /// </summary>
         /// <value>The smart match entries.</value>
+        [Obsolete("This configuration is now stored in the SQLite database.")]
         [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
-        public List<SmartMatchInfo> SmartMatchInfos { get; set; }
+        public List<SmartMatchInfo> SmartMatchInfos { get; set; } = new List<SmartMatchInfo>();
 
         public bool Converted { get; set; }
     }

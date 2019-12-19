@@ -78,7 +78,7 @@ namespace Emby.AutoOrganize
             FileOrganizationService.LogReset += OrganizationService_LogReset;
 
             // Convert Config
-            _config.Convert(FileOrganizationService);
+            _config.ConvertSmartMatchInfo(FileOrganizationService);
 
             return Task.CompletedTask;
         }

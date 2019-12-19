@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Emby.AutoOrganize.Model;
@@ -8,9 +10,16 @@ namespace Emby.AutoOrganize.Core
 {
     public static class ConfigurationExtension
     {
+        /// <summary>
+        /// The key to use with <see cref="IConfigurationManager"/> for storing the configuration of this plugin.
+        /// </summary>
         public const string AutoOrganizeOptionsKey = "autoorganize";
 
-        public static void Convert(this IConfigurationManager manager, IFileOrganizationService service)
+        /// <summary>
+        /// Perform a one-time migration of smart match info from the plugin configuration to the SQLite database.
+        /// </summary>
+        [SuppressMessage("Compiler", "CS0618:Type or member is obsolete", Justification = "This method is used to migrates configuration away from the obsolete property.")]
+        public static void ConvertSmartMatchInfo(this IConfigurationManager manager, IFileOrganizationService service)
         {
             var options = manager.GetConfiguration<AutoOrganizeOptions>(AutoOrganizeOptionsKey);
             if (!options.Converted)
