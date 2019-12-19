@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Emby.AutoOrganize.Model
 {
@@ -8,6 +9,7 @@ namespace Emby.AutoOrganize.Model
         public string ItemName { get; set; }
         public string DisplayName { get; set; }
         public FileOrganizerType OrganizerType { get; set; }
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
         public List<string> MatchStrings { get; set; }
 
         public SmartMatchInfo()

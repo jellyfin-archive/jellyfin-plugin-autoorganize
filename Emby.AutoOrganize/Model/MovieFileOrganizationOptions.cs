@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Emby.AutoOrganize.Model
 {
@@ -9,8 +10,10 @@ namespace Emby.AutoOrganize.Model
 
         public int MinFileSizeMb { get; set; }
 
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
         public List<string> LeftOverFileExtensionsToDelete { get; set; }
 
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
         public List<string> WatchLocations { get; set; }
 
         public string MoviePattern { get; set; }

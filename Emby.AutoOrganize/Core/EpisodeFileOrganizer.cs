@@ -301,7 +301,7 @@ namespace Emby.AutoOrganize.Core
                     // Create the folder
                     Directory.CreateDirectory(series.Path);
 
-                    series.ProviderIds = request.NewSeriesProviderIds;
+                    series.ProviderIds = request.NewSeriesProviderIds.ToDictionary(x => x.Key, x => x.Value);
                 }
             }
 

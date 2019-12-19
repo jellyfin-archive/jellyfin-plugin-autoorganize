@@ -507,7 +507,7 @@ namespace Emby.AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.MatchStrings = _json.DeserializeFromString<List<string>>(reader[index].ToString());
+                result.MatchStrings.AddRange(_json.DeserializeFromString<List<string>>(reader[index].ToString()));
             }
 
             return result;

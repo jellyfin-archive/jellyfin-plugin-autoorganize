@@ -21,6 +21,6 @@ namespace Emby.AutoOrganize.Model
 
         public string TargetFolder { get; set; }
 
-        public Dictionary<string, string> NewSeriesProviderIds { get; set; }
+        public IReadOnlyDictionary<string, string> NewSeriesProviderIds { get; set; }
     }
 }

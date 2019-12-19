@@ -154,7 +154,7 @@ namespace Emby.AutoOrganize.Core
                     Name = request.NewMovieName,
                     ProductionYear = request.NewMovieYear,
                     IsInMixedFolder = !options.MovieFolder,
-                    ProviderIds = request.NewMovieProviderIds,
+                    ProviderIds = request.NewMovieProviderIds.ToDictionary(x => x.Key, x => x.Value),
                 };
 
                 var newPath = GetMoviePath(result.OriginalPath, movie, options);
