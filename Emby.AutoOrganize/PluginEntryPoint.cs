@@ -17,6 +17,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize
 {
+    /// <summary>
+    /// Entry point for the <see cref="AutoOrganizePlugin"/>.
+    /// </summary>
     public sealed class PluginEntryPoint : IServerEntryPoint
     {
         private readonly ISessionManager _sessionManager;
@@ -31,6 +34,9 @@ namespace Emby.AutoOrganize
 
         private IFileOrganizationRepository _repository;
 
+        /// <summary>
+        /// Initialize a new instance of the <see cref="PluginEntryPoint"/> class.
+        /// </summary>
         public PluginEntryPoint(
             ISessionManager sessionManager,
             ITaskManager taskManager,

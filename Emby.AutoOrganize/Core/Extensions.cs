@@ -8,6 +8,9 @@ using MediaBrowser.Common.Configuration;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// Static class containing extension methods helpful for working with configuration for this plugin.
+    /// </summary>
     public static class ConfigurationExtension
     {
         /// <summary>
@@ -42,19 +45,34 @@ namespace Emby.AutoOrganize.Core
             }
         }
 
+        /// <summary>
+        /// Get the <see cref="AutoOrganizeOptions"/> stored in the configuration manager using the
+        /// <see cref="AutoOrganizeOptionsKey"/>.
+        /// </summary>
+        /// <param name="manager">The manager to retrieve the options from.</param>
+        /// <returns>The retrieved options.</returns>
         public static AutoOrganizeOptions GetAutoOrganizeOptions(this IConfigurationManager manager)
         {
             return manager.GetConfiguration<AutoOrganizeOptions>(AutoOrganizeOptionsKey);
         }
 
+        /// <summary>
+        /// Save <see cref="AutoOrganizeOptions"/> into the configuration manager.
+        /// </summary>
+        /// <param name="manager">The configuration manager to store the options into.</param>
+        /// <param name="options">The options to store.</param>
         public static void SaveAutoOrganizeOptions(this IConfigurationManager manager, AutoOrganizeOptions options)
         {
             manager.SaveConfiguration(AutoOrganizeOptionsKey, options);
         }
     }
 
+    /// <summary>
+    /// A configuration factory that registers the configuration entry required for the <see cref="AutoOrganizePlugin"/>.
+    /// </summary>
     public class AutoOrganizeOptionsFactory : IConfigurationFactory
     {
+        /// <inheritdoc/>
         public IEnumerable<ConfigurationStore> GetConfigurations()
         {
             return new List<ConfigurationStore>
