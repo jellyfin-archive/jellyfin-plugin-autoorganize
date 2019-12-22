@@ -73,7 +73,10 @@ namespace Emby.AutoOrganize.Core
             return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i, path));
         }
 
-        public async Task Organize(MovieFileOrganizationOptions options, CancellationToken cancellationToken, IProgress<double> progress)
+        public async Task Organize(
+            MovieFileOrganizationOptions options,
+            IProgress<double> progress,
+            CancellationToken cancellationToken)
         {
             var libraryFolderPaths = _libraryManager.GetVirtualFolders().SelectMany(i => i.Locations).ToList();
 
@@ -94,8 +97,7 @@ namespace Emby.AutoOrganize.Core
             {
                 var numComplete = 0;
 
-                var organizer = new MovieFileOrganizer(_organizationService, _config, _fileSystem, _logger, _libraryManager,
-                    _libraryMonitor, _providerManager);
+                var organizer = new MovieFileOrganizer(_organizationService, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
                 foreach (var file in eligibleFiles)
                 {

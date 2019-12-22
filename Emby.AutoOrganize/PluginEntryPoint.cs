@@ -17,13 +17,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize
 {
-    public class PluginEntryPoint : IServerEntryPoint
+    public sealed class PluginEntryPoint : IServerEntryPoint
     {
-        public static PluginEntryPoint Current;
+        public static PluginEntryPoint Current { get; private set; }
 
         public IFileOrganizationService FileOrganizationService { get; private set; }
+        
         private readonly ISessionManager _sessionManager;
-
         private readonly ITaskManager _taskManager;
         private readonly ILogger _logger;
         private readonly ILibraryMonitor _libraryMonitor;
@@ -33,7 +33,7 @@ namespace Emby.AutoOrganize
         private readonly IProviderManager _providerManager;
         private readonly IJsonSerializer _json;
 
-        public IFileOrganizationRepository Repository;
+        private IFileOrganizationRepository _repository;
 
         public PluginEntryPoint(
             ISessionManager sessionManager,
@@ -61,7 +61,7 @@ namespace Emby.AutoOrganize
         {
             try
             {
-                Repository = GetRepository();
+                _repository = GetRepository();
             }
             catch (Exception ex)
             {
@@ -69,7 +69,7 @@ namespace Emby.AutoOrganize
             }
 
             Current = this;
-            FileOrganizationService = new FileOrganizationService(_taskManager, Repository, _logger, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
+            FileOrganizationService = new FileOrganizationService(_taskManager, _repository, _logger, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
 
             FileOrganizationService.ItemAdded += _organizationService_ItemAdded;
             FileOrganizationService.ItemRemoved += _organizationService_ItemRemoved;
@@ -118,7 +118,7 @@ namespace Emby.AutoOrganize
             FileOrganizationService.ItemUpdated -= _organizationService_ItemUpdated;
             FileOrganizationService.LogReset -= _organizationService_LogReset;
 
-            var repo = Repository as IDisposable;
+            var repo = _repository as IDisposable;
             if (repo != null)
             {
                 repo.Dispose();

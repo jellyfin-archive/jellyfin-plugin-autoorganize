@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Data;
 using Emby.AutoOrganize.Model;
-using MediaBrowser.Common.Events;
 using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Persistence;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Events;
 using MediaBrowser.Model.IO;
@@ -65,10 +64,10 @@ namespace Emby.AutoOrganize.Core
         {
             if (result == null || string.IsNullOrEmpty(result.OriginalPath))
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
-            result.Id = result.OriginalPath.GetMD5().ToString("N");
+            result.Id = result.OriginalPath.GetMD5().ToString("N", CultureInfo.InvariantCulture);
 
             _repo.SaveResult(result, cancellationToken);
         }
@@ -77,7 +76,7 @@ namespace Emby.AutoOrganize.Core
         {
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             _repo.SaveResult(result, cancellationToken);
@@ -111,10 +110,10 @@ namespace Emby.AutoOrganize.Core
         {
             if (string.IsNullOrEmpty(path))
             {
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException(nameof(path));
             }
 
-            var id = path.GetMD5().ToString("N");
+            var id = path.GetMD5().ToString("N", CultureInfo.InvariantCulture);
 
             return GetResult(id);
         }
@@ -143,7 +142,7 @@ namespace Emby.AutoOrganize.Core
                 RemoveFromInprogressList(result);
             }
 
-            await _repo.Delete(resultId);
+            await _repo.Delete(resultId).ConfigureAwait(false);
 
             ItemRemoved?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
         }
@@ -168,18 +167,12 @@ namespace Emby.AutoOrganize.Core
             switch (result.Type)
             {
                 case FileOrganizerType.Episode:
-                    var episodeOrganizer = new EpisodeFileOrganizer(
-                        this, _config, _fileSystem, _logger, _libraryManager,
-                        _libraryMonitor, _providerManager);
-
+                    var episodeOrganizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
                     organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, options.TvOptions, CancellationToken.None)
                         .ConfigureAwait(false);
-
                     break;
                 case FileOrganizerType.Movie:
-                    var movieOrganizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
-                        _libraryMonitor, _providerManager);
-
+                    var movieOrganizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
                     organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options.MovieOptions, true, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
@@ -195,20 +188,19 @@ namespace Emby.AutoOrganize.Core
 
         public async Task ClearLog()
         {
-            await _repo.DeleteAll();
+            await _repo.DeleteAll().ConfigureAwait(false);
             LogReset?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task ClearCompleted()
         {
-            await _repo.DeleteCompleted();
+            await _repo.DeleteCompleted().ConfigureAwait(false);
             LogReset?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
         {
-            var organizer = new EpisodeFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
-                _libraryMonitor, _providerManager);
+            var organizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
             var options = GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.TvOptions, CancellationToken.None).ConfigureAwait(false);
@@ -221,8 +213,7 @@ namespace Emby.AutoOrganize.Core
 
         public async Task PerformOrganization(MovieFileOrganizationRequest request)
         {
-            var organizer = new MovieFileOrganizer(this, _config, _fileSystem, _logger, _libraryManager,
-                _libraryMonitor, _providerManager);
+            var organizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
 
             var options = GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.MovieOptions, CancellationToken.None).ConfigureAwait(false);
@@ -269,7 +260,7 @@ namespace Emby.AutoOrganize.Core
         {
             if (string.IsNullOrWhiteSpace(result.Id))
             {
-                result.Id = result.OriginalPath.GetMD5().ToString("N");
+                result.Id = result.OriginalPath.GetMD5().ToString("N", CultureInfo.InvariantCulture);
             }
 
             if (!_inProgressItemIds.TryAdd(result.Id, false))

@@ -1,11 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
 namespace Emby.AutoOrganize.Model
 {
     public class TvFileOrganizationOptions
     {
         public bool IsEnabled { get; set; }
+
         public int MinFileSizeMb { get; set; }
-        public string[] LeftOverFileExtensionsToDelete { get; set; }
-        public string[] WatchLocations { get; set; }
+
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
+        public List<string> LeftOverFileExtensionsToDelete { get; set; }
+
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
+        public List<string> WatchLocations { get; set; }
 
         public string SeasonFolderPattern { get; set; }
 
@@ -34,9 +43,9 @@ namespace Emby.AutoOrganize.Model
         {
             MinFileSizeMb = 50;
 
-            LeftOverFileExtensionsToDelete = new string[] { };
+            LeftOverFileExtensionsToDelete = new List<string>();
 
-            WatchLocations = new string[] { };
+            WatchLocations = new List<string>();
 
             EpisodeNamePattern = "%sn - %sx%0e - %en.%ext";
             MultiEpisodeNamePattern = "%sn - %sx%0e-x%0ed - %en.%ext";

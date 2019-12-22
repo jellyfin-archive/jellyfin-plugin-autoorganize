@@ -14,15 +14,11 @@ namespace Emby.AutoOrganize.Data
         {
             if (queries == null)
             {
-                throw new ArgumentNullException("queries");
+                throw new ArgumentNullException(nameof(queries));
             }
 
             connection.RunInTransaction(conn =>
             {
-                //foreach (var query in queries)
-                //{
-                //    conn.Execute(query);
-                //}
                 conn.ExecuteAll(string.Join(";", queries));
             });
         }
@@ -120,7 +116,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (obj == null)
             {
-                throw new ArgumentNullException("obj");
+                throw new ArgumentNullException(nameof(obj));
             }
 
             using (var stream = new MemoryStream())
@@ -132,7 +128,7 @@ namespace Emby.AutoOrganize.Data
 
         public static void Attach(ManagedConnection db, string path, string alias)
         {
-            var commandText = string.Format("attach @path as {0};", alias);
+            var commandText = $"attach @path as {alias};";
 
             using (var statement = db.PrepareStatement(commandText))
             {

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
 namespace Emby.AutoOrganize.Model
 {
     public class AutoOrganizeOptions
@@ -18,7 +22,8 @@ namespace Emby.AutoOrganize.Model
         /// Gets or sets a list of smart match entries.
         /// </summary>
         /// <value>The smart match entries.</value>
-        public SmartMatchInfo[] SmartMatchInfos { get; set; }
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
+        public List<SmartMatchInfo> SmartMatchInfos { get; set; }
 
         public bool Converted { get; set; }
 
@@ -26,7 +31,7 @@ namespace Emby.AutoOrganize.Model
         {
             TvOptions = new TvFileOrganizationOptions();
             MovieOptions = new MovieFileOrganizationOptions();
-            SmartMatchInfos = new SmartMatchInfo[] { };
+            SmartMatchInfos = new List<SmartMatchInfo>();
             Converted = false;
         }
     }

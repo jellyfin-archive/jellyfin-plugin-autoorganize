@@ -1,11 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
 namespace Emby.AutoOrganize.Model
 {
     public class MovieFileOrganizationOptions
     {
         public bool IsEnabled { get; set; }
+
         public int MinFileSizeMb { get; set; }
-        public string[] LeftOverFileExtensionsToDelete { get; set; }
-        public string[] WatchLocations { get; set; }
+
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
+        public List<string> LeftOverFileExtensionsToDelete { get; set; }
+
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
+        public List<string> WatchLocations { get; set; }
 
         public string MoviePattern { get; set; }
 
@@ -31,11 +40,11 @@ namespace Emby.AutoOrganize.Model
         {
             MinFileSizeMb = 50;
 
-            LeftOverFileExtensionsToDelete = new string[] { };
+            LeftOverFileExtensionsToDelete = new List<string>();
 
             MoviePattern = "%fn.%ext";
 
-            WatchLocations = new string[] { };
+            WatchLocations = new List<string>();
 
             CopyOriginalFile = false;
 

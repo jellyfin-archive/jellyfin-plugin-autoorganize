@@ -87,7 +87,7 @@ namespace Emby.AutoOrganize.Model
         /// Gets or sets the duplicate paths.
         /// </summary>
         /// <value>The duplicate paths.</value>
-        public List<string> DuplicatePaths { get; set; }
+        public IReadOnlyList<string> DuplicatePaths { get; set; }
 
         /// <summary>
         /// Gets or sets the size of the file.
@@ -103,7 +103,7 @@ namespace Emby.AutoOrganize.Model
 
         public FileOrganizationResult()
         {
-            DuplicatePaths = new List<string>();
+            DuplicatePaths = new List<string>().AsReadOnly();
         }
     }
 }

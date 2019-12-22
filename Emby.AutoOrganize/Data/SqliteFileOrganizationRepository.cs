@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
 using MediaBrowser.Controller;
-using MediaBrowser.Controller.Persistence;
 using MediaBrowser.Model.Querying;
 using MediaBrowser.Model.Serialization;
 using Microsoft.Extensions.Logging;
@@ -15,12 +14,13 @@ using SQLitePCL.pretty;
 
 namespace Emby.AutoOrganize.Data
 {
-    public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository, IDisposable
+    public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository
     {
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
         private readonly IJsonSerializer _json;
 
-        public SqliteFileOrganizationRepository(ILogger logger, IServerApplicationPaths appPaths, IJsonSerializer json) : base(logger)
+        public SqliteFileOrganizationRepository(ILogger logger, IServerApplicationPaths appPaths, IJsonSerializer json)
+            : base(logger)
         {
             _json = json;
             DbFilePath = Path.Combine(appPaths.DataPath, "fileorganization.db");
@@ -54,7 +54,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -92,11 +92,11 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public async Task Delete(string id)
+        public Task Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Write())
@@ -113,9 +113,11 @@ namespace Emby.AutoOrganize.Data
                     }, TransactionMode);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteAll()
+        public Task DeleteAll()
         {
             using (WriteLock.Write())
             {
@@ -129,9 +131,11 @@ namespace Emby.AutoOrganize.Data
                     }, TransactionMode);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteCompleted()
+        public Task DeleteCompleted()
         {
             using (WriteLock.Write())
             {
@@ -147,13 +151,15 @@ namespace Emby.AutoOrganize.Data
                     }, TransactionMode);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
 
             using (WriteLock.Read())
@@ -164,11 +170,11 @@ namespace Emby.AutoOrganize.Data
 
                     if (query.StartIndex.HasValue && query.StartIndex.Value > 0)
                     {
-                        commandText += string.Format(" WHERE ResultId NOT IN (SELECT ResultId FROM FileOrganizerResults ORDER BY OrganizationDate desc LIMIT {0})",
-                            query.StartIndex.Value.ToString(_usCulture));
+                        var startIndex = query.StartIndex.Value.ToString(_usCulture);
+                        commandText += $" WHERE ResultId NOT IN (SELECT ResultId FROM FileOrganizerResults ORDER BY OrganizationDate DESC LIMIT {startIndex})";
                     }
 
-                    commandText += " ORDER BY OrganizationDate desc";
+                    commandText += " ORDER BY OrganizationDate DESC";
 
                     if (query.Limit.HasValue)
                     {
@@ -203,7 +209,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Read())
@@ -230,7 +236,7 @@ namespace Emby.AutoOrganize.Data
 
             var result = new FileOrganizationResult
             {
-                Id = reader[0].ReadGuidFromBlob().ToString("N")
+                Id = reader[0].ReadGuidFromBlob().ToString("N", CultureInfo.InvariantCulture)
             };
 
             index++;
@@ -312,7 +318,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -345,7 +351,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Write())
@@ -364,11 +370,11 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public async Task DeleteSmartMatch(string id, string matchString)
+        public Task DeleteSmartMatch(string id, string matchString)
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             var match = GetSmartMatch(id);
@@ -383,6 +389,8 @@ namespace Emby.AutoOrganize.Data
             {
                 DeleteSmartMatch(id);
             }
+
+            return Task.CompletedTask;
         }
 
         public void DeleteAllSmartMatch()
@@ -405,7 +413,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             using (WriteLock.Read())
@@ -431,7 +439,7 @@ namespace Emby.AutoOrganize.Data
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
 
             using (WriteLock.Read())
@@ -442,11 +450,11 @@ namespace Emby.AutoOrganize.Data
 
                     if (query.StartIndex.HasValue && query.StartIndex.Value > 0)
                     {
-                        commandText += string.Format(" WHERE Id NOT IN (SELECT Id FROM SmartMatch ORDER BY ItemName desc LIMIT {0})",
-                            query.StartIndex.Value.ToString(_usCulture));
+                        var startIndex = query.StartIndex.Value.ToString(_usCulture);
+                        commandText += $" WHERE Id NOT IN (SELECT Id FROM SmartMatch ORDER BY ItemName DESC LIMIT {startIndex})";
                     }
 
-                    commandText += " ORDER BY ItemName desc";
+                    commandText += " ORDER BY ItemName DESC";
 
                     if (query.Limit.HasValue)
                     {
@@ -499,7 +507,7 @@ namespace Emby.AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.MatchStrings = _json.DeserializeFromString<List<string>>(reader[index].ToString());
+                result.MatchStrings.AddRange(_json.DeserializeFromString<List<string>>(reader[index].ToString()));
             }
 
             return result;

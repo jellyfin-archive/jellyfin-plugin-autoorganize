@@ -13,14 +13,13 @@ namespace Emby.AutoOrganize.Data
     public abstract class BaseSqliteRepository : IDisposable
     {
         protected string DbFilePath { get; set; }
-        protected ReaderWriterLockSlim WriteLock;
+        protected ReaderWriterLockSlim WriteLock { get; }
 
-        protected ILogger _logger { get; private set; }
+        private readonly ILogger _logger;
 
         protected BaseSqliteRepository(ILogger logger)
         {
             _logger = logger;
-
             WriteLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }
 
@@ -56,7 +55,8 @@ namespace Emby.AutoOrganize.Data
         private static bool _versionLogged;
 
         private string _defaultWal;
-        protected ManagedConnection _connection;
+        private SQLiteDatabaseConnection _dbConnection;
+        private ManagedConnection _connection;
 
         protected virtual bool EnableSingleConnection
         {
@@ -75,8 +75,8 @@ namespace Emby.AutoOrganize.Data
                 if (!_versionLogged)
                 {
                     _versionLogged = true;
-                    _logger.LogInformation("Sqlite version: {ver}", SQLite3.Version);
-                    _logger.LogInformation("Sqlite compiler options: {opts}", string.Join(",", SQLite3.CompilerOptions.ToArray()));
+                    _logger.LogInformation("SQLite version: {Version}", SQLite3.Version);
+                    _logger.LogInformation("SQLite compiler options: {Options}", string.Join(",", SQLite3.CompilerOptions));
                 }
 
                 ConnectionFlags connectionFlags;
@@ -138,24 +138,16 @@ namespace Emby.AutoOrganize.Data
                         queries.Add("PRAGMA temp_store = file");
                     }
 
-                    //foreach (var query in queries)
-                    //{
-                    //    db.Execute(query);
-                    //}
                     db.ExecuteAll(string.Join(";", queries.ToArray()));
                 }
                 catch
                 {
-                    using (db)
-                    {
-
-                    }
-
+                    db.Dispose();
                     throw;
                 }
 
-                _connection = new ManagedConnection(db, false);
-
+                _dbConnection = db;
+                _connection = new ManagedConnection(db);
                 return _connection;
             }
         }
@@ -260,50 +252,31 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        internal static void CheckOk(int rc)
-        {
-            string msg = "";
-
-            if (raw.SQLITE_OK != rc)
-            {
-                throw CreateException((ErrorCode)rc, msg);
-            }
-        }
-
-        internal static Exception CreateException(ErrorCode rc, string msg)
-        {
-            var exp = new Exception(msg);
-
-            return exp;
-        }
-
-        private bool _disposed;
-        protected void CheckDisposed()
-        {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(GetType().Name + " has been disposed and cannot be accessed.");
-            }
-        }
+        #region IDisposable Support
+        private bool _disposed = false;
+        private readonly object _disposeLock = new object();
 
         public void Dispose()
         {
-            _disposed = true;
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
-
-        private readonly object _disposeLock = new object();
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool dispose)
+        protected virtual void Dispose(bool disposing)
         {
-            if (dispose)
+            if (_disposed) return;
+
+            if (disposing)
             {
+                // Dispose managed state
                 DisposeConnection();
             }
+
+            _disposed = true;
         }
 
         private void DisposeConnection()
@@ -314,16 +287,8 @@ namespace Emby.AutoOrganize.Data
                 {
                     using (WriteLock.Write())
                     {
-                        if (_connection != null)
-                        {
-                            using (_connection)
-                            {
-                                _connection.Close();
-                            }
-                            _connection = null;
-                        }
-
-                        CloseConnection();
+                        _connection?.Dispose();
+                        _dbConnection?.Dispose();
                     }
                 }
             }
@@ -332,11 +297,7 @@ namespace Emby.AutoOrganize.Data
                 _logger.LogError(ex, "Error disposing database", ex);
             }
         }
-
-        protected virtual void CloseConnection()
-        {
-
-        }
+        #endregion
 
         protected List<string> GetColumnNames(IDatabaseConnection connection, string table)
         {
@@ -400,13 +361,6 @@ namespace Emby.AutoOrganize.Data
                     _sync.ExitWriteLock();
                     _sync = null;
                 }
-            }
-        }
-
-        public class DummyToken : IDisposable
-        {
-            public void Dispose()
-            {
             }
         }
 

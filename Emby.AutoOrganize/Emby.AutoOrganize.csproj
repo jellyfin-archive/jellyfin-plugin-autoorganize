@@ -40,4 +40,14 @@
     <PackageReference Include="SQLitePCL.pretty.netstandard" Version="2.0.1" />
   </ItemGroup>
 
+  <!-- Code Analyzers-->
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="All" />
+    <!-- <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" /> -->
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
 </Project>

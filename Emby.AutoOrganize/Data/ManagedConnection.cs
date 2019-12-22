@@ -7,15 +7,22 @@ using SQLitePCL.pretty;
 
 namespace Emby.AutoOrganize.Data
 {
-    public class ManagedConnection :  IDisposable
+    /// <summary>
+    /// Wraps a <see cref="SQLiteDatabaseConnection"/>.
+    /// </summary>
+    public sealed class ManagedConnection : IDisposable
     {
-        private SQLiteDatabaseConnection db;
-        private readonly bool _closeOnDispose;
+        private readonly SQLiteDatabaseConnection db;
 
-        public ManagedConnection(SQLiteDatabaseConnection db, bool closeOnDispose)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManagedConnection"/> class by wrapping a
+        /// <see cref="SQLiteDatabaseConnection"/>. The caller of this constructor is responsible for disposing the
+        /// connection at an appropriate time.
+        /// </summary>
+        /// <param name="db">The database connection to wrap.</param>
+        public ManagedConnection(SQLiteDatabaseConnection db)
         {
             this.db = db;
-            _closeOnDispose = closeOnDispose;
         }
 
         public IStatement PrepareStatement(string sql)
@@ -50,7 +57,7 @@ namespace Emby.AutoOrganize.Data
 
         public T RunInTransaction<T>(Func<IDatabaseConnection, T> action, TransactionMode mode)
         {
-            return db.RunInTransaction<T>(action, mode);
+            return db.RunInTransaction(action, mode);
         }
 
         public IEnumerable<IReadOnlyList<IResultSetValue>> Query(string sql)
@@ -63,20 +70,11 @@ namespace Emby.AutoOrganize.Data
             return db.Query(sql, values);
         }
 
-        public void Close()
-        {
-            using (db)
-            {
-
-            }
-        }
-
         public void Dispose()
         {
-            if (_closeOnDispose)
-            {
-                Close();
-            }
+            // There is nothing to dispose in this class, the db connection is managed by BaseSqliteRepository.
+            // The IDisposable interface has been left on this class to reduce the amount of code changes necessary
+            // later on in case we decide to move management of the db connection down to this class.
         }
     }
 }

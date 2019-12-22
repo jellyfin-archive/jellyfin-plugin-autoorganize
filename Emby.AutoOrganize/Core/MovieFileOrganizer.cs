@@ -27,15 +27,17 @@ namespace Emby.AutoOrganize.Core
         private readonly ILogger _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
-        private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
 
-        private readonly CultureInfo _usCulture = new CultureInfo("en-US");
-
-        public MovieFileOrganizer(IFileOrganizationService organizationService, IServerConfigurationManager config, IFileSystem fileSystem, ILogger logger, ILibraryManager libraryManager, ILibraryMonitor libraryMonitor, IProviderManager providerManager)
+        public MovieFileOrganizer(
+            IFileOrganizationService organizationService,
+            IFileSystem fileSystem,
+            ILogger logger,
+            ILibraryManager libraryManager,
+            ILibraryMonitor libraryMonitor,
+            IProviderManager providerManager)
         {
             _organizationService = organizationService;
-            _config = config;
             _fileSystem = fileSystem;
             _logger = logger;
             _libraryManager = libraryManager;
@@ -109,7 +111,7 @@ namespace Emby.AutoOrganize.Core
                 }
                 else
                 {
-                    var msg = string.Format("Unable to determine movie name from {0}", path);
+                    var msg = "Unable to determine movie name from " + path;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
                     _logger.LogWarning(msg);
@@ -138,10 +140,10 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-        private Movie CreateNewMovie(MovieFileOrganizationRequest request, FileOrganizationResult result, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
+        private Movie CreateNewMovie(MovieFileOrganizationRequest request, FileOrganizationResult result, MovieFileOrganizationOptions options)
         {
             // To avoid Movie duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-            var movie = GetMatchingMovie(request.NewMovieName, request.NewMovieYear, request.TargetFolder, result, options);
+            var movie = GetMatchingMovie(request.NewMovieName, request.NewMovieYear, request.TargetFolder, result);
 
             if (movie == null)
             {
@@ -152,14 +154,14 @@ namespace Emby.AutoOrganize.Core
                     Name = request.NewMovieName,
                     ProductionYear = request.NewMovieYear,
                     IsInMixedFolder = !options.MovieFolder,
-                    ProviderIds = request.NewMovieProviderIds,
+                    ProviderIds = request.NewMovieProviderIds.ToDictionary(x => x.Key, x => x.Value),
                 };
 
                 var newPath = GetMoviePath(result.OriginalPath, movie, options);
 
                 if (string.IsNullOrEmpty(newPath))
                 {
-                    var msg = string.Format("Unable to sort {0} because target path could not be determined.", result.OriginalPath);
+                    var msg = $"Unable to sort {result.OriginalPath} because target path could not be determined.";
                     throw new OrganizationException(msg);
                 }
 
@@ -180,7 +182,7 @@ namespace Emby.AutoOrganize.Core
                 if (request.NewMovieProviderIds.Count > 0)
                 {
                     // To avoid Series duplicate by mistake (Missing SmartMatch and wrong selection in UI)
-                    movie = CreateNewMovie(request, result, options, cancellationToken);
+                    movie = CreateNewMovie(request, result, options);
                 }
 
                 if (movie == null)
@@ -192,10 +194,10 @@ namespace Emby.AutoOrganize.Core
                 // We manually set the media as Movie 
                 result.Type = CurrentFileOrganizerType;
 
-                await OrganizeMovie(result.OriginalPath,
+                await OrganizeMovie(
+                    result.OriginalPath,
                     movie,
                     options,
-                    null,
                     true,
                     result,
                     cancellationToken).ConfigureAwait(false);
@@ -211,8 +213,6 @@ namespace Emby.AutoOrganize.Core
             return result;
         }
 
-
-
         private async Task OrganizeMovie(string sourcePath,
             string movieName,
             int? movieYear,
@@ -221,7 +221,7 @@ namespace Emby.AutoOrganize.Core
             FileOrganizationResult result,
             CancellationToken cancellationToken)
         {
-            var movie = GetMatchingMovie(movieName, movieYear, "", result, options);
+            var movie = GetMatchingMovie(movieName, movieYear, string.Empty, result);
             RemoteSearchResult searchResult = null;
 
             if (movie == null)
@@ -233,7 +233,7 @@ namespace Emby.AutoOrganize.Core
 
                 if (movie == null)
                 {
-                    var msg = string.Format("Unable to find movie in library matching name {0}", movieName);
+                    var msg = "Unable to find movie in library matching name " + movieName;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
                     _logger.LogWarning(msg);
@@ -245,24 +245,8 @@ namespace Emby.AutoOrganize.Core
             // We have all the chance that the media type is an Movie
             result.Type = CurrentFileOrganizerType;
 
-            await OrganizeMovie(sourcePath,
-                movie,
-                options,
-                searchResult,
-                overwriteExisting,
-                result,
-                cancellationToken).ConfigureAwait(false);
-        }
-
-        private async Task OrganizeMovie(string sourcePath,
-            Movie movie,
-            MovieFileOrganizationOptions options,
-            RemoteSearchResult remoteResult,
-            bool overwriteExisting,
-            FileOrganizationResult result,
-            CancellationToken cancellationToken)
-        {
-            await OrganizeMovie(sourcePath,
+            await OrganizeMovie(
+                sourcePath,
                 movie,
                 options,
                 overwriteExisting,
@@ -270,7 +254,7 @@ namespace Emby.AutoOrganize.Core
                 cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task OrganizeMovie(
+        private Task OrganizeMovie(
             string sourcePath,
             Movie movie,
             MovieFileOrganizationOptions options,
@@ -305,21 +289,21 @@ namespace Emby.AutoOrganize.Core
                 {
                     if (options.CopyOriginalFile && fileExists && IsSameMovie(sourcePath, newPath))
                     {
-                        var msg = string.Format("File '{0}' already copied to new path '{1}', stopping organization", sourcePath, newPath);
+                        var msg = $"File '{sourcePath}' already copied to new path '{newPath}', stopping organization";
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     if (fileExists)
                     {
-                        var msg = string.Format("File '{0}' already exists as '{1}', stopping organization", sourcePath, newPath);
+                        var msg = $"File '{sourcePath}' already exists as '{newPath}', stopping organization";
                         _logger.LogInformation(msg);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.TargetPath = newPath;
-                        return;
+                        return Task.CompletedTask;
                     }
                 }
 
@@ -340,6 +324,8 @@ namespace Emby.AutoOrganize.Core
             {
                 _organizationService.RemoveFromInprogressList(result);
             }
+
+            return Task.CompletedTask;
         }
 
         private void PerformFileSorting(MovieFileOrganizationOptions options, FileOrganizationResult result)
@@ -372,7 +358,7 @@ namespace Emby.AutoOrganize.Core
             }
             catch (Exception ex)
             {
-                var errorMsg = string.Format("Failed to move file from {0} to {1}: {2}", result.OriginalPath, result.TargetPath, ex.Message);
+                var errorMsg = $"Failed to move file from {result.OriginalPath} to {result.TargetPath}: {ex.Message}";
 
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = errorMsg;
@@ -430,7 +416,7 @@ namespace Emby.AutoOrganize.Core
                 {
                     SearchInfo = movieInfo
 
-                }, cancellationToken);
+                }, cancellationToken).ConfigureAwait(false);
 
                 #endregion
 
@@ -465,7 +451,7 @@ namespace Emby.AutoOrganize.Core
                         TargetFolder = options.DefaultMovieLibraryPath
                     };
 
-                    var movie = CreateNewMovie(organizationRequest, result, options, cancellationToken);
+                    var movie = CreateNewMovie(organizationRequest, result, options);
 
                     return new Tuple<Movie, RemoteSearchResult>(movie, finalResult);
                 }
@@ -474,7 +460,7 @@ namespace Emby.AutoOrganize.Core
             return null;
         }
 
-        private Movie GetMatchingMovie(string movieName, int? movieYear, string targetFolder, FileOrganizationResult result, MovieFileOrganizationOptions options)
+        private Movie GetMatchingMovie(string movieName, int? movieYear, string targetFolder, FileOrganizationResult result)
         {
             var parsedName = _libraryManager.ParseName(movieName);
 
@@ -506,7 +492,9 @@ namespace Emby.AutoOrganize.Core
                 .OrderByDescending(i => i.Item2)
                 .Select(i => i.Item1)
                 // Check For the right folder AND the right extension (to handle quality upgrade)
-                .FirstOrDefault(m => m.Path.StartsWith(targetFolder) && Path.GetExtension(m.Path) == Path.GetExtension(result.OriginalPath));
+                .FirstOrDefault(m =>
+                    m.Path.StartsWith(targetFolder, StringComparison.Ordinal)
+                    && Path.GetExtension(m.Path) == Path.GetExtension(result.OriginalPath));
 
             return movie;
         }
