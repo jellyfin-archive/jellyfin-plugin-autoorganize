@@ -24,13 +24,13 @@ namespace Emby.AutoOrganize
         }
 
         /// <inheritdoc/>
-        public override Guid Id { get; } = new Guid("70b7b43b-471b-4159-b4be-56750c795499");
+        public override Guid Id => new Guid("70b7b43b-471b-4159-b4be-56750c795499");
 
         /// <inheritdoc/>
-        public override string Name { get; } = "Auto Organize";
+        public override string Name => "Auto Organize";
 
         /// <inheritdoc/>
-        public override string Description { get; } = "Automatically organize new media";
+        public override string Description => "Automatically organize new media";
 
         /// <inheritdoc/>
         public IEnumerable<PluginPageInfo> GetPages()
