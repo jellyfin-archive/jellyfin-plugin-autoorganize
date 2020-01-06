@@ -21,7 +21,6 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Perform a one-time migration of smart match info from the plugin configuration to the SQLite database.
         /// </summary>
-        [SuppressMessage("Compiler", "CS0618:Type or member is obsolete", Justification = "This method is used to migrates configuration away from the obsolete property.")]
         public static void ConvertSmartMatchInfo(this IConfigurationManager manager, IFileOrganizationService service)
         {
             var options = manager.GetConfiguration<AutoOrganizeOptions>(AutoOrganizeOptionsKey);
@@ -29,7 +28,9 @@ namespace Emby.AutoOrganize.Core
             {
                 options.Converted = true;
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 foreach (SmartMatchInfo optionsSmartMatchInfo in options.SmartMatchInfos)
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     var result = new SmartMatchResult
                     {
