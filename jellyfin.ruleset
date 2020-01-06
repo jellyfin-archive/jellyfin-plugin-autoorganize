@@ -60,8 +60,6 @@
     <Rule Id="SA1201" Action="Info" />
     <!-- disable Warning SA1402: File may only contain a single type -->
     <Rule Id="SA1402" Action="Info" />
-    <!-- disable Warning SA1600: Elements should be documented -->
-    <Rule Id="SA1600" Action="Info" />
     <!-- disable Warning SA1611: Element Parameters Must Be Documented -->
     <Rule Id="SA1611" Action="Info" />
     <!-- disable Warning SA1649: File name should match first type -->
