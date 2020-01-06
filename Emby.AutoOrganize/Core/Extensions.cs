@@ -21,6 +21,8 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Perform a one-time migration of smart match info from the plugin configuration to the SQLite database.
         /// </summary>
+        /// <param name="manager">The manager to use for migrating the configuration.</param>
+        /// <param name="service">The file organization service to use to save the migrated <see cref="SmartMatchResult"/> records.</param>
         public static void ConvertSmartMatchInfo(this IConfigurationManager manager, IFileOrganizationService service)
         {
             var options = manager.GetConfiguration<AutoOrganizeOptions>(AutoOrganizeOptionsKey);

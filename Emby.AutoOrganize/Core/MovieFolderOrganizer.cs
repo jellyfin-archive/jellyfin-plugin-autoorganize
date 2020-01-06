@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -29,6 +30,7 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="MovieFolderOrganizer"/> class.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter types/names are self-documenting")]
         public MovieFolderOrganizer(
             ILibraryManager libraryManager,
             ILogger logger,
