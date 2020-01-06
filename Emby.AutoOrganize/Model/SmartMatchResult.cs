@@ -39,7 +39,7 @@ namespace Emby.AutoOrganize.Model
         public FileOrganizerType OrganizerType { get; set; }
 
         /// <summary>
-        /// Gets or sets the match strings used for auto-organizing.
+        /// Gets the match strings used for auto-organizing.
         /// </summary>
         /// <remarks>
         /// When organizing, a media name (series, movie, etc.) is first extracted from the filepath. The extracted

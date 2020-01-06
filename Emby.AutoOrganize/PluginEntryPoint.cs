@@ -35,7 +35,7 @@ namespace Emby.AutoOrganize
         private IFileOrganizationRepository _repository;
 
         /// <summary>
-        /// Initialize a new instance of the <see cref="PluginEntryPoint"/> class.
+        /// Initializes a new instance of the <see cref="PluginEntryPoint"/> class.
         /// </summary>
         public PluginEntryPoint(
             ISessionManager sessionManager,
