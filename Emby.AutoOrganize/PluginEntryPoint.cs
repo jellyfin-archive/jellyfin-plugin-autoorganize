@@ -59,8 +59,14 @@ namespace Emby.AutoOrganize
             _json = json;
         }
 
+        /// <summary>
+        /// Gets a reference to the current instance of the plugin instantiated by the server.
+        /// </summary>
         public static PluginEntryPoint Current { get; private set; }
 
+        /// <summary>
+        /// Gets the file organization service.
+        /// </summary>
         public IFileOrganizationService FileOrganizationService { get; private set; }
 
         /// <inheritdoc/>

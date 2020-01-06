@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Emby.AutoOrganize.Model
 {
+    /// <summary>
+    /// The result of a file organization operation.
+    /// </summary>
     public class FileOrganizationResult
     {
         /// <summary>

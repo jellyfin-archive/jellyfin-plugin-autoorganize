@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// A scheduled task that organizes media files.
+    /// </summary>
     public class OrganizerScheduledTask : IScheduledTask, IConfigurableScheduledTask
     {
         private readonly ILibraryMonitor _libraryMonitor;

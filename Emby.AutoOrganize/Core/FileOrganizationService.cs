@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <inheritdoc/>
     public class FileOrganizationService : IFileOrganizationService
     {
         private readonly ITaskManager _taskManager;

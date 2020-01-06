@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// Service used to organize all files in the movie watch folders.
+    /// </summary>
     public class MovieFolderOrganizer
     {
         private readonly ILibraryMonitor _libraryMonitor;
@@ -23,6 +26,9 @@ namespace Emby.AutoOrganize.Core
         private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MovieFolderOrganizer"/> class.
+        /// </summary>
         public MovieFolderOrganizer(
             ILibraryManager libraryManager,
             ILogger logger,
@@ -41,7 +47,7 @@ namespace Emby.AutoOrganize.Core
             _providerManager = providerManager;
         }
 
-        private bool EnableOrganization(FileSystemMetadata fileInfo, MovieFileOrganizationOptions options)
+        private bool CanOrganize(FileSystemMetadata fileInfo, MovieFileOrganizationOptions options)
         {
             var minFileBytes = options.MinFileSizeMb * 1024 * 1024;
 
@@ -73,20 +79,27 @@ namespace Emby.AutoOrganize.Core
             return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i, path));
         }
 
+        /// <summary>
+        /// Perform organization for the movie watch folders.
+        /// </summary>
+        /// <param name="options">The organization options.</param>
+        /// <param name="progress">The <see cref="IProgress{T}"/> to use for reporting operation progress.</param>
+        /// <param name="cancellationToken">A cancellation token for the operation.</param>
+        /// <returns>A task representing the operation completion.</returns>
         public async Task Organize(
             MovieFileOrganizationOptions options,
             IProgress<double> progress,
             CancellationToken cancellationToken)
         {
+            // Get all valid watch locations
             var libraryFolderPaths = _libraryManager.GetVirtualFolders().SelectMany(i => i.Locations).ToList();
-
             var watchLocations = options.WatchLocations
                 .Where(i => IsValidWatchLocation(i, libraryFolderPaths))
                 .ToList();
 
             var eligibleFiles = watchLocations.SelectMany(GetFilesToOrganize)
                 .OrderBy(_fileSystem.GetCreationTimeUtc)
-                .Where(i => EnableOrganization(i, options))
+                .Where(i => CanOrganize(i, options))
                 .ToList();
 
             var processedFolders = new HashSet<string>();

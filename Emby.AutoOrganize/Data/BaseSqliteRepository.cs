@@ -1,9 +1,13 @@
+// TODO: This class should be replaced with the common class in the main Jellyfin repository:
+// https://github.com/jellyfin/jellyfin/blob/master/Emby.Server.Implementations/Data/BaseSqliteRepository.cs
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SQLitePCL;
 using SQLitePCL.pretty;
