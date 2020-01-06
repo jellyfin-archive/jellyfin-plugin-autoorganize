@@ -305,6 +305,24 @@ namespace Emby.AutoOrganize.Data
 
     public static class ReaderWriterLockSlimExtensions
     {
+        public static IDisposable Read(this ReaderWriterLockSlim obj)
+        {
+            // if (BaseSqliteRepository.ThreadSafeMode > 0)
+            // {
+            //    return new DummyToken();
+            // }
+            return new WriteLockToken(obj);
+        }
+
+        public static IDisposable Write(this ReaderWriterLockSlim obj)
+        {
+            // if (BaseSqliteRepository.ThreadSafeMode > 0)
+            // {
+            //    return new DummyToken();
+            // }
+            return new WriteLockToken(obj);
+        }
+
         private sealed class ReadLockToken : IDisposable
         {
             private ReaderWriterLockSlim _sync;
@@ -343,24 +361,6 @@ namespace Emby.AutoOrganize.Data
                     _sync = null;
                 }
             }
-        }
-
-        public static IDisposable Read(this ReaderWriterLockSlim obj)
-        {
-            // if (BaseSqliteRepository.ThreadSafeMode > 0)
-            // {
-            //    return new DummyToken();
-            // }
-            return new WriteLockToken(obj);
-        }
-
-        public static IDisposable Write(this ReaderWriterLockSlim obj)
-        {
-            // if (BaseSqliteRepository.ThreadSafeMode > 0)
-            // {
-            //    return new DummyToken();
-            // }
-            return new WriteLockToken(obj);
         }
     }
 }

@@ -37,6 +37,8 @@ namespace Emby.AutoOrganize.Core
 
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
 
+        private NamingOptions _namingOptions;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EpisodeFileOrganizer"/> class.
         /// </summary>
@@ -57,21 +59,13 @@ namespace Emby.AutoOrganize.Core
             _providerManager = providerManager;
         }
 
-        private NamingOptions _namingOptions;
+        private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Episode;
 
         private NamingOptions GetNamingOptionsInternal()
         {
-            if (_namingOptions == null)
-            {
-                var options = new NamingOptions();
-
-                _namingOptions = options;
-            }
-
+            _namingOptions = _namingOptions ?? new NamingOptions();
             return _namingOptions;
         }
-
-        private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Episode;
 
         /// <summary>
         /// Organize an episode file.
