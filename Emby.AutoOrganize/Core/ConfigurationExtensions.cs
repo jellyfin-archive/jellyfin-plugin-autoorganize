@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Emby.AutoOrganize.Model;
@@ -11,7 +9,7 @@ namespace Emby.AutoOrganize.Core
     /// <summary>
     /// Static class containing extension methods helpful for working with configuration for this plugin.
     /// </summary>
-    public static class ConfigurationExtension
+    public static class ConfigurationExtensions
     {
         /// <summary>
         /// The key to use with <see cref="IConfigurationManager"/> for storing the configuration of this plugin.
@@ -67,25 +65,6 @@ namespace Emby.AutoOrganize.Core
         public static void SaveAutoOrganizeOptions(this IConfigurationManager manager, AutoOrganizeOptions options)
         {
             manager.SaveConfiguration(AutoOrganizeOptionsKey, options);
-        }
-    }
-
-    /// <summary>
-    /// A configuration factory that registers the configuration entry required for the <see cref="AutoOrganizePlugin"/>.
-    /// </summary>
-    public class AutoOrganizeOptionsFactory : IConfigurationFactory
-    {
-        /// <inheritdoc/>
-        public IEnumerable<ConfigurationStore> GetConfigurations()
-        {
-            return new List<ConfigurationStore>
-            {
-                new ConfigurationStore
-                {
-                    Key = ConfigurationExtension.AutoOrganizeOptionsKey,
-                    ConfigurationType = typeof(AutoOrganizeOptions)
-                }
-            };
         }
     }
 }
