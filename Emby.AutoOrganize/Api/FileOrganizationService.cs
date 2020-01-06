@@ -14,15 +14,16 @@ namespace Emby.AutoOrganize.Api
     public class GetFileOrganizationActivity : IReturn<QueryResult<FileOrganizationResult>>
     {
         /// <summary>
-        /// Gets or sets the maximum number of items to return. Use to specify a page size.
+        /// Gets or sets a value indicating the number of items to skip over in the query. Use to specify a page
+        /// number.
         /// </summary>
-        [ApiMember(Name = "StartIndex", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
+        [ApiMember(Name = "StartIndex", Description = "Optional. The record index to start at. All items with a lower index will be dropped from the results.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? StartIndex { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        [ApiMember(Name = "Limit", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
+        [ApiMember(Name = "Limit", Description = "Optional. The maximum number of records to return.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? Limit { get; set; }
     }
 
