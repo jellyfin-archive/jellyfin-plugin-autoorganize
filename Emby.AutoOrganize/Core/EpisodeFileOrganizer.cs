@@ -889,15 +889,16 @@ namespace Emby.AutoOrganize.Core
         }
 
         /// <summary>
-        /// CreateNewEpisode.
+        /// Look up metadata for an episode and use it to create an <see cref="Episode"/> object.
         /// </summary>
-        /// <param name="series">The series.</param>
-        /// <param name="seasonNumber">The season number.</param>
+        /// <param name="series">The series the episode is in.</param>
+        /// <param name="seasonNumber">The season number the episode is in.</param>
         /// <param name="episodeNumber">The episode number.</param>
         /// <param name="endingEpisodeNumber">The ending episode number.</param>
         /// <param name="premiereDate">The premiere date.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>System.String.</returns>
+        /// <returns>A task representing the creation of the <see cref="Episode"/> object.</returns>
+        /// <exception cref="OrganizationException">If no metadata can be found for the specified episode parameters.</exception>
         private async Task<Episode> CreateNewEpisode(
             Series series,
             int? seasonNumber,

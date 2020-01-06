@@ -77,7 +77,7 @@ namespace Emby.AutoOrganize.Data
                 if (isReadOnly)
                 {
                     // TODO: set connection flags correctly
-                    // connectionFlags |= ConnectionFlags.ReadOnly
+                    // connectionFlags = ConnectionFlags.ReadOnly
                     _logger.LogDebug("Opening read connection to database");
                     connectionFlags = ConnectionFlags.Create;
                     connectionFlags |= ConnectionFlags.ReadWrite;
