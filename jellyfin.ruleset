@@ -53,4 +53,18 @@
     <!-- disable warning CA2000: Dispose objects before losing scope -->
     <Rule Id="CA2000" Action="None" />
   </Rules>
+
+  <!-- TODO: These rules need to be addressed and set back to their default level (Warning) -->
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <!-- disable Warning SA1201: Elements Must Appear In The Correct Order -->
+    <Rule Id="SA1201" Action="Info" />
+    <!-- disable Warning SA1402: File may only contain a single type -->
+    <Rule Id="SA1402" Action="Info" />
+    <!-- disable Warning SA1600: Elements should be documented -->
+    <Rule Id="SA1600" Action="Info" />
+    <!-- disable Warning SA1611: Element Parameters Must Be Documented -->
+    <Rule Id="SA1611" Action="Info" />
+    <!-- disable Warning SA1649: File name should match first type -->
+    <Rule Id="SA1649" Action="Info" />
+  </Rules>
 </RuleSet>
