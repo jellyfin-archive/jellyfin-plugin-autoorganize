@@ -399,17 +399,6 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Organize part responsible of Season AND Episode recognition.
         /// </summary>
-        /// <param name="sourcePath"></param>
-        /// <param name="series"></param>
-        /// <param name="seasonNumber"></param>
-        /// <param name="episodeNumber"></param>
-        /// <param name="endingEpiosdeNumber"></param>
-        /// <param name="premiereDate"></param>
-        /// <param name="options"></param>
-        /// <param name="rememberCorrection"></param>
-        /// <param name="result"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         private async Task OrganizeEpisode(
             string sourcePath,
             Series series,
@@ -865,9 +854,6 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Get the new series name.
         /// </summary>
-        /// <param name="series"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
         private string GetSeriesDirectoryName(Series series, TvFileOrganizationOptions options)
         {
             var seriesName = series.Name;
