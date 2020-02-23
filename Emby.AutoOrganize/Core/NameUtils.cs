@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Extensions;
 using MediaBrowser.Model.Extensions;
@@ -75,10 +76,10 @@ namespace Emby.AutoOrganize.Core
             .Replace("-", " ")
             .Replace("'", " ")
             .Replace("[", " ")
-            .Replace("]", " ")
-            .Replace(" a ", String.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace(" the ", String.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace(" ", String.Empty);
+            .Replace("]", " ");
+            name = Regex.Replace(name, " a ", String.Empty, RegexOptions.IgnoreCase);
+            name = Regex.Replace(name, " the ", String.Empty, RegexOptions.IgnoreCase);
+            name = name.Replace(" ", String.Empty);
 
             return name.Trim();
         }
