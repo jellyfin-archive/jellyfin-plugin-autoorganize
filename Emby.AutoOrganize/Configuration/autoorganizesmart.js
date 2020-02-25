@@ -147,7 +147,7 @@
 
             matchStringHtml += '</div>';
 
-            matchStringHtml += '<button type="button" is="emby-button" class="btnDeleteMatchEntry" style="padding: 0;" data-index="' + i + '" data-matchindex="' + matchStringIndex + '" title="Delete"><i class="md-icon">delete</i></button>';
+            matchStringHtml += '<button type="button" is="emby-button" class="btnDeleteMatchEntry" style="padding: 0;" data-index="' + i + '" data-matchindex="' + matchStringIndex + '" title="Delete"><i class="material-icons">delete</i></button>';
 
             matchStringHtml += '</div>';
             matchStringIndex++;
@@ -192,7 +192,7 @@
             html += '<div class="listItem">';
 
             html += '<div class="listItemIconContainer">';
-            html += '<i class="listItemIcon md-icon">folder</i>';
+            html += '<i class="listItemIcon material-icons">folder</i>';
             html += '</div>';
 
             html += '<div class="listItemBody">';
