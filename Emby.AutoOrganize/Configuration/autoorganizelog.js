@@ -289,8 +289,8 @@
 
             html += '<div style="display:inline-block;">';
 
-            html += '<button is="paper-icon-button-light" class="btnPreviousPage autoSize" ' + (startIndex ? '' : 'disabled') + '><i class="material-icons">&#xE5C4;</i></button>';
-            html += '<button is="paper-icon-button-light" class="btnNextPage autoSize" ' + (startIndex + limit >= totalRecordCount ? 'disabled' : '') + '><i class="material-icons">&#xE5C8;</i></button>';
+            html += '<button is="paper-icon-button-light" class="btnPreviousPage autoSize" ' + (startIndex ? '' : 'disabled') + '><i class="material-icons arrow_back"></i></button>';
+            html += '<button is="paper-icon-button-light" class="btnNextPage autoSize" ' + (startIndex + limit >= totalRecordCount ? 'disabled' : '') + '><i class="material-icons arrow_forward"></i></button>';
 
             html += '</div>';
         }
@@ -428,8 +428,8 @@
 
         if (item.Status !== 'Success') {
 
-            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="Organize"><i class="material-icons">folder</i></button>';
-            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="Delete"><i class="material-icons">delete</i></button>';
+            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="Organize"><i class="material-icons folder"></i></button>';
+            html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="Delete"><i class="material-icons delete"></i></button>';
         }
 
         html += '</td>';
