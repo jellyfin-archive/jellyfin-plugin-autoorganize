@@ -5,32 +5,34 @@ using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
-using System.IO;
-using MediaBrowser.Model.Drawing;
 
 namespace Emby.AutoOrganize
 {
-    public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
+    /// <summary>
+    /// The auto-organize plugin.
+    /// </summary>
+    public class AutoOrganizePlugin : BasePlugin<PluginConfiguration>, IHasWebPages
     {
-        public Plugin(IApplicationPaths appPaths, IXmlSerializer xmlSerializer)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AutoOrganizePlugin"/> class.
+        /// </summary>
+        /// <param name="appPaths">The application paths.</param>
+        /// <param name="xmlSerializer">The XML serializer.</param>
+        public AutoOrganizePlugin(IApplicationPaths appPaths, IXmlSerializer xmlSerializer)
             : base(appPaths, xmlSerializer)
         {
         }
 
+        /// <inheritdoc/>
+        public override Guid Id => new Guid("70b7b43b-471b-4159-b4be-56750c795499");
+
+        /// <inheritdoc/>
         public override string Name => "Auto Organize";
 
+        /// <inheritdoc/>
+        public override string Description => "Automatically organize new media";
 
-        public override string Description
-            => "Automatically organize new media";
-
-        public PluginConfiguration PluginConfiguration => Configuration;
-
-        private Guid _id = new Guid("70b7b43b-471b-4159-b4be-56750c795499");
-        public override Guid Id
-        {
-            get { return _id; }
-        }
-
+        /// <inheritdoc/>
         public IEnumerable<PluginPageInfo> GetPages()
         {
             return new[]

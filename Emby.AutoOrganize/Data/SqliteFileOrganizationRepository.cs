@@ -17,39 +17,46 @@ namespace Emby.AutoOrganize.Data
     public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository
     {
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
-        private readonly IJsonSerializer _json;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public SqliteFileOrganizationRepository(ILogger logger, IServerApplicationPaths appPaths, IJsonSerializer json)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqliteFileOrganizationRepository"/> class.
+        /// </summary>
+        /// <param name="logger">The application logger.</param>
+        /// <param name="appPaths">The server application paths.</param>
+        /// <param name="jsonSerializer">A JSON serializer.</param>
+        public SqliteFileOrganizationRepository(
+            ILogger logger,
+            IServerApplicationPaths appPaths,
+            IJsonSerializer jsonSerializer)
             : base(logger)
         {
-            _json = json;
+            _jsonSerializer = jsonSerializer;
             DbFilePath = Path.Combine(appPaths.DataPath, "fileorganization.db");
         }
 
         /// <summary>
-        /// Opens the connection to the database
+        /// Opens the connection to the database.
         /// </summary>
-        /// <returns>Task.</returns>
         public void Initialize()
         {
             using (var connection = CreateConnection())
             {
                 RunDefaultInitialization(connection);
 
-                string[] queries = {
-
-                                "create table if not exists FileOrganizerResults (ResultId GUID PRIMARY KEY, OriginalPath TEXT, TargetPath TEXT, FileLength INT, OrganizationDate datetime, Status TEXT, OrganizationType TEXT, StatusMessage TEXT, ExtractedName TEXT, ExtractedYear int null, ExtractedSeasonNumber int null, ExtractedEpisodeNumber int null, ExtractedEndingEpisodeNumber, DuplicatePaths TEXT int null)",
-                                "create index if not exists idx_FileOrganizerResults on FileOrganizerResults(ResultId)",
-                                "create table if not exists SmartMatch (Id GUID PRIMARY KEY, ItemName TEXT, DisplayName TEXT, OrganizerType TEXT, MatchStrings TEXT null)",
-                                "create index if not exists idx_SmartMatch on SmartMatch(Id)",
-                               };
+                string[] queries =
+                {
+                    "create table if not exists FileOrganizerResults (ResultId GUID PRIMARY KEY, OriginalPath TEXT, TargetPath TEXT, FileLength INT, OrganizationDate datetime, Status TEXT, OrganizationType TEXT, StatusMessage TEXT, ExtractedName TEXT, ExtractedYear int null, ExtractedSeasonNumber int null, ExtractedEpisodeNumber int null, ExtractedEndingEpisodeNumber, DuplicatePaths TEXT int null)",
+                    "create index if not exists idx_FileOrganizerResults on FileOrganizerResults(ResultId)",
+                    "create table if not exists SmartMatch (Id GUID PRIMARY KEY, ItemName TEXT, DisplayName TEXT, OrganizerType TEXT, MatchStrings TEXT null)",
+                    "create index if not exists idx_SmartMatch on SmartMatch(Id)",
+                };
 
                 connection.RunQueries(queries);
             }
         }
 
-        #region FileOrganizationResult
-
+        /// <inheritdoc/>
         public void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken)
         {
             if (result == null)
@@ -63,35 +70,38 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "replace into FileOrganizerResults (ResultId, OriginalPath, TargetPath, FileLength, OrganizationDate, Status, OrganizationType, StatusMessage, ExtractedName, ExtractedYear, ExtractedSeasonNumber, ExtractedEpisodeNumber, ExtractedEndingEpisodeNumber, DuplicatePaths) values (@ResultId, @OriginalPath, @TargetPath, @FileLength, @OrganizationDate, @Status, @OrganizationType, @StatusMessage, @ExtractedName, @ExtractedYear, @ExtractedSeasonNumber, @ExtractedEpisodeNumber, @ExtractedEndingEpisodeNumber, @DuplicatePaths)";
-
-                        using (var statement = db.PrepareStatement(commandText))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@ResultId", result.Id.ToGuidBlob());
-                            statement.TryBind("@OriginalPath", result.OriginalPath);
+                            var commandText = "replace into FileOrganizerResults (ResultId, OriginalPath, TargetPath, FileLength, OrganizationDate, Status, OrganizationType, StatusMessage, ExtractedName, ExtractedYear, ExtractedSeasonNumber, ExtractedEpisodeNumber, ExtractedEndingEpisodeNumber, DuplicatePaths) values (@ResultId, @OriginalPath, @TargetPath, @FileLength, @OrganizationDate, @Status, @OrganizationType, @StatusMessage, @ExtractedName, @ExtractedYear, @ExtractedSeasonNumber, @ExtractedEpisodeNumber, @ExtractedEndingEpisodeNumber, @DuplicatePaths)";
 
-                            statement.TryBind("@TargetPath", result.TargetPath);
-                            statement.TryBind("@FileLength", result.FileSize);
-                            statement.TryBind("@OrganizationDate", result.Date.ToDateTimeParamValue());
-                            statement.TryBind("@Status", result.Status.ToString());
-                            statement.TryBind("@OrganizationType", result.Type.ToString());
-                            statement.TryBind("@StatusMessage", result.StatusMessage);
-                            statement.TryBind("@ExtractedName", result.ExtractedName);
-                            statement.TryBind("@ExtractedYear", result.ExtractedYear);
-                            statement.TryBind("@ExtractedSeasonNumber", result.ExtractedSeasonNumber);
-                            statement.TryBind("@ExtractedEpisodeNumber", result.ExtractedEpisodeNumber);
-                            statement.TryBind("@ExtractedEndingEpisodeNumber", result.ExtractedEndingEpisodeNumber);
-                            statement.TryBind("@DuplicatePaths", string.Join("|", result.DuplicatePaths.ToArray()));
+                            using (var statement = db.PrepareStatement(commandText))
+                            {
+                                statement.TryBind("@ResultId", result.Id.ToGuidBlob());
+                                statement.TryBind("@OriginalPath", result.OriginalPath);
 
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                                statement.TryBind("@TargetPath", result.TargetPath);
+                                statement.TryBind("@FileLength", result.FileSize);
+                                statement.TryBind("@OrganizationDate", result.Date.ToDateTimeParamValue());
+                                statement.TryBind("@Status", result.Status.ToString());
+                                statement.TryBind("@OrganizationType", result.Type.ToString());
+                                statement.TryBind("@StatusMessage", result.StatusMessage);
+                                statement.TryBind("@ExtractedName", result.ExtractedName);
+                                statement.TryBind("@ExtractedYear", result.ExtractedYear);
+                                statement.TryBind("@ExtractedSeasonNumber", result.ExtractedSeasonNumber);
+                                statement.TryBind("@ExtractedEpisodeNumber", result.ExtractedEpisodeNumber);
+                                statement.TryBind("@ExtractedEndingEpisodeNumber", result.ExtractedEndingEpisodeNumber);
+                                statement.TryBind("@DuplicatePaths", string.Join("|", result.DuplicatePaths.ToArray()));
+
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
         }
 
+        /// <inheritdoc/>
         public Task Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -103,58 +113,64 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        using (var statement = db.PrepareStatement("delete from FileOrganizerResults where ResultId = @ResultId"))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@ResultId", id.ToGuidBlob());
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                            string command = "delete from FileOrganizerResults where ResultId = @ResultId";
+                            using (var statement = db.PrepareStatement(command))
+                            {
+                                statement.TryBind("@ResultId", id.ToGuidBlob());
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
 
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task DeleteAll()
         {
             using (WriteLock.Write())
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "delete from FileOrganizerResults";
-
-                        db.Execute(commandText);
-                    }, TransactionMode);
+                    connection.RunInTransaction(
+                        db => db.Execute("delete from FileOrganizerResults"),
+                        TransactionMode);
                 }
             }
 
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task DeleteCompleted()
         {
             using (WriteLock.Write())
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        using (var statement = db.PrepareStatement("delete from FileOrganizerResults where Status = @Status"))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@Status", FileSortingStatus.Success.ToString());
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                            string command = "delete from FileOrganizerResults where Status = @Status";
+                            using (var statement = db.PrepareStatement(command))
+                            {
+                                statement.TryBind("@Status", FileSortingStatus.Success.ToString());
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
 
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public QueryResult<FileOrganizationResult> GetResults(FileOrganizationResultQuery query)
         {
             if (query == null)
@@ -205,6 +221,8 @@ namespace Emby.AutoOrganize.Data
                 }
             }
         }
+
+        /// <inheritdoc/>
         public FileOrganizationResult GetResult(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -230,7 +248,8 @@ namespace Emby.AutoOrganize.Data
                 }
             }
         }
-        public FileOrganizationResult GetResult(IReadOnlyList<IResultSetValue> reader)
+
+        private FileOrganizationResult GetResult(IReadOnlyList<IResultSetValue> reader)
         {
             var index = 0;
 
@@ -310,10 +329,7 @@ namespace Emby.AutoOrganize.Data
             return result;
         }
 
-        #endregion
-
-        #region SmartMatch
-
+        /// <inheritdoc/>
         public void SaveResult(SmartMatchResult result, CancellationToken cancellationToken)
         {
             if (result == null)
@@ -327,26 +343,29 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "replace into SmartMatch (Id, ItemName, DisplayName, OrganizerType, MatchStrings) values (@Id, @ItemName, @DisplayName, @OrganizerType, @MatchStrings)";
-
-                        using (var statement = db.PrepareStatement(commandText))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@Id", result.Id.ToGuidBlob());
+                            var commandText = "replace into SmartMatch (Id, ItemName, DisplayName, OrganizerType, MatchStrings) values (@Id, @ItemName, @DisplayName, @OrganizerType, @MatchStrings)";
 
-                            statement.TryBind("@ItemName", result.ItemName);
-                            statement.TryBind("@DisplayName", result.DisplayName);
-                            statement.TryBind("@OrganizerType", result.OrganizerType.ToString());
-                            statement.TryBind("@MatchStrings", _json.SerializeToString(result.MatchStrings));
+                            using (var statement = db.PrepareStatement(commandText))
+                            {
+                                statement.TryBind("@Id", result.Id.ToGuidBlob());
 
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                                statement.TryBind("@ItemName", result.ItemName);
+                                statement.TryBind("@DisplayName", result.DisplayName);
+                                statement.TryBind("@OrganizerType", result.OrganizerType.ToString());
+                                statement.TryBind("@MatchStrings", _jsonSerializer.SerializeToString(result.MatchStrings));
+
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
         }
 
+        /// <inheritdoc/>
         public void DeleteSmartMatch(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -358,18 +377,21 @@ namespace Emby.AutoOrganize.Data
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        using (var statement = db.PrepareStatement("delete from SmartMatch where Id = @Id"))
+                    connection.RunInTransaction(
+                        db =>
                         {
-                            statement.TryBind("@Id", id.ToGuidBlob());
-                            statement.MoveNext();
-                        }
-                    }, TransactionMode);
+                            using (var statement = db.PrepareStatement("delete from SmartMatch where Id = @Id"))
+                            {
+                                statement.TryBind("@Id", id.ToGuidBlob());
+                                statement.MoveNext();
+                            }
+                        },
+                        TransactionMode);
                 }
             }
         }
 
+        /// <inheritdoc/>
         public Task DeleteSmartMatch(string id, string matchString)
         {
             if (string.IsNullOrEmpty(id))
@@ -393,23 +415,21 @@ namespace Emby.AutoOrganize.Data
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public void DeleteAllSmartMatch()
         {
             using (WriteLock.Write())
             {
                 using (var connection = CreateConnection())
                 {
-                    connection.RunInTransaction(db =>
-                    {
-                        var commandText = "delete from SmartMatch";
-
-                        db.Execute(commandText);
-                    }, TransactionMode);
+                    connection.RunInTransaction(
+                        db => db.Execute("delete from SmartMatch"),
+                        TransactionMode);
                 }
             }
         }
 
-        public SmartMatchResult GetSmartMatch(string id)
+        private SmartMatchResult GetSmartMatch(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -435,6 +455,7 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
+        /// <inheritdoc/>
         public QueryResult<SmartMatchResult> GetSmartMatch(FileOrganizationResultQuery query)
         {
             if (query == null)
@@ -507,12 +528,10 @@ namespace Emby.AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.MatchStrings.AddRange(_json.DeserializeFromString<List<string>>(reader[index].ToString()));
+                result.MatchStrings.AddRange(_jsonSerializer.DeserializeFromString<List<string>>(reader[index].ToString()));
             }
 
             return result;
         }
-
-        #endregion
     }
 }

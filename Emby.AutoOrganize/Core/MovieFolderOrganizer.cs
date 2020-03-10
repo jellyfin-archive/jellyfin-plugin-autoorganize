@@ -125,20 +125,18 @@ namespace Emby.AutoOrganize.Core
                     double percent = numComplete;
                     percent /= eligibleFiles.Count;
 
-                    progress.Report(10 + 89 * percent);
+                    progress.Report(10 + (89 * percent));
                 }
             }
 
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report(99);
 
-
             List<string> deleteExtensions = options.LeftOverFileExtensionsToDelete
                 .Select(i => i.Trim().TrimStart('.'))
                 .Where(i => !string.IsNullOrEmpty(i))
                 .Select(i => "." + i)
                 .ToList();
-
 
             // Normal Clean
             Clean(processedFolders, watchLocations, options.DeleteEmptyFolders, deleteExtensions);
@@ -165,7 +163,6 @@ namespace Emby.AutoOrganize.Core
                 {
                     DeleteEmptyFolders(path, watchLocations);
                 }
-
             }
         }
 
@@ -216,34 +213,33 @@ namespace Emby.AutoOrganize.Core
         /// Deletes the empty folders.
         /// </summary>
         /// <param name="path">The path.</param>
-        /// <param name="watchLocations">The path.</param>
-        private void DeleteEmptyFolders(string path, List<string> watchLocations)
+        /// <param name="ignorePaths">A set of paths to ignore and not delete.</param>
+        private void DeleteEmptyFolders(string path, List<string> ignorePaths)
         {
             try
             {
+                // Recurse and delete all sub-folders
                 foreach (var d in _fileSystem.GetDirectoryPaths(path))
                 {
-                    DeleteEmptyFolders(d, watchLocations);
+                    DeleteEmptyFolders(d, ignorePaths);
                 }
 
                 var entries = _fileSystem.GetFileSystemEntryPaths(path);
 
-                if (!entries.Any() && !IsWatchFolder(path, watchLocations))
+                if (!entries.Any() && !IsWatchFolder(path, ignorePaths))
                 {
-                    try
-                    {
-                        _logger.LogDebug("Deleting empty directory {0}", path);
-                        Directory.Delete(path, false);
-                    }
-                    catch (UnauthorizedAccessException) { }
-                    catch (IOException) { }
+                    _logger.LogDebug("Deleting empty directory {0}", path);
+                    Directory.Delete(path, false);
                 }
             }
-            catch (UnauthorizedAccessException) { }
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+            {
+                _logger.LogError(ex, "Failed to delete empty movie directory {Directory}", path);
+            }
         }
 
         /// <summary>
-        /// Determines if a given folder path is contained in a folder list
+        /// Determines if a given folder path is contained in a folder list.
         /// </summary>
         /// <param name="path">The folder path to check.</param>
         /// <param name="watchLocations">A list of folders.</param>

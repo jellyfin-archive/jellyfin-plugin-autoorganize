@@ -4,35 +4,42 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Emby.AutoOrganize.Model
 {
+    /// <summary>
+    /// Configuration options for the <see cref="AutoOrganizePlugin"/>.
+    /// </summary>
     public class AutoOrganizeOptions
     {
         /// <summary>
-        /// Gets or sets the tv options.
+        /// Initializes a new instance of the <see cref="AutoOrganizeOptions"/> class.
         /// </summary>
-        /// <value>The tv options.</value>
+        public AutoOrganizeOptions()
+        {
+            TvOptions = new TvFileOrganizationOptions();
+            MovieOptions = new MovieFileOrganizationOptions();
+            Converted = false;
+        }
+
+        /// <summary>
+        /// Gets or sets options used to auto-organize TV media.
+        /// </summary>
         public TvFileOrganizationOptions TvOptions { get; set; }
 
         /// <summary>
-        /// Gets or sets the tv options.
+        /// Gets or sets the options used to auto-organize movie media.
         /// </summary>
-        /// <value>The tv options.</value>
         public MovieFileOrganizationOptions MovieOptions { get; set; }
 
         /// <summary>
         /// Gets or sets a list of smart match entries.
         /// </summary>
-        /// <value>The smart match entries.</value>
+        [Obsolete("This configuration is now stored in the SQLite database.")]
         [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This property needs to support serialization by both ServiceStack and XmlSerializer")]
-        public List<SmartMatchInfo> SmartMatchInfos { get; set; }
+        public List<SmartMatchInfo> SmartMatchInfos { get; set; } = new List<SmartMatchInfo>();
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the smart match info has been moved from this configuration into
+        /// the SQLite database.
+        /// </summary>
         public bool Converted { get; set; }
-
-        public AutoOrganizeOptions()
-        {
-            TvOptions = new TvFileOrganizationOptions();
-            MovieOptions = new MovieFileOrganizationOptions();
-            SmartMatchInfos = new List<SmartMatchInfo>();
-            Converted = false;
-        }
     }
 }

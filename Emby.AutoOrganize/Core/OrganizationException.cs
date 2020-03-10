@@ -8,13 +8,10 @@ namespace Emby.AutoOrganize.Core
     {
         public OrganizationException()
         {
-            
         }
 
         public OrganizationException(string msg) : base(msg)
         {
-
         }
-
     }
 }

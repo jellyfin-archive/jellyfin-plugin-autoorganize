@@ -14,17 +14,16 @@ namespace Emby.AutoOrganize.Api
     public class GetFileOrganizationActivity : IReturn<QueryResult<FileOrganizationResult>>
     {
         /// <summary>
-        /// Skips over a given number of items within the results. Use for paging.
+        /// Gets or sets a value indicating the number of items to skip over in the query. Use to specify a page
+        /// number.
         /// </summary>
-        /// <value>The start index.</value>
         [ApiMember(Name = "StartIndex", Description = "Optional. The record index to start at. All items with a lower index will be dropped from the results.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? StartIndex { get; set; }
 
         /// <summary>
-        /// The maximum number of items to return
+        /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        /// <value>The limit.</value>
-        [ApiMember(Name = "Limit", Description = "Optional. The maximum number of records to return", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
+        [ApiMember(Name = "Limit", Description = "Optional. The maximum number of records to return.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? Limit { get; set; }
     }
 
@@ -119,19 +118,18 @@ namespace Emby.AutoOrganize.Api
     }
 
     [Route("/Library/FileOrganizations/SmartMatches", "GET", Summary = "Gets smart match entries")]
-    public class GetSmartMatchInfos : IReturn<QueryResult<SmartMatchInfo>>
+    public class GetSmartMatchInfos : IReturn<QueryResult<SmartMatchResult>>
     {
         /// <summary>
-        /// Skips over a given number of items within the results. Use for paging.
+        /// Gets or sets a value indicating the number of items to skips over in the query. Use to specify a page
+        /// number.
         /// </summary>
-        /// <value>The start index.</value>
         [ApiMember(Name = "StartIndex", Description = "Optional. The record index to start at. All items with a lower index will be dropped from the results.", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? StartIndex { get; set; }
 
         /// <summary>
-        /// The maximum number of items to return
+        /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        /// <value>The limit.</value>
         [ApiMember(Name = "Limit", Description = "Optional. The maximum number of records to return", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
         public int? Limit { get; set; }
     }
@@ -148,12 +146,16 @@ namespace Emby.AutoOrganize.Api
     {
         private readonly IHttpResultFactory _resultFactory;
 
-        public IRequest Request { get; set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileOrganizationService"/> class.
+        /// </summary>
+        /// <param name="resultFactory">HTTP result factory to use for making requests.</param>
         public FileOrganizationService(IHttpResultFactory resultFactory)
         {
             _resultFactory = resultFactory;
         }
+
+        public IRequest Request { get; set; }
 
         private IFileOrganizationService InternalFileOrganizationService
         {
@@ -193,7 +195,6 @@ namespace Emby.AutoOrganize.Api
 
             Task.WaitAll(task);
         }
-
 
         public void Post(PerformOrganization request)
         {

@@ -1,15 +1,55 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using MediaBrowser.Model.IO;
+using System.IO;
 using MediaBrowser.Model.Serialization;
 using SQLitePCL.pretty;
-using System.IO;
 
 namespace Emby.AutoOrganize.Data
 {
     public static class SqliteExtensions
     {
+        /// <summary>
+        /// An array of ISO-8601 DateTime formats that we support parsing.
+        /// </summary>
+        private static readonly string[] _datetimeFormats = new string[]
+        {
+          "THHmmssK",
+          "THHmmK",
+          "HH:mm:ss.FFFFFFFK",
+          "HH:mm:ssK",
+          "HH:mmK",
+          "yyyy-MM-dd HH:mm:ss.FFFFFFFK", /* NOTE: UTC default (5). */
+          "yyyy-MM-dd HH:mm:ssK",
+          "yyyy-MM-dd HH:mmK",
+          "yyyy-MM-ddTHH:mm:ss.FFFFFFFK",
+          "yyyy-MM-ddTHH:mmK",
+          "yyyy-MM-ddTHH:mm:ssK",
+          "yyyyMMddHHmmssK",
+          "yyyyMMddHHmmK",
+          "yyyyMMddTHHmmssFFFFFFFK",
+          "THHmmss",
+          "THHmm",
+          "HH:mm:ss.FFFFFFF",
+          "HH:mm:ss",
+          "HH:mm",
+          "yyyy-MM-dd HH:mm:ss.FFFFFFF", /* NOTE: Non-UTC default (19). */
+          "yyyy-MM-dd HH:mm:ss",
+          "yyyy-MM-dd HH:mm",
+          "yyyy-MM-ddTHH:mm:ss.FFFFFFF",
+          "yyyy-MM-ddTHH:mm",
+          "yyyy-MM-ddTHH:mm:ss",
+          "yyyyMMddHHmmss",
+          "yyyyMMddHHmm",
+          "yyyyMMddTHHmmssFFFFFFF",
+          "yyyy-MM-dd",
+          "yyyyMMdd",
+          "yy-MM-dd"
+        };
+
+        private static string _datetimeFormatUtc = _datetimeFormats[5];
+        private static string _datetimeFormatLocal = _datetimeFormats[19];
+
         public static void RunQueries(this SQLiteDatabaseConnection connection, string[] queries)
         {
             if (queries == null)
@@ -57,61 +97,24 @@ namespace Emby.AutoOrganize.Data
             return (kind == DateTimeKind.Utc) ? _datetimeFormatUtc : _datetimeFormatLocal;
         }
 
-        /// <summary>
-        /// An array of ISO-8601 DateTime formats that we support parsing.
-        /// </summary>
-        private static string[] _datetimeFormats = new string[] {
-      "THHmmssK",
-      "THHmmK",
-      "HH:mm:ss.FFFFFFFK",
-      "HH:mm:ssK",
-      "HH:mmK",
-      "yyyy-MM-dd HH:mm:ss.FFFFFFFK", /* NOTE: UTC default (5). */
-      "yyyy-MM-dd HH:mm:ssK",
-      "yyyy-MM-dd HH:mmK",
-      "yyyy-MM-ddTHH:mm:ss.FFFFFFFK",
-      "yyyy-MM-ddTHH:mmK",
-      "yyyy-MM-ddTHH:mm:ssK",
-      "yyyyMMddHHmmssK",
-      "yyyyMMddHHmmK",
-      "yyyyMMddTHHmmssFFFFFFFK",
-      "THHmmss",
-      "THHmm",
-      "HH:mm:ss.FFFFFFF",
-      "HH:mm:ss",
-      "HH:mm",
-      "yyyy-MM-dd HH:mm:ss.FFFFFFF", /* NOTE: Non-UTC default (19). */
-      "yyyy-MM-dd HH:mm:ss",
-      "yyyy-MM-dd HH:mm",
-      "yyyy-MM-ddTHH:mm:ss.FFFFFFF",
-      "yyyy-MM-ddTHH:mm",
-      "yyyy-MM-ddTHH:mm:ss",
-      "yyyyMMddHHmmss",
-      "yyyyMMddHHmm",
-      "yyyyMMddTHHmmssFFFFFFF",
-      "yyyy-MM-dd",
-      "yyyyMMdd",
-      "yy-MM-dd"
-    };
-
-        private static string _datetimeFormatUtc = _datetimeFormats[5];
-        private static string _datetimeFormatLocal = _datetimeFormats[19];
-
         public static DateTime ReadDateTime(this IResultSetValue result)
         {
             var dateText = result.ToString();
 
             return DateTime.ParseExact(
-                dateText, _datetimeFormats,
+                dateText,
+                _datetimeFormats,
                 DateTimeFormatInfo.InvariantInfo,
                 DateTimeStyles.None).ToUniversalTime();
         }
 
         /// <summary>
-        /// Serializes to bytes.
+        /// Serializes an object to JSON bytes.
         /// </summary>
-        /// <returns>System.Byte[][].</returns>
-        /// <exception cref="System.ArgumentNullException">obj</exception>
+        /// <param name="json">The JSON serializer to use.</param>
+        /// <param name="obj">The object to serialize.</param>
+        /// <returns>The serialized <see cref="byte"/> array.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="obj"/> is null.</exception>
         public static byte[] SerializeToBytes(this IJsonSerializer json, object obj)
         {
             if (obj == null)
@@ -172,13 +175,10 @@ namespace Emby.AutoOrganize.Data
             return result[index].ReadGuidFromBlob();
         }
 
-        private static void CheckName(string name)
+        private static void ThrowInvalidParamName(string name)
         {
 #if DEBUG
-            //if (!name.IndexOf("@", StringComparison.OrdinalIgnoreCase) != 0)
-            {
-                throw new Exception("Invalid param name: " + name);
-            }
+            throw new Exception("Invalid param name: " + name);
 #endif
         }
 
@@ -191,7 +191,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -211,7 +211,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -224,7 +224,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -237,7 +237,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -250,7 +250,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -263,7 +263,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -276,7 +276,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -289,7 +289,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -302,7 +302,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -315,7 +315,7 @@ namespace Emby.AutoOrganize.Data
             }
             else
             {
-                CheckName(name);
+                ThrowInvalidParamName(name);
             }
         }
 
@@ -391,12 +391,11 @@ namespace Emby.AutoOrganize.Data
             }
         }
 
-        public static IEnumerable<IReadOnlyList<IResultSetValue>> ExecuteQuery(
-            this IStatement This)
+        public static IEnumerable<IReadOnlyList<IResultSetValue>> ExecuteQuery(this IStatement statement)
         {
-            while (This.MoveNext())
+            while (statement.MoveNext())
             {
-                yield return This.Current;
+                yield return statement.Current;
             }
         }
     }

@@ -17,7 +17,7 @@ namespace Emby.AutoOrganize.Core
             var seriesNameWithoutYear = itemName;
             if (itemProductionYear.HasValue)
             {
-                seriesNameWithoutYear = seriesNameWithoutYear.Replace(itemProductionYear.Value.ToString(UsCulture), String.Empty);
+                seriesNameWithoutYear = seriesNameWithoutYear.Replace(itemProductionYear.Value.ToString(UsCulture), string.Empty);
             }
 
             if (IsNameMatch(sortedName, seriesNameWithoutYear))
@@ -47,13 +47,12 @@ namespace Emby.AutoOrganize.Core
             return new Tuple<T, int>(item, GetMatchScore(sortedName, year, item.Name, item.ProductionYear));
         }
 
-
         private static bool IsNameMatch(string name1, string name2)
         {
             name1 = GetComparableName(name1);
             name2 = GetComparableName(name2);
 
-            return String.Equals(name1, name2, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(name1, name2, StringComparison.OrdinalIgnoreCase);
         }
 
         private static string GetComparableName(string name)
@@ -76,9 +75,9 @@ namespace Emby.AutoOrganize.Core
             .Replace("'", " ")
             .Replace("[", " ")
             .Replace("]", " ")
-            .Replace(" a ", String.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace(" the ", String.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace(" ", String.Empty);
+            .Replace(" a ", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace(" the ", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace(" ", string.Empty);
 
             return name.Trim();
         }

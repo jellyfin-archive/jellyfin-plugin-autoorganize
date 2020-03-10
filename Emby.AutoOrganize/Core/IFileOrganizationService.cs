@@ -1,17 +1,20 @@
-using MediaBrowser.Model.Events;
-using MediaBrowser.Model.Querying;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
+using MediaBrowser.Model.Events;
+using MediaBrowser.Model.Querying;
 
 namespace Emby.AutoOrganize.Core
 {
     public interface IFileOrganizationService
     {
         event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
+
         event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
+
         event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
+
         event EventHandler LogReset;
 
         /// <summary>
@@ -85,7 +88,6 @@ namespace Emby.AutoOrganize.Core
         /// </summary>
         /// <param name="result">The result.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Task.</returns>
         void SaveResult(FileOrganizationResult result, CancellationToken cancellationToken);
 
         /// <summary>
@@ -93,32 +95,31 @@ namespace Emby.AutoOrganize.Core
         /// </summary>
         /// <param name="result">The result.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Task.</returns>
         void SaveResult(SmartMatchResult result, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Returns a list of smart match entries
+        /// Returns a list of smart match entries.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>IEnumerable{SmartMatchInfo}.</returns>
         QueryResult<SmartMatchResult> GetSmartMatchInfos(FileOrganizationResultQuery query);
 
         /// <summary>
-        /// Returns a list of smart match entries
+        /// Returns a list of smart match entries.
         /// </summary>
-        /// <param name="query">The query.</param>
         /// <returns>IEnumerable{SmartMatchInfo}.</returns>
         QueryResult<SmartMatchResult> GetSmartMatchInfos();
 
         /// <summary>
-        /// Deletes a smart match entry.
+        /// Deletes a match string entry from a <see cref="SmartMatchResult"/>. If there are no match strings remaining
+        /// then the <see cref="SmartMatchResult"/> itself will also be deleted.
         /// </summary>
-        /// <param name="ItemName">Item name.</param>
+        /// <param name="id">The id of the <see cref="SmartMatchResult"/> to delete.</param>
         /// <param name="matchString">The match string to delete.</param>
         void DeleteSmartMatchEntry(string id, string matchString);
 
         /// <summary>
-        /// Attempts to add a an item to the list of currently processed items.
+        /// Attempts to add an item to the list of currently processed items.
         /// </summary>
         /// <param name="result">The result item.</param>
         /// <param name="fullClientRefresh">Passing true will notify the client to reload all items, otherwise only a single item will be refreshed.</param>

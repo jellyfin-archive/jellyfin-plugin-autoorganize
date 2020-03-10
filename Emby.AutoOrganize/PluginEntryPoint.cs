@@ -17,12 +17,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize
 {
+    /// <summary>
+    /// Entry point for the <see cref="AutoOrganizePlugin"/>.
+    /// </summary>
     public sealed class PluginEntryPoint : IServerEntryPoint
     {
-        public static PluginEntryPoint Current { get; private set; }
-
-        public IFileOrganizationService FileOrganizationService { get; private set; }
-        
         private readonly ISessionManager _sessionManager;
         private readonly ITaskManager _taskManager;
         private readonly ILogger _logger;
@@ -35,6 +34,9 @@ namespace Emby.AutoOrganize
 
         private IFileOrganizationRepository _repository;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PluginEntryPoint"/> class.
+        /// </summary>
         public PluginEntryPoint(
             ISessionManager sessionManager,
             ITaskManager taskManager,
@@ -57,6 +59,11 @@ namespace Emby.AutoOrganize
             _json = json;
         }
 
+        public static PluginEntryPoint Current { get; private set; }
+
+        public IFileOrganizationService FileOrganizationService { get; private set; }
+
+        /// <inheritdoc/>
         public Task RunAsync()
         {
             try
@@ -71,13 +78,13 @@ namespace Emby.AutoOrganize
             Current = this;
             FileOrganizationService = new FileOrganizationService(_taskManager, _repository, _logger, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
 
-            FileOrganizationService.ItemAdded += _organizationService_ItemAdded;
-            FileOrganizationService.ItemRemoved += _organizationService_ItemRemoved;
-            FileOrganizationService.ItemUpdated += _organizationService_ItemUpdated;
-            FileOrganizationService.LogReset += _organizationService_LogReset;
+            FileOrganizationService.ItemAdded += OnOrganizationServiceItemAdded;
+            FileOrganizationService.ItemRemoved += OnOrganizationServiceItemRemoved;
+            FileOrganizationService.ItemUpdated += OnOrganizationServiceItemUpdated;
+            FileOrganizationService.LogReset += OnOrganizationServiceLogReset;
 
             // Convert Config
-            _config.Convert(FileOrganizationService);
+            _config.ConvertSmartMatchInfo(FileOrganizationService);
 
             return Task.CompletedTask;
         }
@@ -91,32 +98,33 @@ namespace Emby.AutoOrganize
             return repo;
         }
 
-        private void _organizationService_LogReset(object sender, EventArgs e)
+        private void OnOrganizationServiceLogReset(object sender, EventArgs e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_LogReset", (FileOrganizationResult)null, CancellationToken.None);
         }
 
-        private void _organizationService_ItemUpdated(object sender, GenericEventArgs<FileOrganizationResult> e)
+        private void OnOrganizationServiceItemUpdated(object sender, GenericEventArgs<FileOrganizationResult> e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemUpdated", e.Argument, CancellationToken.None);
         }
 
-        private void _organizationService_ItemRemoved(object sender, GenericEventArgs<FileOrganizationResult> e)
+        private void OnOrganizationServiceItemRemoved(object sender, GenericEventArgs<FileOrganizationResult> e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemRemoved", e.Argument, CancellationToken.None);
         }
 
-        private void _organizationService_ItemAdded(object sender, GenericEventArgs<FileOrganizationResult> e)
+        private void OnOrganizationServiceItemAdded(object sender, GenericEventArgs<FileOrganizationResult> e)
         {
             _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemAdded", e.Argument, CancellationToken.None);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
-            FileOrganizationService.ItemAdded -= _organizationService_ItemAdded;
-            FileOrganizationService.ItemRemoved -= _organizationService_ItemRemoved;
-            FileOrganizationService.ItemUpdated -= _organizationService_ItemUpdated;
-            FileOrganizationService.LogReset -= _organizationService_LogReset;
+            FileOrganizationService.ItemAdded -= OnOrganizationServiceItemAdded;
+            FileOrganizationService.ItemRemoved -= OnOrganizationServiceItemRemoved;
+            FileOrganizationService.ItemUpdated -= OnOrganizationServiceItemUpdated;
+            FileOrganizationService.LogReset -= OnOrganizationServiceLogReset;
 
             var repo = _repository as IDisposable;
             if (repo != null)

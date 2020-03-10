@@ -6,6 +6,22 @@ namespace Emby.AutoOrganize.Model
 {
     public class MovieFileOrganizationOptions
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MovieFileOrganizationOptions"/> class.
+        /// </summary>
+        public MovieFileOrganizationOptions()
+        {
+            MinFileSizeMb = 50;
+            LeftOverFileExtensionsToDelete = new List<string>();
+            MoviePattern = "%fn.%ext";
+            WatchLocations = new List<string>();
+            CopyOriginalFile = false;
+            MovieFolder = false;
+            MovieFolderPattern = "%mn (%my)";
+            QueueLibraryScan = false;
+            ExtendedClean = false;
+        }
+
         public bool IsEnabled { get; set; }
 
         public int MinFileSizeMb { get; set; }
@@ -35,26 +51,5 @@ namespace Emby.AutoOrganize.Model
         public string MovieFolderPattern { get; set; }
 
         public bool QueueLibraryScan { get; set; }
-
-        public MovieFileOrganizationOptions()
-        {
-            MinFileSizeMb = 50;
-
-            LeftOverFileExtensionsToDelete = new List<string>();
-
-            MoviePattern = "%fn.%ext";
-
-            WatchLocations = new List<string>();
-
-            CopyOriginalFile = false;
-
-            MovieFolder = false;
-
-            MovieFolderPattern = "%mn (%my)";
-
-            QueueLibraryScan = false;
-
-            ExtendedClean = false;
-        }
     }
 }

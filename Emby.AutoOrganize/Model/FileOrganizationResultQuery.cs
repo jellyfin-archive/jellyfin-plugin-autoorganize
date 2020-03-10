@@ -3,15 +3,14 @@ namespace Emby.AutoOrganize.Model
     public class FileOrganizationResultQuery
     {
         /// <summary>
-        /// Skips over a given number of items within the results. Use for paging.
+        /// Gets or sets a value indicating the number of items to skips over in the query. Use to specify a page
+        /// number.
         /// </summary>
-        /// <value>The start index.</value>
         public int? StartIndex { get; set; }
 
         /// <summary>
-        /// The maximum number of items to return
+        /// Gets or sets the maximum number of items to return. Use to specify a page size.
         /// </summary>
-        /// <value>The limit.</value>
         public int? Limit { get; set; }
     }
 }

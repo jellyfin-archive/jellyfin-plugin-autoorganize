@@ -12,10 +12,27 @@ namespace Emby.AutoOrganize.Data
 {
     public abstract class BaseSqliteRepository : IDisposable
     {
-        protected string DbFilePath { get; set; }
-        protected ReaderWriterLockSlim WriteLock { get; }
-
         private readonly ILogger _logger;
+        private readonly object _disposeLock = new object();
+
+        private static bool _versionLogged;
+        private string _defaultWal;
+        private SQLiteDatabaseConnection _dbConnection;
+        private ManagedConnection _connection;
+        private bool _disposed = false;
+
+        static BaseSqliteRepository()
+        {
+            SQLite3.EnableSharedCache = false;
+
+            int rc = raw.sqlite3_config(raw.SQLITE_CONFIG_MEMSTATUS, 0);
+
+            rc = raw.sqlite3_config(raw.SQLITE_CONFIG_MULTITHREAD, 1);
+
+            rc = raw.sqlite3_enable_shared_cache(1);
+
+            ThreadSafeMode = raw.sqlite3_threadsafe();
+        }
 
         protected BaseSqliteRepository(ILogger logger)
         {
@@ -23,45 +40,21 @@ namespace Emby.AutoOrganize.Data
             WriteLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }
 
-        protected TransactionMode TransactionMode
-        {
-            get { return TransactionMode.Deferred; }
-        }
+        protected string DbFilePath { get; set; }
 
-        protected TransactionMode ReadTransactionMode
-        {
-            get { return TransactionMode.Deferred; }
-        }
+        protected ReaderWriterLockSlim WriteLock { get; }
+
+        protected TransactionMode TransactionMode => TransactionMode.Deferred;
+
+        protected TransactionMode ReadTransactionMode => TransactionMode.Deferred;
 
         internal static int ThreadSafeMode { get; set; }
 
-        static BaseSqliteRepository()
-        {
-            SQLite3.EnableSharedCache = false;
+        protected virtual bool EnableSingleConnection => true;
 
-            int rc = raw.sqlite3_config(raw.SQLITE_CONFIG_MEMSTATUS, 0);
-            //CheckOk(rc);
+        protected virtual bool EnableTempStoreMemory => false;
 
-            rc = raw.sqlite3_config(raw.SQLITE_CONFIG_MULTITHREAD, 1);
-            //rc = raw.sqlite3_config(raw.SQLITE_CONFIG_SINGLETHREAD, 1);
-            //rc = raw.sqlite3_config(raw.SQLITE_CONFIG_SERIALIZED, 1);
-            //CheckOk(rc);
-
-            rc = raw.sqlite3_enable_shared_cache(1);
-
-            ThreadSafeMode = raw.sqlite3_threadsafe();
-        }
-
-        private static bool _versionLogged;
-
-        private string _defaultWal;
-        private SQLiteDatabaseConnection _dbConnection;
-        private ManagedConnection _connection;
-
-        protected virtual bool EnableSingleConnection
-        {
-            get { return true; }
-        }
+        protected virtual int? CacheSize => null;
 
         protected ManagedConnection CreateConnection(bool isReadOnly = false)
         {
@@ -83,14 +76,15 @@ namespace Emby.AutoOrganize.Data
 
                 if (isReadOnly)
                 {
-                    //_logger.LogInformation("Opening read connection");
-                    //connectionFlags = ConnectionFlags.ReadOnly;
+                    // TODO: set connection flags correctly
+                    // connectionFlags = ConnectionFlags.ReadOnly
+                    _logger.LogDebug("Opening read connection to database");
                     connectionFlags = ConnectionFlags.Create;
                     connectionFlags |= ConnectionFlags.ReadWrite;
                 }
                 else
                 {
-                    //_logger.LogInformation("Opening write connection");
+                    _logger.LogDebug("Opening write connection to database.");
                     connectionFlags = ConnectionFlags.Create;
                     connectionFlags |= ConnectionFlags.ReadWrite;
                 }
@@ -119,8 +113,8 @@ namespace Emby.AutoOrganize.Data
 
                     var queries = new List<string>
                     {
-                        //"PRAGMA cache size=-10000"
-                        //"PRAGMA read_uncommitted = true",
+                        // "PRAGMA cache size=-10000"
+                        // "PRAGMA read_uncommitted = true",
                         "PRAGMA synchronous=Normal"
                     };
 
@@ -184,11 +178,7 @@ namespace Emby.AutoOrganize.Data
 
         protected bool TableExists(ManagedConnection connection, string name)
         {
-            return connection.RunInTransaction(db =>
-            {
-                return TableExists(db, name);
-
-            }, ReadTransactionMode);
+            return connection.RunInTransaction(db => TableExists(db, name), ReadTransactionMode);
         }
 
         protected bool TableExists(IDatabaseConnection db, string name)
@@ -236,26 +226,6 @@ namespace Emby.AutoOrganize.Data
             _logger.LogInformation("PRAGMA synchronous={sync}", db.Query("PRAGMA synchronous").SelectScalarString().First());
         }
 
-        protected virtual bool EnableTempStoreMemory
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        protected virtual int? CacheSize
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        #region IDisposable Support
-        private bool _disposed = false;
-        private readonly object _disposeLock = new object();
-
         public void Dispose()
         {
             Dispose(true);
@@ -265,10 +235,13 @@ namespace Emby.AutoOrganize.Data
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
 
             if (disposing)
             {
@@ -297,7 +270,6 @@ namespace Emby.AutoOrganize.Data
                 _logger.LogError(ex, "Error disposing database", ex);
             }
         }
-        #endregion
 
         protected List<string> GetColumnNames(IDatabaseConnection connection, string table)
         {
@@ -332,11 +304,13 @@ namespace Emby.AutoOrganize.Data
         private sealed class ReadLockToken : IDisposable
         {
             private ReaderWriterLockSlim _sync;
+
             public ReadLockToken(ReaderWriterLockSlim sync)
             {
                 _sync = sync;
                 sync.EnterReadLock();
             }
+
             public void Dispose()
             {
                 if (_sync != null)
@@ -346,14 +320,17 @@ namespace Emby.AutoOrganize.Data
                 }
             }
         }
+
         private sealed class WriteLockToken : IDisposable
         {
             private ReaderWriterLockSlim _sync;
+
             public WriteLockToken(ReaderWriterLockSlim sync)
             {
                 _sync = sync;
                 sync.EnterWriteLock();
             }
+
             public void Dispose()
             {
                 if (_sync != null)
@@ -366,18 +343,19 @@ namespace Emby.AutoOrganize.Data
 
         public static IDisposable Read(this ReaderWriterLockSlim obj)
         {
-            //if (BaseSqliteRepository.ThreadSafeMode > 0)
-            //{
+            // if (BaseSqliteRepository.ThreadSafeMode > 0)
+            // {
             //    return new DummyToken();
-            //}
+            // }
             return new WriteLockToken(obj);
         }
+
         public static IDisposable Write(this ReaderWriterLockSlim obj)
         {
-            //if (BaseSqliteRepository.ThreadSafeMode > 0)
-            //{
+            // if (BaseSqliteRepository.ThreadSafeMode > 0)
+            // {
             //    return new DummyToken();
-            //}
+            // }
             return new WriteLockToken(obj);
         }
     }
