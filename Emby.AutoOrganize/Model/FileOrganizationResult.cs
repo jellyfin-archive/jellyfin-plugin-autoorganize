@@ -13,7 +13,7 @@ namespace Emby.AutoOrganize.Model
         /// </summary>
         public FileOrganizationResult()
         {
-            DuplicatePaths = new List<string>().AsReadOnly();
+            DuplicatePaths = new List<string>();
         }
 
         /// <summary>
