@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// Service used for organizing movie media files.
+    /// </summary>
     public class MovieFileOrganizer
     {
         private readonly ILibraryMonitor _libraryMonitor;
@@ -32,6 +36,7 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="MovieFileOrganizer"/> class.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter types/names are self-documenting")]
         public MovieFileOrganizer(
             IFileOrganizationService organizationService,
             IFileSystem fileSystem,
@@ -50,6 +55,14 @@ namespace Emby.AutoOrganize.Core
 
         private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Movie;
 
+        /// <summary>
+        /// Organize a movie media file.
+        /// </summary>
+        /// <param name="path">The filepath of the movie.</param>
+        /// <param name="options">The organize options to use.</param>
+        /// <param name="overwriteExisting">If true, any existing file at the same destination path will be overwritten.</param>
+        /// <param name="cancellationToken">A cancellation token for the operation.</param>
+        /// <returns>A task representing the operation completion and containing the operation result.</returns>
         public async Task<FileOrganizationResult> OrganizeMovieFile(
             string path,
             MovieFileOrganizationOptions options,
@@ -162,6 +175,13 @@ namespace Emby.AutoOrganize.Core
             return movie;
         }
 
+        /// <summary>
+        /// Organize a movie media file with user-supplied parameters.
+        /// </summary>
+        /// <param name="request">The user supplied parameters provided via API request.</param>
+        /// <param name="options">The organize options to use.</param>
+        /// <param name="cancellationToken">A cancellation token for the operation.</param>
+        /// <returns>A task representing the operation completion and containing the operation result.</returns>
         public async Task<FileOrganizationResult> OrganizeWithCorrection(MovieFileOrganizationRequest request, MovieFileOrganizationOptions options, CancellationToken cancellationToken)
         {
             var result = _organizationService.GetResult(request.ResultId);

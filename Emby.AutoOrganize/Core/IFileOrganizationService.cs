@@ -7,14 +7,29 @@ using MediaBrowser.Model.Querying;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// A service that can be used to auto-organize media files.
+    /// </summary>
     public interface IFileOrganizationService
     {
+        /// <summary>
+        /// Occurs when a new <see cref="FileOrganizationResult"/> record has been created.
+        /// </summary>
         event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
 
+        /// <summary>
+        /// Occurs when a <see cref="FileOrganizationResult"/> record has been updated.
+        /// </summary>
         event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
 
+        /// <summary>
+        /// Occurs when a <see cref="FileOrganizationResult"/> record has been deleted.
+        /// </summary>
         event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
 
+        /// <summary>
+        /// Occurs when multiple <see cref="FileOrganizationResult"/> records are deleted.
+        /// </summary>
         event EventHandler LogReset;
 
         /// <summary>

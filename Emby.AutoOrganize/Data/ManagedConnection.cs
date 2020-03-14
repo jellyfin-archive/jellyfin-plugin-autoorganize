@@ -1,3 +1,7 @@
+// TODO: This class should be replaced with the common class in the main Jellyfin repository:
+// https://github.com/jellyfin/jellyfin/blob/master/Emby.Server.Implementations/Data/ManagedConnection.cs
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

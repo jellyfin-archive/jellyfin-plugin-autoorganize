@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
@@ -12,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// A scheduled task that organizes media files.
+    /// </summary>
     public class OrganizerScheduledTask : IScheduledTask, IConfigurableScheduledTask
     {
         private readonly ILibraryMonitor _libraryMonitor;
@@ -24,6 +28,7 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizerScheduledTask"/> class.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter types/names are self-documenting")]
         public OrganizerScheduledTask(ILibraryMonitor libraryMonitor, ILibraryManager libraryManager, ILogger logger, IFileSystem fileSystem, IServerConfigurationManager config, IProviderManager providerManager)
         {
             _libraryMonitor = libraryMonitor;

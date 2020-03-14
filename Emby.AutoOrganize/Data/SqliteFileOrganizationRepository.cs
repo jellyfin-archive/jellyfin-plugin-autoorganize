@@ -14,6 +14,10 @@ using SQLitePCL.pretty;
 
 namespace Emby.AutoOrganize.Data
 {
+    /// <summary>
+    /// SQLite repository for managing persistence of <see cref="FileOrganizationResult"/> and
+    /// <see cref="SmartMatchResult"/> entities.
+    /// </summary>
     public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository
     {
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");

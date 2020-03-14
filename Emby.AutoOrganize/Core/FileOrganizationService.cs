@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <inheritdoc/>
     public class FileOrganizationService : IFileOrganizationService
     {
         private readonly ITaskManager _taskManager;
@@ -33,6 +35,7 @@ namespace Emby.AutoOrganize.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="FileOrganizationService"/> class.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter names/types are self-documenting.")]
         public FileOrganizationService(
             ITaskManager taskManager,
             IFileOrganizationRepository repo,

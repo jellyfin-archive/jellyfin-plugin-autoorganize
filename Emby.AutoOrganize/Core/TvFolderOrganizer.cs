@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -13,6 +14,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// Service used to organize all files in the TV watch folders.
+    /// </summary>
     public class TvFolderOrganizer
     {
         private readonly ILibraryMonitor _libraryMonitor;
@@ -23,6 +27,10 @@ namespace Emby.AutoOrganize.Core
         private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TvFolderOrganizer"/> class.
+        /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter types/names are self-documenting")]
         public TvFolderOrganizer(ILibraryManager libraryManager, ILogger logger, IFileSystem fileSystem, ILibraryMonitor libraryMonitor, IFileOrganizationService organizationService, IServerConfigurationManager config, IProviderManager providerManager)
         {
             _libraryManager = libraryManager;
@@ -66,6 +74,13 @@ namespace Emby.AutoOrganize.Core
             return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i, path));
         }
 
+        /// <summary>
+        /// Perform organization for the TV watch folders.
+        /// </summary>
+        /// <param name="options">The organization options.</param>
+        /// <param name="progress">The <see cref="IProgress{T}"/> to use for reporting operation progress.</param>
+        /// <param name="cancellationToken">A cancellation token for the operation.</param>
+        /// <returns>A task representing the operation completion.</returns>
         public async Task Organize(
             TvFileOrganizationOptions options,
             IProgress<double> progress,

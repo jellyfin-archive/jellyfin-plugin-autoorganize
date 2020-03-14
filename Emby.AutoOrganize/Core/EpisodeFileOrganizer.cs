@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
 using Emby.Naming.Common;
 using Emby.Naming.TV;
-using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
@@ -23,6 +23,9 @@ using EpisodeInfo = MediaBrowser.Controller.Providers.EpisodeInfo;
 
 namespace Emby.AutoOrganize.Core
 {
+    /// <summary>
+    /// Service to use for organizing episode media files.
+    /// </summary>
     public class EpisodeFileOrganizer
     {
         private readonly ILibraryMonitor _libraryMonitor;
@@ -34,6 +37,10 @@ namespace Emby.AutoOrganize.Core
 
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EpisodeFileOrganizer"/> class.
+        /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter types/names are self-documenting")]
         public EpisodeFileOrganizer(
             IFileOrganizationService organizationService,
             IFileSystem fileSystem,
@@ -66,6 +73,13 @@ namespace Emby.AutoOrganize.Core
 
         private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Episode;
 
+        /// <summary>
+        /// Organize an episode file.
+        /// </summary>
+        /// <param name="path">The path to the episode file.</param>
+        /// <param name="options">The options to use for organizing the file.</param>
+        /// <param name="cancellationToken">Cancellation token for the operation.</param>
+        /// <returns>A task representing the file organization operation and containing the operation result.</returns>
         public async Task<FileOrganizationResult> OrganizeEpisodeFile(
             string path,
             TvFileOrganizationOptions options,
@@ -306,6 +320,13 @@ namespace Emby.AutoOrganize.Core
             return series;
         }
 
+        /// <summary>
+        /// Organize an episode file with parameters provided by the end-user.
+        /// </summary>
+        /// <param name="request">The parameters provided by the user via API request.</param>
+        /// <param name="options">The organization options to use.</param>
+        /// <param name="cancellationToken">A cancellation token for the operation.</param>
+        /// <returns>A task representing the organization operation and containing the operation result.</returns>
         public async Task<FileOrganizationResult> OrganizeWithCorrection(
             EpisodeFileOrganizationRequest request,
             TvFileOrganizationOptions options,
