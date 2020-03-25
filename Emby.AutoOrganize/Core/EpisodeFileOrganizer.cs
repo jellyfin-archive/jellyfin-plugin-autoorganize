@@ -305,7 +305,7 @@ namespace Emby.AutoOrganize.Core
             }
 
             // async outside of the lock for perfs
-            var refreshOptions = new MetadataRefreshOptions(new DirectoryService(_logger, _fileSystem))
+            var refreshOptions = new MetadataRefreshOptions(new DirectoryService(_fileSystem))
             {
                 SearchResult = result
             };
