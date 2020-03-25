@@ -12,4 +12,4 @@ artifacts:
   - "Emby.AutoOrganize.dll"
 build_type: "dotnet"
 dotnet_configuration: "Release"
-dotnet_framework: "netstandard2.0"
+dotnet_framework: "netstandard2.1"
