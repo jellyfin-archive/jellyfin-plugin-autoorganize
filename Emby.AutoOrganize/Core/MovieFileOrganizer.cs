@@ -27,7 +27,7 @@ namespace Emby.AutoOrganize.Core
     {
         private readonly ILibraryMonitor _libraryMonitor;
         private readonly ILibraryManager _libraryManager;
-        private readonly ILogger _logger;
+        private readonly ILogger<MovieFileOrganizer> _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
@@ -40,7 +40,7 @@ namespace Emby.AutoOrganize.Core
         public MovieFileOrganizer(
             IFileOrganizationService organizationService,
             IFileSystem fileSystem,
-            ILogger logger,
+            ILogger<MovieFileOrganizer> logger,
             ILibraryManager libraryManager,
             ILibraryMonitor libraryMonitor,
             IProviderManager providerManager)

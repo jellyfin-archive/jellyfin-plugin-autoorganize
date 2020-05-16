@@ -30,7 +30,7 @@ namespace Emby.AutoOrganize.Data
         /// <param name="appPaths">The server application paths.</param>
         /// <param name="jsonSerializer">A JSON serializer.</param>
         public SqliteFileOrganizationRepository(
-            ILogger logger,
+            ILogger<SqliteFileOrganizationRepository> logger,
             IServerApplicationPaths appPaths,
             IJsonSerializer jsonSerializer)
             : base(logger)

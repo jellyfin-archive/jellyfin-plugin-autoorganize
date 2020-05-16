@@ -20,7 +20,8 @@ namespace Emby.AutoOrganize.Core
     {
         private readonly ILibraryMonitor _libraryMonitor;
         private readonly ILibraryManager _libraryManager;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<OrganizerScheduledTask> _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
@@ -29,11 +30,18 @@ namespace Emby.AutoOrganize.Core
         /// Initializes a new instance of the <see cref="OrganizerScheduledTask"/> class.
         /// </summary>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter types/names are self-documenting")]
-        public OrganizerScheduledTask(ILibraryMonitor libraryMonitor, ILibraryManager libraryManager, ILogger logger, IFileSystem fileSystem, IServerConfigurationManager config, IProviderManager providerManager)
+        public OrganizerScheduledTask(
+            ILibraryMonitor libraryMonitor,
+            ILibraryManager libraryManager,
+            ILoggerFactory loggerFactory,
+            IFileSystem fileSystem,
+            IServerConfigurationManager config,
+            IProviderManager providerManager)
         {
             _libraryMonitor = libraryMonitor;
             _libraryManager = libraryManager;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<OrganizerScheduledTask>();
             _fileSystem = fileSystem;
             _config = config;
             _providerManager = providerManager;
@@ -76,7 +84,14 @@ namespace Emby.AutoOrganize.Core
                 queueTv = options.TvOptions.QueueLibraryScan;
                 var fileOrganizationService = PluginEntryPoint.Current.FileOrganizationService;
 
-                await new TvFolderOrganizer(_libraryManager, _logger, _fileSystem, _libraryMonitor, fileOrganizationService, _config, _providerManager)
+                await new TvFolderOrganizer(
+                    _libraryManager,
+                    _loggerFactory,
+                    _fileSystem,
+                    _libraryMonitor,
+                    fileOrganizationService,
+                    _config,
+                    _providerManager)
                     .Organize(options.TvOptions, progress, cancellationToken).ConfigureAwait(false);
             }
 
@@ -85,7 +100,7 @@ namespace Emby.AutoOrganize.Core
                 queueMovie = options.MovieOptions.QueueLibraryScan;
                 var fileOrganizationService = PluginEntryPoint.Current.FileOrganizationService;
 
-                await new MovieFolderOrganizer(_libraryManager, _logger, _fileSystem, _libraryMonitor, fileOrganizationService, _config, _providerManager)
+                await new MovieFolderOrganizer(_libraryManager, _loggerFactory, _fileSystem, _libraryMonitor, fileOrganizationService, _config, _providerManager)
                     .Organize(options.MovieOptions, progress, cancellationToken).ConfigureAwait(false);
             }
 

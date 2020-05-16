@@ -21,7 +21,8 @@ namespace Emby.AutoOrganize.Core
     {
         private readonly ILibraryMonitor _libraryMonitor;
         private readonly ILibraryManager _libraryManager;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<TvFolderOrganizer> _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IServerConfigurationManager _config;
@@ -31,10 +32,18 @@ namespace Emby.AutoOrganize.Core
         /// Initializes a new instance of the <see cref="TvFolderOrganizer"/> class.
         /// </summary>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1611:Element parameters should be documented", Justification = "Parameter types/names are self-documenting")]
-        public TvFolderOrganizer(ILibraryManager libraryManager, ILogger logger, IFileSystem fileSystem, ILibraryMonitor libraryMonitor, IFileOrganizationService organizationService, IServerConfigurationManager config, IProviderManager providerManager)
+        public TvFolderOrganizer(
+            ILibraryManager libraryManager,
+            ILoggerFactory loggerFactory,
+            IFileSystem fileSystem,
+            ILibraryMonitor libraryMonitor,
+            IFileOrganizationService organizationService,
+            IServerConfigurationManager config,
+            IProviderManager providerManager)
         {
             _libraryManager = libraryManager;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<TvFolderOrganizer>();
             _fileSystem = fileSystem;
             _libraryMonitor = libraryMonitor;
             _organizationService = organizationService;
@@ -105,7 +114,13 @@ namespace Emby.AutoOrganize.Core
             {
                 var numComplete = 0;
 
-                var organizer = new EpisodeFileOrganizer(_organizationService, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
+                var organizer = new EpisodeFileOrganizer(
+                    _organizationService,
+                    _fileSystem,
+                    _loggerFactory.CreateLogger<EpisodeFileOrganizer>(),
+                    _libraryManager,
+                    _libraryMonitor,
+                    _providerManager);
 
                 foreach (var file in eligibleFiles)
                 {
