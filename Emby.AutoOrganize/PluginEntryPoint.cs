@@ -24,7 +24,8 @@ namespace Emby.AutoOrganize
     {
         private readonly ISessionManager _sessionManager;
         private readonly ITaskManager _taskManager;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<PluginEntryPoint> _logger;
         private readonly ILibraryMonitor _libraryMonitor;
         private readonly ILibraryManager _libraryManager;
         private readonly IServerConfigurationManager _config;
@@ -50,7 +51,8 @@ namespace Emby.AutoOrganize
         {
             _sessionManager = sessionManager;
             _taskManager = taskManager;
-            _logger = loggerFactory.CreateLogger("AutoOrganize");
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<PluginEntryPoint>();
             _libraryMonitor = libraryMonitor;
             _libraryManager = libraryManager;
             _config = config;
@@ -82,7 +84,7 @@ namespace Emby.AutoOrganize
             }
 
             Current = this;
-            FileOrganizationService = new FileOrganizationService(_taskManager, _repository, _logger, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
+            FileOrganizationService = new FileOrganizationService(_taskManager, _repository, _loggerFactory, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
 
             FileOrganizationService.ItemAdded += OnOrganizationServiceItemAdded;
             FileOrganizationService.ItemRemoved += OnOrganizationServiceItemRemoved;
@@ -97,7 +99,10 @@ namespace Emby.AutoOrganize
 
         private IFileOrganizationRepository GetRepository()
         {
-            var repo = new SqliteFileOrganizationRepository(_logger, _config.ApplicationPaths, _json);
+            var repo = new SqliteFileOrganizationRepository(
+                _loggerFactory.CreateLogger<SqliteFileOrganizationRepository>(),
+                _config.ApplicationPaths,
+                _json);
 
             repo.Initialize();
 
@@ -132,8 +137,7 @@ namespace Emby.AutoOrganize
             FileOrganizationService.ItemUpdated -= OnOrganizationServiceItemUpdated;
             FileOrganizationService.LogReset -= OnOrganizationServiceLogReset;
 
-            var repo = _repository as IDisposable;
-            if (repo != null)
+            if (_repository is IDisposable repo)
             {
                 repo.Dispose();
             }

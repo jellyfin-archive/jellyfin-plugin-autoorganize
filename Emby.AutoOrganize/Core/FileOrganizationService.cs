@@ -24,7 +24,8 @@ namespace Emby.AutoOrganize.Core
     {
         private readonly ITaskManager _taskManager;
         private readonly IFileOrganizationRepository _repo;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<FileOrganizationService> _logger;
         private readonly ILibraryMonitor _libraryMonitor;
         private readonly ILibraryManager _libraryManager;
         private readonly IServerConfigurationManager _config;
@@ -39,7 +40,7 @@ namespace Emby.AutoOrganize.Core
         public FileOrganizationService(
             ITaskManager taskManager,
             IFileOrganizationRepository repo,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             ILibraryMonitor libraryMonitor,
             ILibraryManager libraryManager,
             IServerConfigurationManager config,
@@ -48,7 +49,8 @@ namespace Emby.AutoOrganize.Core
         {
             _taskManager = taskManager;
             _repo = repo;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<FileOrganizationService>();
             _libraryMonitor = libraryMonitor;
             _libraryManager = libraryManager;
             _config = config;
@@ -183,12 +185,23 @@ namespace Emby.AutoOrganize.Core
             switch (result.Type)
             {
                 case FileOrganizerType.Episode:
-                    var episodeOrganizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
+                    var episodeOrganizer = new EpisodeFileOrganizer(
+                        this,
+                        _fileSystem,
+                        _loggerFactory.CreateLogger<EpisodeFileOrganizer>(),
+                        _libraryManager,
+                        _libraryMonitor,
+                        _providerManager);
                     organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, options.TvOptions, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
                 case FileOrganizerType.Movie:
-                    var movieOrganizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
+                    var movieOrganizer = new MovieFileOrganizer(this,
+                        _fileSystem,
+                        _loggerFactory.CreateLogger<MovieFileOrganizer>(),
+                        _libraryManager,
+                        _libraryMonitor,
+                        _providerManager);
                     organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options.MovieOptions, true, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
@@ -219,7 +232,13 @@ namespace Emby.AutoOrganize.Core
         /// <inheritdoc/>
         public async Task PerformOrganization(EpisodeFileOrganizationRequest request)
         {
-            var organizer = new EpisodeFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
+            var organizer = new EpisodeFileOrganizer(
+                this,
+                _fileSystem,
+                _loggerFactory.CreateLogger<EpisodeFileOrganizer>(),
+                _libraryManager,
+                _libraryMonitor,
+                _providerManager);
 
             var options = _config.GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.TvOptions, CancellationToken.None).ConfigureAwait(false);
@@ -233,7 +252,13 @@ namespace Emby.AutoOrganize.Core
         /// <inheritdoc/>
         public async Task PerformOrganization(MovieFileOrganizationRequest request)
         {
-            var organizer = new MovieFileOrganizer(this, _fileSystem, _logger, _libraryManager, _libraryMonitor, _providerManager);
+            var organizer = new MovieFileOrganizer(
+                this,
+                _fileSystem,
+                _loggerFactory.CreateLogger<MovieFileOrganizer>(),
+                _libraryManager,
+                _libraryMonitor, 
+                _providerManager);
 
             var options = _config.GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.MovieOptions, CancellationToken.None).ConfigureAwait(false);
