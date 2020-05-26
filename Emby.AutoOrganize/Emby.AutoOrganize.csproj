@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyVersion>7.0.0</AssemblyVersion>
-    <FileVersion>7.0.0</FileVersion>
+    <AssemblyVersion>7.0.0.0</AssemblyVersion>
+    <FileVersion>7.0.0.0</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -22,7 +22,6 @@
     <None Remove="Configuration\autoorganizetv.js" />
     <None Remove="Configuration\fileorganizer.js" />
     <None Remove="Configuration\fileorganizer.template.html" />
-    <None Remove="thumb.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +35,6 @@
     <EmbeddedResource Include="Configuration\autoorganizetv.js" />
     <EmbeddedResource Include="Configuration\fileorganizer.js" />
     <EmbeddedResource Include="Configuration\fileorganizer.template.html" />
-    <EmbeddedResource Include="thumb.jpg" />
   </ItemGroup>
 
   <ItemGroup>

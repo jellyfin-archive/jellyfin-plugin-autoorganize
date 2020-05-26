@@ -1,15 +1,13 @@
 ---
-name: "jellyfin-plugin-autoorganize"
+name: "Auto Organize"
 guid: "70b7b43b-471b-4159-b4be-56750c795499"
-version: "7" # Please increment with each pull request
-jellyfin_version: "10.5.0" # The earliest binary-compatible version
+version: "7.0.0.0"
+jellyfin_version: "10.5.0.0"
 owner: "jellyfin"
-nicename: "Auto Organize"
-description: "Automatically organize your media"
 overview: "Automatically organize your media"
+description: "Automatically organize your media"
 category: "General"
 artifacts:
-  - "Emby.AutoOrganize.dll"
-build_type: "dotnet"
-dotnet_configuration: "Release"
-dotnet_framework: "netstandard2.1"
+- "Emby.AutoOrganize.dll"
+changelog: >
+  changelog
