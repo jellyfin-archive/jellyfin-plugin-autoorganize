@@ -38,8 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jellyfin.Controller" Version="10.*" />
-    <PackageReference Include="Jellyfin.Naming" Version="10.*" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.*-*" />
+    <PackageReference Include="Jellyfin.Naming" Version="10.*-*" />
     <PackageReference Include="SQLitePCL.pretty.netstandard" Version="2.0.1" />
   </ItemGroup>
 
