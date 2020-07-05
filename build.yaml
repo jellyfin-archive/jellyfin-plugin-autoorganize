@@ -1,8 +1,8 @@
 ---
 name: "Auto Organize"
 guid: "70b7b43b-471b-4159-b4be-56750c795499"
-version: "7.0.0.0"
-targetAbi: "10.5.0.0"
+version: "8.0.0.0"
+targetAbi: "10.6.0.0"
 owner: "jellyfin"
 overview: "Automatically organize your media"
 description: "Automatically organize your media"
