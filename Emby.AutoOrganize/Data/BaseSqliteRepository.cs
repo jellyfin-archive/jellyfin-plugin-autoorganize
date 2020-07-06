@@ -15,7 +15,7 @@ namespace Emby.AutoOrganize.Data
 {
     public abstract class BaseSqliteRepository : IDisposable
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<BaseSqliteRepository> _logger;
         private readonly object _disposeLock = new object();
 
         private static bool _versionLogged;
@@ -37,7 +37,7 @@ namespace Emby.AutoOrganize.Data
             ThreadSafeMode = raw.sqlite3_threadsafe();
         }
 
-        protected BaseSqliteRepository(ILogger logger)
+        protected BaseSqliteRepository(ILogger<BaseSqliteRepository> logger)
         {
             _logger = logger;
             WriteLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
