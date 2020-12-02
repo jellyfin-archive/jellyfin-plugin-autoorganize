@@ -4,14 +4,15 @@ using System.Threading.Tasks;
 using Emby.AutoOrganize.Core;
 using Emby.AutoOrganize.Data;
 using Emby.AutoOrganize.Model;
+using Jellyfin.Data.Events;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Controller.Session;
-using MediaBrowser.Model.Events;
 using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Serialization;
+using MediaBrowser.Model.Session;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -86,11 +87,6 @@ namespace Emby.AutoOrganize
             Current = this;
             FileOrganizationService = new FileOrganizationService(_taskManager, _repository, _loggerFactory, _libraryMonitor, _libraryManager, _config, _fileSystem, _providerManager);
 
-            FileOrganizationService.ItemAdded += OnOrganizationServiceItemAdded;
-            FileOrganizationService.ItemRemoved += OnOrganizationServiceItemRemoved;
-            FileOrganizationService.ItemUpdated += OnOrganizationServiceItemUpdated;
-            FileOrganizationService.LogReset += OnOrganizationServiceLogReset;
-
             // Convert Config
             _config.ConvertSmartMatchInfo(FileOrganizationService);
 
@@ -109,38 +105,11 @@ namespace Emby.AutoOrganize
             return repo;
         }
 
-        private void OnOrganizationServiceLogReset(object sender, EventArgs e)
-        {
-            _sessionManager.SendMessageToAdminSessions("AutoOrganize_LogReset", (FileOrganizationResult)null, CancellationToken.None);
-        }
-
-        private void OnOrganizationServiceItemUpdated(object sender, GenericEventArgs<FileOrganizationResult> e)
-        {
-            _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemUpdated", e.Argument, CancellationToken.None);
-        }
-
-        private void OnOrganizationServiceItemRemoved(object sender, GenericEventArgs<FileOrganizationResult> e)
-        {
-            _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemRemoved", e.Argument, CancellationToken.None);
-        }
-
-        private void OnOrganizationServiceItemAdded(object sender, GenericEventArgs<FileOrganizationResult> e)
-        {
-            _sessionManager.SendMessageToAdminSessions("AutoOrganize_ItemAdded", e.Argument, CancellationToken.None);
-        }
-
-        /// <inheritdoc/>
         public void Dispose()
         {
-            FileOrganizationService.ItemAdded -= OnOrganizationServiceItemAdded;
-            FileOrganizationService.ItemRemoved -= OnOrganizationServiceItemRemoved;
-            FileOrganizationService.ItemUpdated -= OnOrganizationServiceItemUpdated;
-            FileOrganizationService.LogReset -= OnOrganizationServiceLogReset;
-
-            if (_repository is IDisposable repo)
-            {
-                repo.Dispose();
-            }
+            _taskManager?.Dispose();
+            _loggerFactory?.Dispose();
+            _libraryMonitor?.Dispose();
         }
     }
 }

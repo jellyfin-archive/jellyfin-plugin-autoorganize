@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Data;
@@ -11,7 +10,6 @@ using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.Events;
 using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Querying;
 using MediaBrowser.Model.Tasks;
@@ -57,18 +55,6 @@ namespace Emby.AutoOrganize.Core
             _fileSystem = fileSystem;
             _providerManager = providerManager;
         }
-
-        /// <inheritdoc/>
-        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
-
-        /// <inheritdoc/>
-        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
-
-        /// <inheritdoc/>
-        public event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
-
-        /// <inheritdoc/>
-        public event EventHandler LogReset;
 
         /// <inheritdoc/>
         public void BeginProcessNewFiles()
@@ -165,8 +151,6 @@ namespace Emby.AutoOrganize.Core
             }
 
             await _repo.Delete(resultId).ConfigureAwait(false);
-
-            ItemRemoved?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
         }
 
         /// <inheritdoc/>
@@ -219,14 +203,12 @@ namespace Emby.AutoOrganize.Core
         public async Task ClearLog()
         {
             await _repo.DeleteAll().ConfigureAwait(false);
-            LogReset?.Invoke(this, EventArgs.Empty);
         }
 
         /// <inheritdoc/>
         public async Task ClearCompleted()
         {
             await _repo.DeleteCompleted().ConfigureAwait(false);
-            LogReset?.Invoke(this, EventArgs.Empty);
         }
 
         /// <inheritdoc/>
@@ -311,16 +293,6 @@ namespace Emby.AutoOrganize.Core
             }
 
             result.IsInProgress = true;
-
-            if (isNewItem)
-            {
-                ItemAdded?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
-            }
-            else
-            {
-                ItemUpdated?.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
-            }
-
             return true;
         }
 
@@ -331,9 +303,6 @@ namespace Emby.AutoOrganize.Core
             var retval = _inProgressItemIds.TryRemove(result.Id, out itemValue);
 
             result.IsInProgress = false;
-
-            ItemUpdated.Invoke(this, new GenericEventArgs<FileOrganizationResult>(result));
-
             return retval;
         }
     }

@@ -166,7 +166,7 @@ namespace Emby.AutoOrganize.Api
         /// Performs organization of a movie.
         /// </summary>
         /// <param name="id">Result id.</param>
-        /// <param name="movieId">Movie id</param>
+        /// <param name="movieId">Movie id.</param>
         /// <param name="newMovieName">Name of a movie to add.</param>
         /// <param name="newMovieYear">Year of a movie to add.</param>
         /// <param name="newMovieProviderIds">A list of provider IDs identifying a new movie.</param>

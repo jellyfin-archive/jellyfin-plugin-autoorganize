@@ -104,7 +104,7 @@ namespace Emby.AutoOrganize.Core
                 var resolver = new EpisodeResolver(namingOptions);
 
                 var episodeInfo = resolver.Resolve(path, false) ??
-                    new Naming.TV.EpisodeInfo();
+                                  new Naming.TV.EpisodeInfo(string.Empty);
 
                 var seriesName = episodeInfo.SeriesName;
                 int? seriesYear = null;
@@ -153,7 +153,7 @@ namespace Emby.AutoOrganize.Core
                         // if an earlier result exist with an different type, we update it
                         result.Type = CurrentFileOrganizerType;
 
-                        var endingEpisodeNumber = episodeInfo.EndingEpsiodeNumber;
+                        var endingEpisodeNumber = episodeInfo.EndingEpisodeNumber;
 
                         result.ExtractedEndingEpisodeNumber = endingEpisodeNumber;
 
