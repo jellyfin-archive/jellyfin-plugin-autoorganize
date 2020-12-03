@@ -90,23 +90,19 @@ namespace Emby.AutoOrganize.Core
                     return result;
                 }
 
-                _namingOptions = _namingOptions ?? new NamingOptions();
+                _namingOptions ??= new NamingOptions();
                 var resolver = new VideoResolver(_namingOptions);
 
-                var movieInfo = resolver.Resolve(path, false) ??
-                    new VideoFileInfo();
-
-                var movieName = movieInfo.Name;
-
-                if (!string.IsNullOrEmpty(movieName))
+                var movieInfo = resolver.Resolve(path, false);
+                if (!string.IsNullOrEmpty(movieInfo?.Name))
                 {
                     var movieYear = movieInfo.Year;
 
-                    _logger.LogDebug("Extracted information from {0}. Movie {1}, Year {2}", path, movieName, movieYear);
+                    _logger.LogDebug("Extracted information from {0}. Movie {1}, Year {2}", path, movieInfo.Name, movieYear);
 
                     await OrganizeMovie(
                         path,
-                        movieName,
+                        movieInfo.Name,
                         movieYear,
                         options,
                         overwriteExisting,

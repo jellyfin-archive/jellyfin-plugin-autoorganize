@@ -1,8 +1,6 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
-using MediaBrowser.Model.Events;
 using MediaBrowser.Model.Querying;
 
 namespace Emby.AutoOrganize.Core
@@ -12,26 +10,6 @@ namespace Emby.AutoOrganize.Core
     /// </summary>
     public interface IFileOrganizationService
     {
-        /// <summary>
-        /// Occurs when a new <see cref="FileOrganizationResult"/> record has been created.
-        /// </summary>
-        event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemAdded;
-
-        /// <summary>
-        /// Occurs when a <see cref="FileOrganizationResult"/> record has been updated.
-        /// </summary>
-        event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemUpdated;
-
-        /// <summary>
-        /// Occurs when a <see cref="FileOrganizationResult"/> record has been deleted.
-        /// </summary>
-        event EventHandler<GenericEventArgs<FileOrganizationResult>> ItemRemoved;
-
-        /// <summary>
-        /// Occurs when multiple <see cref="FileOrganizationResult"/> records are deleted.
-        /// </summary>
-        event EventHandler LogReset;
-
         /// <summary>
         /// Processes the new files.
         /// </summary>
