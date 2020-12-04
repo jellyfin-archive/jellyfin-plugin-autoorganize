@@ -880,8 +880,8 @@ namespace Emby.AutoOrganize.Core
 
             var seasonFolderName = options.SeriesFolderPattern.
                 Replace("%sn", seriesName, StringComparison.Ordinal)
-                .Replace("%s.n", seriesName.Replace(" ", ".", StringComparison.Ordinal), StringComparison.Ordinal)
-                .Replace("%s_n", seriesName.Replace(" ", "_", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%s.n", seriesName.Replace(' ', '.'), StringComparison.Ordinal)
+                .Replace("%s_n", seriesName.Replace(' ', '_'), StringComparison.Ordinal)
                 .Replace("%sy", serieYear.ToString(), StringComparison.Ordinal)
                 .Replace("%fn", seriesFullName, StringComparison.Ordinal);
 
@@ -1016,8 +1016,8 @@ namespace Emby.AutoOrganize.Core
             }
 
             var result = pattern.Replace("%sn", seriesName, StringComparison.Ordinal)
-                .Replace("%s.n", seriesName.Replace(" ", ".", StringComparison.Ordinal), StringComparison.Ordinal)
-                .Replace("%s_n", seriesName.Replace(" ", "_", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%s.n", seriesName.Replace(' ', '.'), StringComparison.Ordinal)
+                .Replace("%s_n", seriesName.Replace(' ', '_'), StringComparison.Ordinal)
                 .Replace("%s", seasonNumber.ToString(_usCulture), StringComparison.Ordinal)
                 .Replace("%0s", seasonNumber.ToString("00", _usCulture), StringComparison.Ordinal)
                 .Replace("%00s", seasonNumber.ToString("000", _usCulture), StringComparison.Ordinal)

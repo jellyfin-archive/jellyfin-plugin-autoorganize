@@ -550,8 +550,8 @@ namespace Emby.AutoOrganize.Core
             }
 
             var result = pattern.Replace("%mn", movieName, StringComparison.Ordinal)
-                .Replace("%m.n", movieName.Replace(" ", ".", StringComparison.Ordinal), StringComparison.Ordinal)
-                .Replace("%m_n", movieName.Replace(" ", "_", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%m.n", movieName.Replace(' ', '.'), StringComparison.Ordinal)
+                .Replace("%m_n", movieName.Replace(' ', '_'), StringComparison.Ordinal)
                 .Replace("%my", productionYear.ToString(), StringComparison.Ordinal)
                 .Replace("%ext", sourceExtension, StringComparison.Ordinal)
                 .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath), StringComparison.Ordinal);

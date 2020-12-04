@@ -77,22 +77,22 @@ namespace Emby.AutoOrganize.Core
         {
             name = name.RemoveDiacritics();
 
-            name = " " + name + " ";
+            name = ' ' + name + ' ';
 
-            name = name.Replace(".", " ", StringComparison.Ordinal)
-                .Replace("_", " ", StringComparison.Ordinal)
+            name = name.Replace('.', ' ')
+                .Replace('_', ' ')
                 .Replace(" and ", " ", StringComparison.OrdinalIgnoreCase)
                 .Replace(".and.", " ", StringComparison.OrdinalIgnoreCase)
-                .Replace("&", " ", StringComparison.Ordinal)
-                .Replace("!", " ", StringComparison.Ordinal)
-                .Replace("(", " ", StringComparison.Ordinal)
-                .Replace(")", " ", StringComparison.Ordinal)
-                .Replace(":", " ", StringComparison.Ordinal)
-                .Replace(",", " ", StringComparison.Ordinal)
-                .Replace("-", " ", StringComparison.Ordinal)
-                .Replace("'", " ", StringComparison.Ordinal)
-                .Replace("[", " ", StringComparison.Ordinal)
-                .Replace("]", " ", StringComparison.Ordinal)
+                .Replace('&', ' ')
+                .Replace('!', ' ')
+                .Replace('(', ' ')
+                .Replace(')', ' ')
+                .Replace(':', ' ')
+                .Replace(',', ' ')
+                .Replace('-', ' ')
+                .Replace('\'', ' ')
+                .Replace('[', ' ')
+                .Replace(']', ' ')
                 .Replace(" a ", string.Empty, StringComparison.OrdinalIgnoreCase)
                 .Replace(" the ", string.Empty, StringComparison.OrdinalIgnoreCase)
                 .Replace(" ", string.Empty, StringComparison.Ordinal);
