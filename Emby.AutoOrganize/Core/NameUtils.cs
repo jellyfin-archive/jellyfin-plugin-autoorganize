@@ -81,8 +81,8 @@ namespace Emby.AutoOrganize.Core
 
             name = name.Replace(".", " ", StringComparison.Ordinal)
                 .Replace("_", " ", StringComparison.Ordinal)
-                .Replace(" and ", " ", StringComparison.Ordinal)
-                .Replace(".and.", " ", StringComparison.Ordinal)
+                .Replace(" and ", " ", StringComparison.OrdinalIgnoreCase)
+                .Replace(".and.", " ", StringComparison.OrdinalIgnoreCase)
                 .Replace("&", " ", StringComparison.Ordinal)
                 .Replace("!", " ", StringComparison.Ordinal)
                 .Replace("(", " ", StringComparison.Ordinal)
