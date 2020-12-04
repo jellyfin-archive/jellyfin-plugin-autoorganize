@@ -77,7 +77,7 @@ namespace Emby.AutoOrganize.Core
         {
             name = name.RemoveDiacritics();
 
-            name = ' ' + name + ' ';
+            name = " " + name + " ";
 
             name = name.Replace('.', ' ')
                 .Replace('_', ' ')
