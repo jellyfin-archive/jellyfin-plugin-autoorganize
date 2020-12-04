@@ -15,7 +15,6 @@ using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
-using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
@@ -880,11 +879,11 @@ namespace Emby.AutoOrganize.Core
             }
 
             var seasonFolderName = options.SeriesFolderPattern.
-                Replace("%sn", seriesName)
-                .Replace("%s.n", seriesName.Replace(" ", "."))
-                .Replace("%s_n", seriesName.Replace(" ", "_"))
-                .Replace("%sy", serieYear.ToString())
-                .Replace("%fn", seriesFullName);
+                Replace("%sn", seriesName, StringComparison.Ordinal)
+                .Replace("%s.n", seriesName.Replace(" ", ".", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%s_n", seriesName.Replace(" ", "_", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%sy", serieYear.ToString(), StringComparison.Ordinal)
+                .Replace("%fn", seriesFullName, StringComparison.Ordinal);
 
             return _fileSystem.GetValidFilename(seasonFolderName);
         }
@@ -971,9 +970,9 @@ namespace Emby.AutoOrganize.Core
             }
 
             var seasonFolderName = options.SeasonFolderPattern
-                .Replace("%s", seasonNumber.ToString(_usCulture))
-                .Replace("%0s", seasonNumber.ToString("00", _usCulture))
-                .Replace("%00s", seasonNumber.ToString("000", _usCulture));
+                .Replace("%s", seasonNumber.ToString(_usCulture), StringComparison.Ordinal)
+                .Replace("%0s", seasonNumber.ToString("00", _usCulture), StringComparison.Ordinal)
+                .Replace("%00s", seasonNumber.ToString("000", _usCulture), StringComparison.Ordinal);
 
             return Path.Combine(path, _fileSystem.GetValidFilename(seasonFolderName));
         }
@@ -1016,34 +1015,34 @@ namespace Emby.AutoOrganize.Core
                 throw new OrganizationException("GetEpisodeFileName: Configured episode name pattern is empty!");
             }
 
-            var result = pattern.Replace("%sn", seriesName)
-                .Replace("%s.n", seriesName.Replace(" ", "."))
-                .Replace("%s_n", seriesName.Replace(" ", "_"))
-                .Replace("%s", seasonNumber.ToString(_usCulture))
-                .Replace("%0s", seasonNumber.ToString("00", _usCulture))
-                .Replace("%00s", seasonNumber.ToString("000", _usCulture))
-                .Replace("%ext", sourceExtension)
-                .Replace("%en", "%#1")
-                .Replace("%e.n", "%#2")
-                .Replace("%e_n", "%#3")
-                .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath));
+            var result = pattern.Replace("%sn", seriesName, StringComparison.Ordinal)
+                .Replace("%s.n", seriesName.Replace(" ", ".", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%s_n", seriesName.Replace(" ", "_", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%s", seasonNumber.ToString(_usCulture), StringComparison.Ordinal)
+                .Replace("%0s", seasonNumber.ToString("00", _usCulture), StringComparison.Ordinal)
+                .Replace("%00s", seasonNumber.ToString("000", _usCulture), StringComparison.Ordinal)
+                .Replace("%ext", sourceExtension, StringComparison.Ordinal)
+                .Replace("%en", "%#1", StringComparison.Ordinal)
+                .Replace("%e.n", "%#2", StringComparison.Ordinal)
+                .Replace("%e_n", "%#3", StringComparison.Ordinal)
+                .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath), StringComparison.Ordinal);
 
             if (endingEpisodeNumber.HasValue)
             {
-                result = result.Replace("%ed", endingEpisodeNumber.Value.ToString(_usCulture))
-                .Replace("%0ed", endingEpisodeNumber.Value.ToString("00", _usCulture))
-                .Replace("%00ed", endingEpisodeNumber.Value.ToString("000", _usCulture));
+                result = result.Replace("%ed", endingEpisodeNumber.Value.ToString(_usCulture), StringComparison.Ordinal)
+                .Replace("%0ed", endingEpisodeNumber.Value.ToString("00", _usCulture), StringComparison.Ordinal)
+                .Replace("%00ed", endingEpisodeNumber.Value.ToString("000", _usCulture), StringComparison.Ordinal);
             }
 
-            result = result.Replace("%e", episodeNumber.ToString(_usCulture))
-                .Replace("%0e", episodeNumber.ToString("00", _usCulture))
-                .Replace("%00e", episodeNumber.ToString("000", _usCulture));
+            result = result.Replace("%e", episodeNumber.ToString(_usCulture), StringComparison.Ordinal)
+                .Replace("%0e", episodeNumber.ToString("00", _usCulture), StringComparison.Ordinal)
+                .Replace("%00e", episodeNumber.ToString("000", _usCulture), StringComparison.Ordinal);
 
-            if (result.Contains("%#"))
+            if (result.Contains("%#", StringComparison.Ordinal))
             {
-                result = result.Replace("%#1", episodeTitle)
-                    .Replace("%#2", episodeTitle.Replace(" ", "."))
-                    .Replace("%#3", episodeTitle.Replace(" ", "_"));
+                result = result.Replace("%#1", episodeTitle, StringComparison.Ordinal)
+                    .Replace("%#2", episodeTitle.Replace(' ', '.'), StringComparison.Ordinal)
+                    .Replace("%#3", episodeTitle.Replace(' ', '_'), StringComparison.Ordinal);
             }
 
             // Finally, call GetValidFilename again in case user customized the episode expression with any invalid filename characters

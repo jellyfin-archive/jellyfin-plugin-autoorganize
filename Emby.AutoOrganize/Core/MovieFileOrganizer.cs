@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -551,12 +549,12 @@ namespace Emby.AutoOrganize.Core
                 throw new OrganizationException("GetMovieFolder: Configured movie name pattern is empty!");
             }
 
-            var result = pattern.Replace("%mn", movieName)
-                .Replace("%m.n", movieName.Replace(" ", "."))
-                .Replace("%m_n", movieName.Replace(" ", "_"))
-                .Replace("%my", productionYear.ToString())
-                .Replace("%ext", sourceExtension)
-                .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath));
+            var result = pattern.Replace("%mn", movieName, StringComparison.Ordinal)
+                .Replace("%m.n", movieName.Replace(" ", ".", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%m_n", movieName.Replace(" ", "_", StringComparison.Ordinal), StringComparison.Ordinal)
+                .Replace("%my", productionYear.ToString(), StringComparison.Ordinal)
+                .Replace("%ext", sourceExtension, StringComparison.Ordinal)
+                .Replace("%fn", Path.GetFileNameWithoutExtension(sourcePath), StringComparison.Ordinal);
 
             // Finally, call GetValidFilename again in case user customized the movie expression with any invalid filename characters
             return _fileSystem.GetValidFilename(result).Trim();

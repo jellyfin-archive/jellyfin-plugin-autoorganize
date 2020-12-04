@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Threading;
 using Emby.AutoOrganize.Model;
 using MediaBrowser.Common.Configuration;

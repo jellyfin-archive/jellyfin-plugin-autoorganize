@@ -4,7 +4,6 @@
 #pragma warning disable SA1600 // Elements should be documented
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Emby.AutoOrganize.Data
