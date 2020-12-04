@@ -1,10 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Core;
 using Emby.AutoOrganize.Data;
-using Emby.AutoOrganize.Model;
-using Jellyfin.Data.Events;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
@@ -12,7 +9,6 @@ using MediaBrowser.Controller.Providers;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Serialization;
-using MediaBrowser.Model.Session;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -39,6 +35,15 @@ namespace Emby.AutoOrganize
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginEntryPoint"/> class.
         /// </summary>
+        /// <param name="sessionManager">Instance of the <see cref="ISessionManager"/> interface.</param>
+        /// <param name="taskManager">Instance of the <see cref="ITaskManager"/> interface.</param>
+        /// <param name="loggerFactory">Instance of the <see cref="ILoggerFactory"/> interface.</param>
+        /// <param name="libraryMonitor">Instance of the <see cref="ILibraryMonitor"/> interface.</param>
+        /// <param name="libraryManager">Instance of the <see cref="ILibraryManager"/> interface.</param>
+        /// <param name="config">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
+        /// <param name="fileSystem">Instance of the <see cref="IFileSystem"/> interface.</param>
+        /// <param name="providerManager">Instance of the <see cref="IProviderManager"/> interface.</param>
+        /// <param name="json">Instance of the <see cref="IJsonSerializer"/> interface.</param>
         public PluginEntryPoint(
             ISessionManager sessionManager,
             ITaskManager taskManager,
@@ -105,6 +110,7 @@ namespace Emby.AutoOrganize
             return repo;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             _taskManager?.Dispose();

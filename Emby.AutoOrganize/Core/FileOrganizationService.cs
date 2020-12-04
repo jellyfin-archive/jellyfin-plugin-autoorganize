@@ -180,7 +180,8 @@ namespace Emby.AutoOrganize.Core
                         .ConfigureAwait(false);
                     break;
                 case FileOrganizerType.Movie:
-                    var movieOrganizer = new MovieFileOrganizer(this,
+                    var movieOrganizer = new MovieFileOrganizer(
+                        this,
                         _fileSystem,
                         _loggerFactory.CreateLogger<MovieFileOrganizer>(),
                         _libraryManager,
@@ -239,7 +240,7 @@ namespace Emby.AutoOrganize.Core
                 _fileSystem,
                 _loggerFactory.CreateLogger<MovieFileOrganizer>(),
                 _libraryManager,
-                _libraryMonitor, 
+                _libraryMonitor,
                 _providerManager);
 
             var options = _config.GetAutoOrganizeOptions();

@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Extensions;
-using MediaBrowser.Model.Extensions;
 
 namespace Emby.AutoOrganize.Core
 {
@@ -28,7 +27,7 @@ namespace Emby.AutoOrganize.Core
             var seriesNameWithoutYear = itemName;
             if (itemProductionYear.HasValue)
             {
-                seriesNameWithoutYear = seriesNameWithoutYear.Replace(itemProductionYear.Value.ToString(UsCulture), string.Empty);
+                seriesNameWithoutYear = seriesNameWithoutYear.Replace(itemProductionYear.Value.ToString(UsCulture), string.Empty, StringComparison.Ordinal);
             }
 
             if (IsNameMatch(sortedName, seriesNameWithoutYear))
@@ -80,23 +79,23 @@ namespace Emby.AutoOrganize.Core
 
             name = " " + name + " ";
 
-            name = name.Replace(".", " ")
-            .Replace("_", " ")
-            .Replace(" and ", " ")
-            .Replace(".and.", " ")
-            .Replace("&", " ")
-            .Replace("!", " ")
-            .Replace("(", " ")
-            .Replace(")", " ")
-            .Replace(":", " ")
-            .Replace(",", " ")
-            .Replace("-", " ")
-            .Replace("'", " ")
-            .Replace("[", " ")
-            .Replace("]", " ")
-            .Replace(" a ", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace(" the ", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace(" ", string.Empty);
+            name = name.Replace('.', ' ')
+                .Replace('_', ' ')
+                .Replace(" and ", " ", StringComparison.OrdinalIgnoreCase)
+                .Replace(".and.", " ", StringComparison.OrdinalIgnoreCase)
+                .Replace('&', ' ')
+                .Replace('!', ' ')
+                .Replace('(', ' ')
+                .Replace(')', ' ')
+                .Replace(':', ' ')
+                .Replace(',', ' ')
+                .Replace('-', ' ')
+                .Replace('\'', ' ')
+                .Replace('[', ' ')
+                .Replace(']', ' ')
+                .Replace(" a ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace(" the ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace(" ", string.Empty, StringComparison.Ordinal);
 
             return name.Trim();
         }

@@ -119,7 +119,7 @@ namespace Emby.AutoOrganize.Core
                     _fileSystem,
                     _loggerFactory.CreateLogger<MovieFileOrganizer>(),
                     _libraryManager,
-                    _libraryMonitor, 
+                    _libraryMonitor,
                     _providerManager);
 
                 foreach (var file in eligibleFiles)
