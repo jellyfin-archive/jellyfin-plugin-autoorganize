@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using MediaBrowser.Model.Serialization;
@@ -182,6 +183,7 @@ namespace Emby.AutoOrganize.Data
             return result[index].ReadGuidFromBlob();
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1801:MustUseParameter", MessageId = "name", Justification = "Used only in debug.")]
         private static void ThrowInvalidParamName(string name)
         {
 #if DEBUG
