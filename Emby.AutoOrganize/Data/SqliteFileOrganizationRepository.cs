@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Emby.AutoOrganize.Model;
+using MediaBrowser.Common.Json;
 using MediaBrowser.Controller;
 using MediaBrowser.Model.Querying;
-using MediaBrowser.Model.Serialization;
 using Microsoft.Extensions.Logging;
 using SQLitePCL.pretty;
 
@@ -21,21 +22,17 @@ namespace Emby.AutoOrganize.Data
     public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository
     {
         private readonly CultureInfo _usCulture = new CultureInfo("en-US");
-        private readonly IJsonSerializer _jsonSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqliteFileOrganizationRepository"/> class.
         /// </summary>
         /// <param name="logger">The application logger.</param>
         /// <param name="appPaths">The server application paths.</param>
-        /// <param name="jsonSerializer">A JSON serializer.</param>
         public SqliteFileOrganizationRepository(
             ILogger<SqliteFileOrganizationRepository> logger,
-            IServerApplicationPaths appPaths,
-            IJsonSerializer jsonSerializer)
+            IServerApplicationPaths appPaths)
             : base(logger)
         {
-            _jsonSerializer = jsonSerializer;
             DbFilePath = Path.Combine(appPaths.DataPath, "fileorganization.db");
         }
 
@@ -359,7 +356,7 @@ namespace Emby.AutoOrganize.Data
                                 statement.TryBind("@ItemName", result.ItemName);
                                 statement.TryBind("@DisplayName", result.DisplayName);
                                 statement.TryBind("@OrganizerType", result.OrganizerType.ToString());
-                                statement.TryBind("@MatchStrings", _jsonSerializer.SerializeToString(result.MatchStrings));
+                                statement.TryBind("@MatchStrings", JsonSerializer.Serialize(result.MatchStrings, JsonDefaults.GetOptions()));
 
                                 statement.MoveNext();
                             }
@@ -532,7 +529,7 @@ namespace Emby.AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.MatchStrings.AddRange(_jsonSerializer.DeserializeFromString<List<string>>(reader[index].ToString()));
+                result.MatchStrings.AddRange(JsonSerializer.Deserialize<List<string>>(reader[index].ToString(), JsonDefaults.GetOptions()));
             }
 
             return result;

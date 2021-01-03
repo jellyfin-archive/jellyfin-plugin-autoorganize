@@ -116,27 +116,6 @@ namespace Emby.AutoOrganize.Data
                 DateTimeStyles.None).ToUniversalTime();
         }
 
-        /// <summary>
-        /// Serializes an object to JSON bytes.
-        /// </summary>
-        /// <param name="json">The JSON serializer to use.</param>
-        /// <param name="obj">The object to serialize.</param>
-        /// <returns>The serialized <see cref="byte"/> array.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="obj"/> is null.</exception>
-        public static byte[] SerializeToBytes(this IJsonSerializer json, object obj)
-        {
-            if (obj == null)
-            {
-                throw new ArgumentNullException(nameof(obj));
-            }
-
-            using (var stream = new MemoryStream())
-            {
-                json.SerializeToStream(obj, stream);
-                return stream.ToArray();
-            }
-        }
-
         public static void Attach(ManagedConnection db, string path, string alias)
         {
             var commandText = $"attach @path as {alias};";

@@ -28,7 +28,6 @@ namespace Emby.AutoOrganize
         private readonly IServerConfigurationManager _config;
         private readonly IFileSystem _fileSystem;
         private readonly IProviderManager _providerManager;
-        private readonly IJsonSerializer _json;
 
         private IFileOrganizationRepository _repository;
 
@@ -43,7 +42,6 @@ namespace Emby.AutoOrganize
         /// <param name="config">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
         /// <param name="fileSystem">Instance of the <see cref="IFileSystem"/> interface.</param>
         /// <param name="providerManager">Instance of the <see cref="IProviderManager"/> interface.</param>
-        /// <param name="json">Instance of the <see cref="IJsonSerializer"/> interface.</param>
         public PluginEntryPoint(
             ISessionManager sessionManager,
             ITaskManager taskManager,
@@ -52,8 +50,7 @@ namespace Emby.AutoOrganize
             ILibraryManager libraryManager,
             IServerConfigurationManager config,
             IFileSystem fileSystem,
-            IProviderManager providerManager,
-            IJsonSerializer json)
+            IProviderManager providerManager)
         {
             _sessionManager = sessionManager;
             _taskManager = taskManager;
@@ -64,7 +61,6 @@ namespace Emby.AutoOrganize
             _config = config;
             _fileSystem = fileSystem;
             _providerManager = providerManager;
-            _json = json;
         }
 
         /// <summary>
@@ -102,8 +98,7 @@ namespace Emby.AutoOrganize
         {
             var repo = new SqliteFileOrganizationRepository(
                 _loggerFactory.CreateLogger<SqliteFileOrganizationRepository>(),
-                _config.ApplicationPaths,
-                _json);
+                _config.ApplicationPaths);
 
             repo.Initialize();
 
