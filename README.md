@@ -17,7 +17,12 @@
 </p>
 
 ## About
+
 Jellyfin AutoOrganize plugin is a plugin to automatically organize your media
+
+## Installation
+
+[See the official documentation for install instructions](https://jellyfin.org/docs/general/server/plugins/index.html#installing).
 
 ## Build
 
