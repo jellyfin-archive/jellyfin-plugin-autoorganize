@@ -146,21 +146,19 @@
 
         var message = 'The following file will be deleted:' + '<br/><br/>' + item.OriginalPath + '<br/><br/>' + 'Are you sure you wish to proceed?';
 
-        require(['confirm'], function (confirm) {
 
-            confirm(message, 'Delete File').then(function () {
+        Dashboard.confirm(message, 'Delete File').then(function () {
 
-                loading.show();
+                Loading.show();
 
                 ApiClient.deleteOriginalFileFromOrganizationResult(id).then(function () {
 
-                    loading.hide();
+                    Loading.hide();
 
                     reloadItems(page, true);
 
                 }, Dashboard.processErrorResponse);
             });
-        });
     }
 
     function organizeFileWithCorrections(page, item) {
@@ -170,7 +168,11 @@
 
     function showCorrectionPopup(page, item) {
 
-        require([Dashboard.getConfigurationResourceUrl('FileOrganizerJs')], function (fileorganizer) {
+        import(
+            window.ApiClient.getUrl('web/ConfigurationPage', {
+                name: 'FileOrganizerJs'
+            })
+        ).then((fileorganizer) => {
 
             fileorganizer.show(item).then(function () {
                 reloadItems(page, false);
@@ -202,27 +204,25 @@
 
         message += '<br/><br/>' + 'Are you sure you wish to proceed?';
 
-        require(['confirm'], function (confirm) {
 
-            confirm(message, 'Organize File').then(function () {
+        Dashboard.confirm(message, 'Organize File').then(function () {
 
-                loading.show();
+                Loading.show();
 
                 ApiClient.performOrganization(id).then(function () {
 
-                    loading.hide();
+                    Loading.hide();
 
                     reloadItems(page, true);
 
                 }, Dashboard.processErrorResponse);
             });
-        });
     }
 
     function reloadItems(page, showSpinner) {
 
         if (showSpinner) {
-            loading.show();
+            Loading.show();
         }
 
         ApiClient.getFileOrganizationResults(query).then(function (result) {
@@ -230,7 +230,7 @@
             currentResult = result;
             renderResults(page, result);
 
-            loading.hide();
+            Loading.hide();
         }, Dashboard.processErrorResponse);
     }
 
@@ -391,8 +391,8 @@
         html += '</td>';
 
         html += '<td class="detailTableBodyCell" data-title="Date">';
-        var date = datetime.parseISO8601Date(item.Date, true);
-        html += datetime.toLocaleDateString(date);
+        var date = Dashboard.datetime.parseISO8601Date(item.Date, true);
+        html += Dashboard.datetime.toLocaleDateString(date);
         html += '</td>';
 
         html += '<td data-title="Source" class="detailTableBodyCell fileCell">';
@@ -492,19 +492,19 @@
     function getTabs() {
         return [
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
+                href: Dashboard.getPluginUrl('AutoOrganizeLog'),
                 name: 'Activity Log'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
+                href: Dashboard.getPluginUrl('AutoOrganizeTv'),
                 name: 'TV'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeMovie'),
+                href: Dashboard.getPluginUrl('AutoOrganizeMovie'),
                 name: 'Movie'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
+                href: Dashboard.getPluginUrl('AutoOrganizeSmart'),
                 name: 'Smart Matches'
             }];
     }
@@ -531,15 +531,15 @@
 
         view.addEventListener('viewshow', function (e) {
 
-            libraryMenu.setTabs('autoorganize', 0, getTabs);
+            LibraryMenu.setTabs('autoorganize', 0, getTabs);
 
             reloadItems(view, true);
 
-            events.on(serverNotifications, 'AutoOrganize_LogReset', onServerEvent);
-            events.on(serverNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
-            events.on(serverNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
-            events.on(serverNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
-            events.on(serverNotifications, 'ScheduledTaskEnded', onServerEvent);
+            Dashboard.Events.on(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
+            Dashboard.Events.on(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
+            Dashboard.Events.on(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
+            Dashboard.Events.on(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
+            Dashboard.Events.on(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
             // on here
             taskButton({
@@ -555,11 +555,11 @@
 
             currentResult = null;
 
-            events.off(serverNotifications, 'AutoOrganize_LogReset', onServerEvent);
-            events.off(serverNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
-            events.off(serverNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
-            events.off(serverNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
-            events.off(serverNotifications, 'ScheduledTaskEnded', onServerEvent);
+            Dashboard.Events.off(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
+            Dashboard.Events.off(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
+            Dashboard.Events.off(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
+            Dashboard.Events.off(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
+            Dashboard.Events.off(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
             // off here
             taskButton({

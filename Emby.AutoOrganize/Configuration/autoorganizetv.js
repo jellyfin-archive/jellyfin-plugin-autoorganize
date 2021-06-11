@@ -205,32 +205,30 @@
 
     function onApiFailure(e) {
 
-        loading.hide();
+        Loading.hide();
 
-        require(['alert'], function (alert) {
-            alert({
+        Dashboard.alert({
                 title: 'Error',
                 text: 'Error: ' + e.headers.get("X-Application-Error-Code")
             });
-        });
     }
 
     function getTabs() {
         return [
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
+                href: Dashboard.getPluginUrl('AutoOrganizeLog'),
                 name: 'Activity Log'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
+                href: Dashboard.getPluginUrl('AutoOrganizeTv'),
                 name: 'TV'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeMovie'),
+                href: Dashboard.getPluginUrl('AutoOrganizeMovie'),
                 name: 'Movie'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
+                href: Dashboard.getPluginUrl('AutoOrganizeSmart'),
                 name: 'Smart Matches'
             }];
     }
@@ -279,9 +277,8 @@
 
         function selectWatchFolder(e) {
 
-            require(['directorybrowser'], function (directoryBrowser) {
 
-                var picker = new directoryBrowser();
+            var picker = new Dashboard.DirectoryBrowser();
 
                 picker.show({
 
@@ -296,7 +293,6 @@
                     header: 'Select Watch Folder',
                     validateWriteable: true
                 });
-            });
         }
 
         function toggleSeriesLocation() {

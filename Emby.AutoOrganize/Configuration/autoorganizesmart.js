@@ -114,7 +114,7 @@
 
     function reloadList(page) {
 
-        loading.show();
+        Loading.show();
 
         ApiClient.getSmartMatchInfos(query).then(function (infos) {
 
@@ -122,11 +122,11 @@
 
             populateList(page, infos);
 
-            loading.hide();
+            Loading.hide();
 
         }, function () {
 
-            loading.hide();
+            Loading.hide();
         });
     }
 
@@ -214,19 +214,19 @@
     function getTabs() {
         return [
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeLog'),
+                href: Dashboard.getPluginUrl('AutoOrganizeLog'),
                 name: 'Activity Log'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeTv'),
+                href: Dashboard.getPluginUrl('AutoOrganizeTv'),
                 name: 'TV'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeMovie'),
+                href: Dashboard.getPluginUrl('AutoOrganizeMovie'),
                 name: 'Movie'
             },
             {
-                href: Dashboard.getConfigurationPageUrl('AutoOrganizeSmart'),
+                href: Dashboard.getPluginUrl('AutoOrganizeSmart'),
                 name: 'Smart Matches'
             }];
     }
@@ -263,8 +263,8 @@
 
         view.addEventListener('viewshow', function (e) {
 
-            libraryMenu.setTabs('autoorganize', 3, getTabs);
-            loading.show();
+            LibraryMenu.setTabs('autoorganize', 3, getTabs);
+            Loading.show();
 
             reloadList(view);
         });

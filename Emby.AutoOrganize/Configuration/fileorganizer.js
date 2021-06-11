@@ -100,17 +100,15 @@
 
     function onApiFailure(e) {
 
-        loading.hide();
+        Loading.hide();
 
-        require(['alert'], function (alert) {
             // Get message from server or display a default message
             var message =
                 e.headers.get("X-Application-Error-Code") ||
                 "Server returned status code " + e.status + " (" + e.statusText + ") but did not provide a more specific error message.";
 
             // Show the error using an alert dialog
-            alert({ title: 'Error', text: 'Error: ' + message });
-        });
+            Dashboard.alert({ title: 'Error', text: 'Error: ' + message });
     }
 
     function initBaseForm(context, item) {
@@ -133,7 +131,7 @@
 
     function populateMedias(context) {
 
-        loading.show();
+        Loading.show();
         ApiClient.getItems(ApiClient.getCurrentUserId(), {
             recursive: true,
             includeItemTypes: chosenType,
@@ -141,7 +139,7 @@
 
         }).then(function (result) {
 
-            loading.hide();
+            Loading.hide();
 
             existingMediasHtml = result.Items.map(function (s) {
 
@@ -216,7 +214,7 @@
 
     function submitMediaForm(dlg) {
 
-        loading.show();
+        Loading.show();
 
         var resultId = dlg.querySelector('#hfResultId').value;
         var mediaId = dlg.querySelector('#selectMedias').value;
@@ -250,10 +248,10 @@
 
             ApiClient.performEpisodeOrganization(resultId, options).then(function () {
 
-                loading.hide();
+                Loading.hide();
 
                 dlg.submitted = true;
-                dialogHelper.close(dlg);
+                Dashboard.dialogHelper.close(dlg);
 
             }, onApiFailure);
         } else if (chosenType == 'Movie') {
@@ -268,10 +266,10 @@
 
             ApiClient.performMovieOrganization(resultId, options).then(function () {
 
-                loading.hide();
+                Loading.hide();
 
                 dlg.submitted = true;
-                dialogHelper.close(dlg);
+                Dashboard.dialogHelper.close(dlg);
 
             }, onApiFailure);
         }
@@ -283,18 +281,15 @@
 
         if (mediasLocationsCount == 0) {
 
-            require(['alert'], function (alert) {
-                alert({
+            Dashboard.alert({
                     title: 'Error',
                     text: 'No TV libraries are configured in Jellyfin library setup.'
                 });
-            });
             return;
         }
 
-        require(['itemIdentifier'], function (itemIdentifier) {
 
-            itemIdentifier.showFindNew(extractedName, extractedYear, chosenType, ApiClient.serverId()).then(function (newItem) {
+            Dashboard.itemIdentifier.showFindNew(extractedName, extractedYear, chosenType, ApiClient.serverId()).then(function (newItem) {
 
                 if (newItem != null) {
                     currentNewItem = newItem;
@@ -304,7 +299,6 @@
                     selectedMediasChanged(dlg);
                 }
             });
-        });
     }
 
     function selectedMediasChanged(dlg) {
@@ -370,13 +364,14 @@
                 currentNewItem = null;
                 existingMediasHtml = null;
 
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', Dashboard.getConfigurationResourceUrl('FileOrganizerHtml'), true);
+                import(
+                    ApiClient.getUrl('web/ConfigurationPage', {
+                        name: 'FileOrganizerHtml'
+                    })
+                ).then((template) => {
 
-                xhr.onload = function (e) {
 
-                    var template = this.response;
-                    var dlg = dialogHelper.createDialog({
+                    var dlg = Dashboard.dialogHelper.createDialog({
                         removeOnClose: true,
                         size: 'small'
                     });
@@ -406,7 +401,7 @@
 
                     dlg.querySelector('.btnCancel').addEventListener('click', function (e) {
 
-                        dialogHelper.close(dlg);
+                        Dashboard.dialogHelper.close(dlg);
                     });
 
                     dlg.querySelector('form').addEventListener('submit', function (e) {
@@ -438,10 +433,8 @@
                     selectedMediaTypeChanged(dlg, item);
 
                     // Show dialog
-                    dialogHelper.open(dlg);
-                };
+                    Dashboard.dialogHelper.open(dlg);
 
-                xhr.send();
             });
         }
     };
