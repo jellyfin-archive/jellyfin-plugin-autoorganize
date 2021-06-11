@@ -1,6 +1,6 @@
 
 ApiClient.getFileOrganizationResults = function (options) {
-    const url = this.getUrl('Library/FileOrganization', options || {});
+    const url = this.getUrl('Library/FileOrganizations', options || {});
 
     return this.getJSON(url);
 };
