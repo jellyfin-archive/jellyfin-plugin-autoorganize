@@ -487,7 +487,7 @@ export default function (view, params) {
         Dashboard.Events.on(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
         // on here
-        taskButton({
+        TaskButton({
             mode: 'on',
             progressElem: view.querySelector('.organizeProgress'),
             panel: view.querySelector('.organizeTaskPanel'),
@@ -506,7 +506,7 @@ export default function (view, params) {
         Dashboard.Events.off(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
         // off here
-        taskButton({
+        TaskButton({
             mode: 'off',
             button: view.querySelector('.btnOrganize')
         });
