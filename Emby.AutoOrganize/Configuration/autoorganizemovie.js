@@ -1,5 +1,4 @@
-﻿define(['libraryMenu', 'emby-input', 'emby-select', 'emby-checkbox', 'emby-button', 'emby-collapse'], function (libraryMenu) {
-    'use strict';
+﻿
 
     ApiClient.getFileOrganizationResults = function (options) {
 
@@ -357,4 +356,3 @@
             });
         });
     };
-});

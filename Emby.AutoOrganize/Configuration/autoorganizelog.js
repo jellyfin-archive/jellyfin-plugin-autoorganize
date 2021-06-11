@@ -1,5 +1,4 @@
-﻿define(['globalize', 'serverNotifications', 'events', 'scripts/taskbutton', 'datetime', 'loading', 'libraryMenu', 'paper-icon-button-light', 'emby-button', 'detailtablecss'], function (globalize, serverNotifications, events, taskButton, datetime, loading, libraryMenu) {
-    'use strict';
+﻿
 
     ApiClient.getFileOrganizationResults = function (options) {
 
@@ -510,7 +509,7 @@
             }];
     }
 
-    return function (view, params) {
+    export default function (view, params) {
 
         pageGlobal = view;
 
@@ -569,4 +568,3 @@
             });
         });
     };
-});

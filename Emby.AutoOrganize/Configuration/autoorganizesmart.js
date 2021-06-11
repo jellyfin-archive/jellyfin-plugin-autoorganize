@@ -1,5 +1,4 @@
-﻿define(['loading', 'libraryMenu', 'listViewStyle'], function (loading, libraryMenu) {
-    'use strict';
+﻿
 
     ApiClient.getFileOrganizationResults = function (options) {
 
@@ -232,7 +231,7 @@
             }];
     }
 
-    return function (view, params) {
+    export default function (view, params) {
 
         var self = this;
 
@@ -275,4 +274,3 @@
             currentResult = null;
         });
     };
-});

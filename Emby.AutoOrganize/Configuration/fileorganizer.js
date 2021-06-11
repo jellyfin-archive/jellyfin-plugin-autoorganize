@@ -1,5 +1,4 @@
-define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button', 'emby-select', 'paper-icon-button-light', 'formDialogStyle'], function (dialogHelper, loading) {
-    'use strict';
+
 
     ApiClient.getFileOrganizationResults = function (options) {
 
@@ -168,10 +167,10 @@ define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button',
                             display: virtualFolder.Name + ': ' + virtualFolder.Locations[i]
                         };
 
-                        if ((chosenType == 'Movie' && virtualFolder.CollectionType == 'movies') || 
+                        if ((chosenType == 'Movie' && virtualFolder.CollectionType == 'movies') ||
                             (chosenType == 'Series' && virtualFolder.CollectionType == 'tvshows')) {
                             mediasLocations.push(location);
-                        } 
+                        }
                     }
                 }
 
@@ -362,7 +361,7 @@ define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button',
         }
     }
 
-    return {
+    export default {
         show: function (item) {
             return new Promise(function (resolve, reject) {
 
@@ -446,4 +445,3 @@ define(['dialogHelper', 'loading', 'emby-checkbox', 'emby-input', 'emby-button',
             });
         }
     };
-});
