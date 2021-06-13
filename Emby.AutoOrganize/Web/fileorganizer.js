@@ -211,7 +211,7 @@ function submitMediaForm(dlg) {
     }
 
     if (chosenType == 'Series') {
-        var options = {
+        const options = {
 
             SeriesId: mediaId,
             SeasonNumber: dlg.querySelector('#txtSeason').value,
@@ -231,7 +231,7 @@ function submitMediaForm(dlg) {
             Dashboard.dialogHelper.close(dlg);
         }, onApiFailure);
     } else if (chosenType == 'Movie') {
-        var options = {
+        const options = {
 
             MovieId: mediaId,
             NewMovieProviderIds: newProviderIds,
@@ -322,76 +322,70 @@ function selectedMediaTypeChanged(dlg, item) {
 }
 
 export default {
-    show: function (item) {
-        return new Promise(function (resolve, reject) {
-            extractedName = null;
-            extractedYear = null;
-            currentNewItem = null;
-            existingMediasHtml = null;
+    show: async function (item) {
+        extractedName = null;
+        extractedYear = null;
+        currentNewItem = null;
+        existingMediasHtml = null;
 
-            import(
-                ApiClient.getUrl('web/ConfigurationPage', {
-                    name: 'FileOrganizerHtml'
-                })
-            ).then((template) => {
-                const dlg = Dashboard.dialogHelper.createDialog({
-                    removeOnClose: true,
-                    size: 'small'
-                });
-
-                dlg.classList.add('ui-body-a');
-                dlg.classList.add('background-theme-a');
-
-                dlg.classList.add('formDialog');
-
-                let html = '';
-
-                html += template;
-
-                dlg.innerHTML = html;
-
-                dlg.querySelector('.formDialogHeaderTitle').innerHTML = 'Organize';
-
-                // Add event listeners to dialog
-                dlg.addEventListener('close', function () {
-                    if (dlg.submitted) {
-                        resolve();
-                    } else {
-                        reject();
-                    }
-                });
-
-                dlg.querySelector('.btnCancel').addEventListener('click', function (e) {
-                    Dashboard.dialogHelper.close(dlg);
-                });
-
-                dlg.querySelector('form').addEventListener('submit', function (e) {
-                    submitMediaForm(dlg);
-
-                    e.preventDefault();
-                    return false;
-                });
-
-                dlg.querySelector('#btnNewMedia').addEventListener('click', function (e) {
-                    showNewMediaDialog(dlg);
-                });
-
-                dlg.querySelector('#selectMedias').addEventListener('change', function (e) {
-                    selectedMediasChanged(dlg);
-                });
-
-                dlg.querySelector('#selectMediaType').addEventListener('change', function (e) {
-                    selectedMediaTypeChanged(dlg, item);
-                });
-
-                dlg.querySelector('#selectMediaType').value = item.Type;
-
-                // Init media type
-                selectedMediaTypeChanged(dlg, item);
-
-                // Show dialog
-                Dashboard.dialogHelper.open(dlg);
-            });
+        const response = await fetch(Dashboard.getConfigurationResourceUrl('FileOrganizerHtml'));
+        const template = await response.text();
+        const dlg = Dashboard.dialogHelper.createDialog({
+            removeOnClose: true,
+            size: 'small'
         });
+
+        dlg.classList.add('ui-body-a');
+        dlg.classList.add('background-theme-a');
+
+        dlg.classList.add('formDialog');
+
+        let html = '';
+
+        html += template;
+
+        dlg.innerHTML = html;
+
+        dlg.querySelector('.formDialogHeaderTitle').innerHTML = 'Organize';
+
+        // Add event listeners to dialog
+        dlg.addEventListener('close', function () {
+            if (dlg.submitted) {
+                return;
+            } else {
+                return;
+            }
+        });
+
+        dlg.querySelector('.btnCancel').addEventListener('click', function (e) {
+            Dashboard.dialogHelper.close(dlg);
+        });
+
+        dlg.querySelector('form').addEventListener('submit', function (e) {
+            submitMediaForm(dlg);
+
+            e.preventDefault();
+            return false;
+        });
+
+        dlg.querySelector('#btnNewMedia').addEventListener('click', function (e) {
+            showNewMediaDialog(dlg);
+        });
+
+        dlg.querySelector('#selectMedias').addEventListener('change', function (e) {
+            selectedMediasChanged(dlg);
+        });
+
+        dlg.querySelector('#selectMediaType').addEventListener('change', function (e) {
+            selectedMediaTypeChanged(dlg, item);
+        });
+
+        dlg.querySelector('#selectMediaType').value = item.Type;
+
+        // Init media type
+        selectedMediaTypeChanged(dlg, item);
+
+        // Show dialog
+        Dashboard.dialogHelper.open(dlg);
     }
 };
