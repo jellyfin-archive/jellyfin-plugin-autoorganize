@@ -147,11 +147,7 @@ function organizeFileWithCorrections(page, item) {
 }
 
 function showCorrectionPopup(page, item) {
-    import(
-        window.ApiClient.getUrl('web/ConfigurationPage', {
-            name: 'FileOrganizerJs'
-        })
-    ).then((fileorganizer) => {
+    import(Dashboard.getConfigurationResourceUrl('FileOrganizerJs')).then(({default: fileorganizer}) => {
         fileorganizer.show(item).then(function () {
             reloadItems(page, false);
         },
