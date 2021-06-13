@@ -40,53 +40,53 @@ namespace Emby.AutoOrganize
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeLog",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizelog.html",
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizelog.html",
                     EnableInMainMenu = true
                 },
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeSmart",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizesmart.html"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizesmart.html"
                 },
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeTv",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizetv.html"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizetv.html"
                 },
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeMovie",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizemovie.html"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizemovie.html"
                 },
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeLogJs",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizelog.js"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizelog.js"
                 },
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeSmartJs",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizesmart.js"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizesmart.js"
                 },
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeTvJs",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizetv.js"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizetv.js"
                 },
                 new PluginPageInfo
                 {
                     Name = "AutoOrganizeMovieJs",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.autoorganizemovie.js"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.autoorganizemovie.js"
                 },
                 new PluginPageInfo
                 {
                     Name = "FileOrganizerJs",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.fileorganizer.js"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.fileorganizer.js"
                 },
                 new PluginPageInfo
                 {
                     Name = "FileOrganizerHtml",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.fileorganizer.template.html"
+                    EmbeddedResourcePath = GetType().Namespace + ".Web.fileorganizer.template.html"
                 }
             };
         }
