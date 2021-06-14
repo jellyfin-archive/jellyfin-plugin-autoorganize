@@ -219,7 +219,7 @@ function getStatusText(item, enhance) {
 
     if (enhance) {
         if (item.StatusMessage) {
-            return '<a style="color:' + color + ';" data-resultid="' + item.Id + '" is="emby-button" href="#" class="button-link btnShowStatusMessage">' + status + '</a>';
+            return '<a style="color:' + color + ';" data-resultid="' + item.Id + '" is="emby-linkbutton" href="#" class="button-link btnShowStatusMessage">' + status + '</a>';
         } else {
             return '<span data-resultid="' + item.Id + '" style="color:' + color + ';">' + status + '</span>';
         }
@@ -362,11 +362,11 @@ function renderItemRow(item) {
         html += item.OriginalFileName;
         html += '</span>';
     } else if (status === 'SkippedExisting') {
-        html += '<a is="emby-button" data-resultid="' + item.Id + '" style="color:blue;" href="#" class="button-link btnShowStatusMessage">';
+        html += '<a is="emby-linkbutton" data-resultid="' + item.Id + '" style="color:blue;" href="#" class="button-link btnShowStatusMessage">';
         html += item.OriginalFileName;
         html += '</a>';
     } else if (status === 'Failure') {
-        html += '<a is="emby-button" data-resultid="' + item.Id + '" style="color:red;" href="#" class="button-link btnShowStatusMessage">';
+        html += '<a is="emby-linkbutton" data-resultid="' + item.Id + '" style="color:red;" href="#" class="button-link btnShowStatusMessage">';
         html += item.OriginalFileName;
         html += '</a>';
     } else {
