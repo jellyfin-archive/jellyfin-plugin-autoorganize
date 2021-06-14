@@ -476,11 +476,11 @@ export default function (view, params) {
 
         reloadItems(view, true);
 
-        Dashboard.Events.on(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
-        Dashboard.Events.on(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
-        Dashboard.Events.on(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
-        Dashboard.Events.on(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
-        Dashboard.Events.on(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
+        events.on(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
+        events.on(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
+        events.on(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
+        events.on(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
+        events.on(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
         // on here
         TaskButton({
@@ -495,11 +495,11 @@ export default function (view, params) {
     view.addEventListener('viewhide', function (e) {
         currentResult = null;
 
-        Dashboard.Events.off(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
-        Dashboard.Events.off(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
-        Dashboard.Events.off(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
-        Dashboard.Events.off(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
-        Dashboard.Events.off(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
+        events.off(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
+        events.off(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
+        events.off(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
+        events.off(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
+        events.off(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
         // off here
         TaskButton({
