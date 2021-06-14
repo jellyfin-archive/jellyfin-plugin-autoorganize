@@ -41,56 +41,6 @@ ApiClient.performOrganization = function (id) {
     });
 };
 
-ApiClient.performEpisodeOrganization = function (id, options) {
-    const url = this.getUrl('Library/FileOrganizations/' + id + '/Episode/Organize');
-
-    return this.ajax({
-        type: 'POST',
-        url: url,
-        data: JSON.stringify(options),
-        contentType: 'application/json'
-    });
-};
-
-ApiClient.performMovieOrganization = function (id, options) {
-    const url = this.getUrl('Library/FileOrganizations/' + id + '/Movie/Organize');
-
-    return this.ajax({
-        type: 'POST',
-        url: url,
-        data: JSON.stringify(options),
-        contentType: 'application/json'
-    });
-};
-
-ApiClient.getSmartMatchInfos = function (options) {
-    options = options || {};
-
-    const url = this.getUrl('Library/FileOrganizations/SmartMatches', options);
-
-    return this.ajax({
-        type: 'GET',
-        url: url,
-        dataType: 'json'
-    });
-};
-
-ApiClient.deleteSmartMatchEntries = function (entries) {
-    const url = this.getUrl('Library/FileOrganizations/SmartMatches/Delete');
-
-    const postData = {
-        Entries: entries
-    };
-
-    return this.ajax({
-
-        type: 'POST',
-        url: url,
-        data: JSON.stringify(postData),
-        contentType: 'application/json'
-    });
-};
-
 const query = {
 
     StartIndex: 0,

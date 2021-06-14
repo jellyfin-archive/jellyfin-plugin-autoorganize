@@ -1,37 +1,3 @@
-
-ApiClient.getFileOrganizationResults = function (options) {
-    const url = this.getUrl('Library/FileOrganizations', options || {});
-
-    return this.getJSON(url);
-};
-
-ApiClient.deleteOriginalFileFromOrganizationResult = function (id) {
-    const url = this.getUrl('Library/FileOrganizations/' + id + '/File');
-
-    return this.ajax({
-        type: 'DELETE',
-        url: url
-    });
-};
-
-ApiClient.clearOrganizationLog = function () {
-    const url = this.getUrl('Library/FileOrganizations');
-
-    return this.ajax({
-        type: 'DELETE',
-        url: url
-    });
-};
-
-ApiClient.performOrganization = function (id) {
-    const url = this.getUrl('Library/FileOrganizations/' + id + '/Organize');
-
-    return this.ajax({
-        type: 'POST',
-        url: url
-    });
-};
-
 ApiClient.performEpisodeOrganization = function (id, options) {
     const url = this.getUrl('Library/FileOrganizations/' + id + '/Episode/Organize');
 
@@ -50,34 +16,6 @@ ApiClient.performMovieOrganization = function (id, options) {
         type: 'POST',
         url: url,
         data: JSON.stringify(options),
-        contentType: 'application/json'
-    });
-};
-
-ApiClient.getSmartMatchInfos = function (options) {
-    options = options || {};
-
-    const url = this.getUrl('Library/FileOrganizations/SmartMatches', options);
-
-    return this.ajax({
-        type: 'GET',
-        url: url,
-        dataType: 'json'
-    });
-};
-
-ApiClient.deleteSmartMatchEntries = function (entries) {
-    const url = this.getUrl('Library/FileOrganizations/SmartMatches/Delete');
-
-    const postData = {
-        Entries: entries
-    };
-
-    return this.ajax({
-
-        type: 'POST',
-        url: url,
-        data: JSON.stringify(postData),
         contentType: 'application/json'
     });
 };
