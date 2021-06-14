@@ -1,21 +1,25 @@
-﻿<div id="libraryFileOrganizerLogPage" data-role="page" class="page type-interior libraryFileOrganizerLogPage pluginConfigurationPage withTabs fullWidthContent" data-helpurl="https://github.com/MediaBrowser/Wiki/wiki/Auto-Organize" data-controller="__plugin/AutoOrganizeLogJs">
+﻿<div id="libraryFileOrganizerLogPage" data-role="page" class="page type-interior libraryFileOrganizerLogPage pluginConfigurationPage withTabs fullWidthContent" data-controller="__plugin/AutoOrganizeLogJs">
 
     <div>
         <div class="content-primary">
 
             <div>
-                <div style="text-align: right;" class="organizeTaskPanel hide">
+                <div class="organizeTaskPanel padded-top padded-bottom hide">
                     <button is="emby-button" type="button" class="btnClearCompleted raised button-cancel">
-                        <i class="material-icons clear_all"></i><span>Clear Completed</span>
+                        <span class="material-icons clear_all" style="margin-right: .5em;"></span>
+                        <span>Clear Completed</span>
                     </button>
                     <button is="emby-button" type="button" class="btnClearLog raised button-cancel">
-                        <i class="material-icons clear_all"></i><span>Clear All</span>
+                        <span class="material-icons clear_all" style="margin-right: .5em;"></span>
+                        <span>Clear All</span>
                     </button>
-                    <button is="emby-button" type="button" class="btnOrganize raised button-cancel"><i class="material-icons check"></i><span>Organize</span></button>
+                    <button is="emby-button" type="button" class="btnOrganize raised button-cancel">
+                        <span class="material-icons play_arrow" style="margin-right: .5em;"></span>
+                        <span>Organize</span>
+                    </button>
                     <progress max="100" min="0" style="width: 100px;" class="organizeProgress"></progress>
                 </div>
-                <div class="listTopPaging">
-                </div>
+                <div class="listTopPaging"></div>
 
                 <div class="autoorganizetable">
                     <table class="tblOrganizationResults table detailTable" style="width:100%;">
@@ -40,8 +44,7 @@
                     <div style="display: inline-block; height: 10px; width: 10px; background: blue; margin-left: 1em; margin-right: 1px;"></div>
                     <span>Skipped</span>
                 </div>
-                <div class="listBottomPaging">
-                </div>
+                <div class="listBottomPaging"></div>
             </div>
         </div>
     </div>

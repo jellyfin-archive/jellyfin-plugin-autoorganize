@@ -130,7 +130,7 @@ function getHtmlFromMatchStrings(info, i) {
 
         matchStringHtml += '</div>';
 
-        matchStringHtml += '<button type="button" is="emby-button" class="btnDeleteMatchEntry" style="padding: 0;" data-index="' + i + '" data-matchindex="' + matchStringIndex + '" title="Delete"><i class="material-icons delete"></i></button>';
+        matchStringHtml += '<button type="button" is="emby-button" class="btnDeleteMatchEntry" style="padding: 0;" data-index="' + i + '" data-matchindex="' + matchStringIndex + '" title="Delete"><span class="material-icons delete"></span></button>';
 
         matchStringHtml += '</div>';
         matchStringIndex++;
@@ -171,7 +171,7 @@ function populateList(page, result) {
         html += '<div class="listItem">';
 
         html += '<div class="listItemIconContainer">';
-        html += '<i class="listItemIcon material-icons folder"></i>';
+        html += '<span class="listItemIcon material-icons folder"></span>';
         html += '</div>';
 
         html += '<div class="listItemBody">';

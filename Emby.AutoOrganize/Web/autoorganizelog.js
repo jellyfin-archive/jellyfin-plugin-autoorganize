@@ -206,9 +206,10 @@ function getStatusText(item, enhance) {
     let color = null;
 
     if (status === 'SkippedExisting') {
+        color = 'blue';
         status = 'Skipped';
     } else if (status === 'Failure') {
-        color = '#cc0000';
+        color = 'red';
         status = 'Failed';
     }
     if (status === 'Success') {
@@ -250,8 +251,8 @@ function getQueryPagingHtml(options) {
 
         html += '<div style="display:inline-block;">';
 
-        html += '<button is="paper-icon-button-light" class="btnPreviousPage autoSize" ' + (startIndex ? '' : 'disabled') + '><i class="material-icons arrow_back"></i></button>';
-        html += '<button is="paper-icon-button-light" class="btnNextPage autoSize" ' + (startIndex + limit >= totalRecordCount ? 'disabled' : '') + '><i class="material-icons arrow_forward"></i></button>';
+        html += '<button is="paper-icon-button-light" class="btnPreviousPage autoSize" ' + (startIndex ? '' : 'disabled') + '><span class="material-icons arrow_back"></span></button>';
+        html += '<button is="paper-icon-button-light" class="btnNextPage autoSize" ' + (startIndex + limit >= totalRecordCount ? 'disabled' : '') + '><span class="material-icons arrow_forward"></span></button>';
 
         html += '</div>';
     }
@@ -382,8 +383,8 @@ function renderItemRow(item) {
     html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;">';
 
     if (item.Status !== 'Success') {
-        html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="Organize"><i class="material-icons folder"></i></button>';
-        html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="Delete"><i class="material-icons delete"></i></button>';
+        html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnProcessResult organizerButton autoSize" title="Organize"><span class="material-icons edit"></span></button>';
+        html += '<button type="button" is="paper-icon-button-light" data-resultid="' + item.Id + '" class="btnDeleteResult organizerButton autoSize" title="Delete"><span class="material-icons delete"></span></button>';
     }
 
     html += '</td>';

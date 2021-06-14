@@ -1,8 +1,8 @@
-﻿<div id="libraryFileOrganizerPage" data-role="page" class="page type-interior pluginConfigurationPage withTabs" data-helpurl="https://github.com/MediaBrowser/Wiki/wiki/Auto-Organize" data-controller="__plugin/AutoOrganizeMovieJs">
+﻿<div id="libraryFileOrganizerPage" data-role="page" class="page type-interior pluginConfigurationPage withTabs" data-controller="__plugin/AutoOrganizeMovieJs">
     <div>
         <div class="content-primary">
 
-            <form class="libraryFileOrganizerForm">
+            <form class="libraryFileOrganizerForm padded-top">
 
                 <div>
                     <label class="checkboxContainer">
@@ -16,21 +16,21 @@
                             <input is="emby-input" id="txtWatchMovieFolder" type="text" label="Watch folder:" />
                             <div class="fieldDescription">This folder will be monitored for new movies.</div>
                         </div>
-                        <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="Select directory" class="autoSize"><i class="material-icons search"></i></button>
+                        <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="Select directory" class="autoSize">
+                            <span class="material-icons search"></span>
+                        </button>
                     </div>
                 </div>
                 <div class="inputContainer">
                     <input is="emby-input" id="txtMovieMinFileSize" type="number" label="Min file size:" pattern="[0-9]*" min="0" required />
                     <div class="fieldDescription">Files smaller than this will be ignored.</div>
                 </div>
-
                 <div class="checkboxContainer">
                     <label>
                         <input type="checkbox" is="emby-checkbox" id="chkSubMovieFolders" />
                         <span>Create subdirectory per Movie</span>
                     </label>
                 </div>
-
                 <div is="emby-collapse" class="hide fldSelectMovieFolderPattern" title="Movie folder pattern">
                     <div class="collapseContent">
                         <br />
@@ -38,10 +38,8 @@
                             <input is="emby-input" id="txtMovieFolderPattern" type="text" label="Movie folder pattern:" required />
                             <div class="fieldDescription movieFolderPatternDescription"></div>
                         </div>
-
                         <br />
                         <p>Supported Patterns</p>
-
                         <table id="movie-table" class="ui-responsive">
                             <thead>
                                 <tr>
@@ -85,7 +83,6 @@
                         </table>
                     </div>
                 </div>
-
                 <div is="emby-collapse" title="Movie file pattern">
                     <div class="collapseContent">
                         <br />
@@ -191,10 +188,11 @@
                     <select id="selectMovieFolder" is="emby-select" label="Default Movie library:"></select>
                 </div>
                 <div>
-                    <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Save</span>
+                    </button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
