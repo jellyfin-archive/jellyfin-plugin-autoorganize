@@ -103,7 +103,7 @@ namespace AutoOrganize.Core
                 var resolver = new EpisodeResolver(namingOptions);
 
                 var episodeInfo = resolver.Resolve(path, false) ??
-                                  new Naming.TV.EpisodeInfo(string.Empty);
+                                  new Emby.Naming.TV.EpisodeInfo(string.Empty);
 
                 var seriesName = episodeInfo.SeriesName;
                 int? seriesYear = null;
