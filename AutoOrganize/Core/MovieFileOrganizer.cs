@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
+using AutoOrganize.Model;
 using Emby.Naming.Common;
 using Emby.Naming.Video;
 using MediaBrowser.Controller.Dto;
@@ -16,7 +16,7 @@ using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize.Core
+namespace AutoOrganize.Core
 {
     /// <summary>
     /// Service used for organizing movie media files.

@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
+using AutoOrganize.Model;
 using MediaBrowser.Common.Json;
 using MediaBrowser.Controller;
 using MediaBrowser.Model.Querying;
 using Microsoft.Extensions.Logging;
 using SQLitePCL.pretty;
 
-namespace Emby.AutoOrganize.Data
+namespace AutoOrganize.Data
 {
     /// <summary>
     /// SQLite repository for managing persistence of <see cref="FileOrganizationResult"/> and

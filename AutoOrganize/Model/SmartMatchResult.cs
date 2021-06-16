@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     /// <summary>
     /// Used to customize matching of media files using a set of match strings.

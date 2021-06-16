@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     /// <summary>
     /// The result of a file organization operation.

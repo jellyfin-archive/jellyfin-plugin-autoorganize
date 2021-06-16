@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     /// <summary>
     /// Configuration options for the <see cref="AutoOrganizePlugin"/>.

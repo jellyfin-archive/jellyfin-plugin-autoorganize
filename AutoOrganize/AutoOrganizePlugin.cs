@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Emby.AutoOrganize.Configuration;
+using AutoOrganize.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 
-namespace Emby.AutoOrganize
+namespace AutoOrganize
 {
     /// <summary>
     /// The auto-organize plugin.

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     /// <summary>
     /// A request to organize a single movie media file.

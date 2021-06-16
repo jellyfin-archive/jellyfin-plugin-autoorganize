@@ -1,4 +1,4 @@
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     /// <summary>
     /// A query to get a list of <see cref="FileOrganizationResult"/> entries from the persistence store.

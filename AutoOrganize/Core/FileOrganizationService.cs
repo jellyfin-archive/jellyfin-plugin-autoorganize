@@ -4,8 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Data;
-using Emby.AutoOrganize.Model;
+using AutoOrganize.Data;
+using AutoOrganize.Model;
 using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
@@ -15,7 +15,7 @@ using MediaBrowser.Model.Querying;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize.Core
+namespace AutoOrganize.Core
 {
     /// <inheritdoc/>
     public class FileOrganizationService : IFileOrganizationService

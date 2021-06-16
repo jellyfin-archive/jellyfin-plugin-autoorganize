@@ -1,6 +1,6 @@
 using System;
 
-namespace Emby.AutoOrganize.Core
+namespace AutoOrganize.Core
 {
     /// <summary>
     /// An generic exception that occurs during file organization.

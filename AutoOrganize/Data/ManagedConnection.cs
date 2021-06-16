@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using SQLitePCL.pretty;
 
-namespace Emby.AutoOrganize.Data
+namespace AutoOrganize.Data
 {
     /// <summary>
     /// Wraps a <see cref="SQLiteDatabaseConnection"/>.

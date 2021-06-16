@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     [Obsolete("This has been replaced by SmartMatchResult")]
     public class SmartMatchInfo

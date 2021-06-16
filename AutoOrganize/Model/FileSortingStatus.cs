@@ -1,4 +1,4 @@
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     /// <summary>
     /// The result status of sorting a single item.

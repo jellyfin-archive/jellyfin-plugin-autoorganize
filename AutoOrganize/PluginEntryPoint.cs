@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Core;
-using Emby.AutoOrganize.Data;
+using AutoOrganize.Core;
+using AutoOrganize.Data;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
@@ -12,7 +12,7 @@ using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize
+namespace AutoOrganize
 {
     /// <summary>
     /// Entry point for the <see cref="AutoOrganizePlugin"/>.

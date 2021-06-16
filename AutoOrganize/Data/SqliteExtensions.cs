@@ -10,7 +10,7 @@ using System.IO;
 using MediaBrowser.Model.Serialization;
 using SQLitePCL.pretty;
 
-namespace Emby.AutoOrganize.Data
+namespace AutoOrganize.Data
 {
     /// <summary>
     /// Static class containing extension methods useful for working with a SQLite database.

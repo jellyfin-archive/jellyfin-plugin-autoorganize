@@ -10,6 +10,6 @@ overview: "Automatically organize your media"
 description: "Automatically organize your media"
 category: "General"
 artifacts:
-  - "Emby.AutoOrganize.dll"
+- "AutoOrganize.dll"
 changelog: |
   changelog

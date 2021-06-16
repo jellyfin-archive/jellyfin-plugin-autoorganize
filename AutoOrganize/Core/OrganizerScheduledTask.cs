@@ -10,7 +10,7 @@ using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Emby.AutoOrganize.Core
+namespace AutoOrganize.Core
 {
     /// <summary>
     /// A scheduled task that organizes media files.

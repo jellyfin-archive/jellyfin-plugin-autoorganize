@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Core;
-using Emby.AutoOrganize.Model;
+using AutoOrganize.Core;
+using AutoOrganize.Model;
 using MediaBrowser.Model.Dto;
 using MediaBrowser.Model.Querying;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Emby.AutoOrganize.Api
+namespace AutoOrganize.Api
 {
     /// <summary>
     /// The file organization controller.
@@ -206,7 +206,7 @@ namespace Emby.AutoOrganize.Api
         /// </summary>
         /// <param name="startIndex">Optional. The record index to start at. All items with a lower index will be dropped from the results.</param>
         /// <param name="limit">Optional. The maximum number of records to return.</param>
-        /// <response code="20´0">Smart watch entries returned.</response>
+        /// <response code="20ï¿½0">Smart watch entries returned.</response>
         /// <returns>A <see cref="QueryResult{SmartWatchResult}"/>.</returns>
         [HttpGet("SmartMatches")]
         [ProducesResponseType(StatusCodes.Status200OK)]

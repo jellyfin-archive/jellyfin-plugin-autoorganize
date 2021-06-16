@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
+using AutoOrganize.Model;
 using MediaBrowser.Model.Querying;
 
-namespace Emby.AutoOrganize.Data
+namespace AutoOrganize.Data
 {
     /// <summary>
     /// Repository for managing persistence of <see cref="FileOrganizationResult"/> and <see cref="SmartMatchResult"/>

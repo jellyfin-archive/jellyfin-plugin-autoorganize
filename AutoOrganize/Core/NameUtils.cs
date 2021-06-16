@@ -3,7 +3,7 @@ using System.Globalization;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Extensions;
 
-namespace Emby.AutoOrganize.Core
+namespace AutoOrganize.Core
 {
     /// <summary>
     /// Static helper class containing methods to work with names.

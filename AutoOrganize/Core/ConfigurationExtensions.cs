@@ -1,8 +1,8 @@
 using System.Threading;
-using Emby.AutoOrganize.Model;
+using AutoOrganize.Model;
 using MediaBrowser.Common.Configuration;
 
-namespace Emby.AutoOrganize.Core
+namespace AutoOrganize.Core
 {
     /// <summary>
     /// Static class containing extension methods helpful for working with configuration for this plugin.

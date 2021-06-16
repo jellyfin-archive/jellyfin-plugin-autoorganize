@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Emby.AutoOrganize.Model;
+using AutoOrganize.Model;
 using MediaBrowser.Model.Querying;
 
-namespace Emby.AutoOrganize.Core
+namespace AutoOrganize.Core
 {
     /// <summary>
     /// A service that can be used to auto-organize media files.

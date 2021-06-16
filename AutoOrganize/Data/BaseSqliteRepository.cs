@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using SQLitePCL;
 using SQLitePCL.pretty;
 
-namespace Emby.AutoOrganize.Data
+namespace AutoOrganize.Data
 {
     public abstract class BaseSqliteRepository : IDisposable
     {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Rules for Emby.AutoOrganize" Description="Code analysis rules for Emby.AutoOrganize.csproj" ToolsVersion="14.0">
+<RuleSet Name="Rules for AutoOrganize" Description="Code analysis rules for AutoOrganize.csproj" ToolsVersion="14.0">
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <!-- disable warning CA1032: Implement standard exception constructors -->
     <Rule Id="CA1032" Action="Info" />

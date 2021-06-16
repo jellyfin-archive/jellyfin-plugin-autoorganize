@@ -1,4 +1,4 @@
-namespace Emby.AutoOrganize.Model
+namespace AutoOrganize.Model
 {
     /// <summary>
     /// Contains the supported file organization types.

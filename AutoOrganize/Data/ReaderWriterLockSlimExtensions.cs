@@ -6,7 +6,7 @@
 using System;
 using System.Threading;
 
-namespace Emby.AutoOrganize.Data
+namespace AutoOrganize.Data
 {
     public static class ReaderWriterLockSlimExtensions
     {
