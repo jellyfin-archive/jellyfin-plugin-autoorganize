@@ -427,11 +427,11 @@ export default function (view, params) {
 
         reloadItems(view, true);
 
-        events.on(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
-        events.on(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
-        events.on(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
-        events.on(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
-        events.on(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
+        Events.on(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
+        Events.on(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
+        Events.on(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
+        Events.on(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
+        Events.on(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
         // on here
         TaskButton({
@@ -446,11 +446,11 @@ export default function (view, params) {
     view.addEventListener('viewhide', function (e) {
         currentResult = null;
 
-        events.off(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
-        events.off(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
-        events.off(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
-        events.off(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
-        events.off(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
+        Events.off(ServerNotifications, 'AutoOrganize_LogReset', onServerEvent);
+        Events.off(ServerNotifications, 'AutoOrganize_ItemUpdated', onServerEvent);
+        Events.off(ServerNotifications, 'AutoOrganize_ItemRemoved', onServerEvent);
+        Events.off(ServerNotifications, 'AutoOrganize_ItemAdded', onServerEvent);
+        Events.off(ServerNotifications, 'ScheduledTaskEnded', onServerEvent);
 
         // off here
         TaskButton({
