@@ -6,8 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using MediaBrowser.Model.Serialization;
 using SQLitePCL.pretty;
 
 namespace AutoOrganize.Data
@@ -67,7 +65,7 @@ namespace AutoOrganize.Data
 
             connection.RunInTransaction(conn =>
             {
-                conn.ExecuteAll(string.Join(";", queries));
+                conn.ExecuteAll(string.Join(';', queries));
             });
         }
 
@@ -81,7 +79,7 @@ namespace AutoOrganize.Data
             return guid.ToByteArray();
         }
 
-        public static Guid ReadGuidFromBlob(this IResultSetValue result)
+        public static Guid ReadGuidFromBlob(this ResultSetValue result)
         {
             return new Guid(result.ToBlob().ToArray());
         }
@@ -105,7 +103,7 @@ namespace AutoOrganize.Data
             return (kind == DateTimeKind.Utc) ? _datetimeFormatUtc : _datetimeFormatLocal;
         }
 
-        public static DateTime ReadDateTime(this IResultSetValue result)
+        public static DateTime ReadDateTime(this ResultSetValue result)
         {
             var dateText = result.ToString();
 
@@ -127,37 +125,37 @@ namespace AutoOrganize.Data
             }
         }
 
-        public static bool IsDBNull(this IReadOnlyList<IResultSetValue> result, int index)
+        public static bool IsDBNull(this IReadOnlyList<ResultSetValue> result, int index)
         {
             return result[index].SQLiteType == SQLiteType.Null;
         }
 
-        public static string GetString(this IReadOnlyList<IResultSetValue> result, int index)
+        public static string GetString(this IReadOnlyList<ResultSetValue> result, int index)
         {
             return result[index].ToString();
         }
 
-        public static bool GetBoolean(this IReadOnlyList<IResultSetValue> result, int index)
+        public static bool GetBoolean(this IReadOnlyList<ResultSetValue> result, int index)
         {
             return result[index].ToBool();
         }
 
-        public static int GetInt32(this IReadOnlyList<IResultSetValue> result, int index)
+        public static int GetInt32(this IReadOnlyList<ResultSetValue> result, int index)
         {
             return result[index].ToInt();
         }
 
-        public static long GetInt64(this IReadOnlyList<IResultSetValue> result, int index)
+        public static long GetInt64(this IReadOnlyList<ResultSetValue> result, int index)
         {
             return result[index].ToInt64();
         }
 
-        public static float GetFloat(this IReadOnlyList<IResultSetValue> result, int index)
+        public static float GetFloat(this IReadOnlyList<ResultSetValue> result, int index)
         {
             return result[index].ToFloat();
         }
 
-        public static Guid GetGuid(this IReadOnlyList<IResultSetValue> result, int index)
+        public static Guid GetGuid(this IReadOnlyList<ResultSetValue> result, int index)
         {
             return result[index].ReadGuidFromBlob();
         }
@@ -379,7 +377,7 @@ namespace AutoOrganize.Data
             }
         }
 
-        public static IEnumerable<IReadOnlyList<IResultSetValue>> ExecuteQuery(this IStatement statement)
+        public static IEnumerable<IReadOnlyList<ResultSetValue>> ExecuteQuery(this IStatement statement)
         {
             while (statement.MoveNext())
             {

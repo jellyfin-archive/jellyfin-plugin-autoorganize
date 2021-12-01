@@ -281,7 +281,7 @@ namespace AutoOrganize.Core
         }
 
         /// <inheritdoc/>
-        public bool AddToInProgressList(FileOrganizationResult result, bool isNewItem)
+        public bool AddToInProgressList(FileOrganizationResult result, bool fullClientRefresh)
         {
             if (string.IsNullOrWhiteSpace(result.Id))
             {

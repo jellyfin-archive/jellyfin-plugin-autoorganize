@@ -61,12 +61,12 @@ namespace AutoOrganize.Data
             return db.RunInTransaction(action, mode);
         }
 
-        public IEnumerable<IReadOnlyList<IResultSetValue>> Query(string sql)
+        public IEnumerable<IReadOnlyList<ResultSetValue>> Query(string sql)
         {
             return db.Query(sql);
         }
 
-        public IEnumerable<IReadOnlyList<IResultSetValue>> Query(string sql, params object[] values)
+        public IEnumerable<IReadOnlyList<ResultSetValue>> Query(string sql, params object[] values)
         {
             return db.Query(sql, values);
         }

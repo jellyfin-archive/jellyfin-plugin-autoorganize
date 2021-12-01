@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
+using Diacritics.Extensions;
 using MediaBrowser.Controller.Entities;
-using MediaBrowser.Controller.Extensions;
 
 namespace AutoOrganize.Core
 {
@@ -10,8 +10,6 @@ namespace AutoOrganize.Core
     /// </summary>
     public static class NameUtils
     {
-        private static readonly CultureInfo UsCulture = new CultureInfo("en-US");
-
         /// <summary>
         /// Assign a score to a matched media item.
         /// </summary>
@@ -27,7 +25,7 @@ namespace AutoOrganize.Core
             var seriesNameWithoutYear = itemName;
             if (itemProductionYear.HasValue)
             {
-                seriesNameWithoutYear = seriesNameWithoutYear.Replace(itemProductionYear.Value.ToString(UsCulture), string.Empty, StringComparison.Ordinal);
+                seriesNameWithoutYear = seriesNameWithoutYear.Replace(itemProductionYear.Value.ToString(CultureInfo.InvariantCulture), string.Empty, StringComparison.Ordinal);
             }
 
             if (IsNameMatch(sortedName, seriesNameWithoutYear))

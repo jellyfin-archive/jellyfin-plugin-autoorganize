@@ -72,7 +72,7 @@ namespace AutoOrganize.Data
                 {
                     _versionLogged = true;
                     _logger.LogInformation("SQLite version: {Version}", SQLite3.Version);
-                    _logger.LogInformation("SQLite compiler options: {Options}", string.Join(",", SQLite3.CompilerOptions));
+                    _logger.LogInformation("SQLite compiler options: {Options}", string.Join(',', SQLite3.CompilerOptions));
                 }
 
                 ConnectionFlags connectionFlags;
@@ -135,7 +135,7 @@ namespace AutoOrganize.Data
                         queries.Add("PRAGMA temp_store = file");
                     }
 
-                    db.ExecuteAll(string.Join(";", queries.ToArray()));
+                    db.ExecuteAll(string.Join(';', queries));
                 }
                 catch
                 {
@@ -225,8 +225,7 @@ namespace AutoOrganize.Data
                 });
             }
 
-            db.ExecuteAll(string.Join(";", queries.ToArray()));
-            _logger.LogInformation("PRAGMA synchronous={sync}", db.Query("PRAGMA synchronous").SelectScalarString().First());
+            db.ExecuteAll(string.Join(';', queries));
         }
 
         public void Dispose()

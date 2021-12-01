@@ -51,11 +51,10 @@ namespace AutoOrganize.Api
         /// <returns>A <see cref="NoContentResult"/> indicating success.</returns>
         [HttpDelete("{id}/File")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult Delete([FromRoute] string id)
+        public async Task<ActionResult> Delete([FromRoute] string id)
         {
-            var task = InternalFileOrganizationService.DeleteOriginalFile(id);
-
-            Task.WaitAll(task);
+            await InternalFileOrganizationService.DeleteOriginalFile(id)
+                .ConfigureAwait(false);
 
             return NoContent();
         }
@@ -67,11 +66,10 @@ namespace AutoOrganize.Api
         /// <returns>A <see cref="NoContentResult"/> indicating success.</returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult ClearActivityLog()
+        public async Task<ActionResult> ClearActivityLog()
         {
-            var task = InternalFileOrganizationService.ClearLog();
-
-            Task.WaitAll(task);
+            await InternalFileOrganizationService.ClearLog()
+                .ConfigureAwait(false);
 
             return NoContent();
         }
@@ -82,11 +80,10 @@ namespace AutoOrganize.Api
         /// <returns>A <see cref="NoContentResult"/> indicating success.</returns>
         [HttpDelete("Completed")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult ClearCompletedActivityLog()
+        public async Task<ActionResult> ClearCompletedActivityLog()
         {
-            var task = InternalFileOrganizationService.ClearCompleted();
-
-            Task.WaitAll(task);
+            await InternalFileOrganizationService.ClearCompleted()
+                .ConfigureAwait(false);
 
             return NoContent();
         }

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoOrganize.Model;
-using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
@@ -25,7 +24,6 @@ namespace AutoOrganize.Core
         private readonly ILogger<TvFolderOrganizer> _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
-        private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
 
         /// <summary>
@@ -38,7 +36,6 @@ namespace AutoOrganize.Core
             IFileSystem fileSystem,
             ILibraryMonitor libraryMonitor,
             IFileOrganizationService organizationService,
-            IServerConfigurationManager config,
             IProviderManager providerManager)
         {
             _libraryManager = libraryManager;
@@ -47,7 +44,6 @@ namespace AutoOrganize.Core
             _fileSystem = fileSystem;
             _libraryMonitor = libraryMonitor;
             _organizationService = organizationService;
-            _config = config;
             _providerManager = providerManager;
         }
 
@@ -61,7 +57,7 @@ namespace AutoOrganize.Core
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error organizing file {0}", ex, fileInfo.Name);
+                _logger.LogError(ex, "Error organizing file {0}", fileInfo.Name);
             }
 
             return false;
@@ -130,9 +126,10 @@ namespace AutoOrganize.Core
                     {
                         var result = await organizer.OrganizeEpisodeFile(file.FullName, options, cancellationToken).ConfigureAwait(false);
 
-                        if (result.Status == FileSortingStatus.Success && !processedFolders.Contains(file.DirectoryName, StringComparer.OrdinalIgnoreCase))
+                        var directoryName = Path.GetDirectoryName(file.FullName);
+                        if (result.Status == FileSortingStatus.Success && !processedFolders.Contains(directoryName, StringComparer.OrdinalIgnoreCase))
                         {
-                            processedFolders.Add(file.DirectoryName);
+                            processedFolders.Add(directoryName);
                         }
                     }
                     catch (OperationCanceledException)
