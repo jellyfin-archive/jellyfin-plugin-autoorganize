@@ -206,7 +206,7 @@ namespace AutoOrganize.Api
         /// </summary>
         /// <param name="startIndex">Optional. The record index to start at. All items with a lower index will be dropped from the results.</param>
         /// <param name="limit">Optional. The maximum number of records to return.</param>
-        /// <response code="20�0">Smart watch entries returned.</response>
+        /// <response code="200">Smart watch entries returned.</response>
         /// <returns>A <see cref="QueryResult{SmartWatchResult}"/>.</returns>
         [HttpGet("SmartMatches")]
         [ProducesResponseType(StatusCodes.Status200OK)]
