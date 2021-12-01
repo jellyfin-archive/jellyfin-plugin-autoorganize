@@ -12,29 +12,29 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Configuration\autoorganizelog.html" />
-    <None Remove="Configuration\autoorganizelog.js" />
-    <None Remove="Configuration\autoorganizemovie.html" />
-    <None Remove="Configuration\autoorganizemovie.js" />
-    <None Remove="Configuration\autoorganizesmart.html" />
-    <None Remove="Configuration\autoorganizesmart.js" />
-    <None Remove="Configuration\autoorganizetv.html" />
-    <None Remove="Configuration\autoorganizetv.js" />
-    <None Remove="Configuration\fileorganizer.js" />
-    <None Remove="Configuration\fileorganizer.template.html" />
+    <None Remove="Web\autoorganizelog.html" />
+    <None Remove="Web\autoorganizelog.js" />
+    <None Remove="Web\autoorganizemovie.html" />
+    <None Remove="Web\autoorganizemovie.js" />
+    <None Remove="Web\autoorganizesmart.html" />
+    <None Remove="Web\autoorganizesmart.js" />
+    <None Remove="Web\autoorganizetv.html" />
+    <None Remove="Web\autoorganizetv.js" />
+    <None Remove="Web\fileorganizer.js" />
+    <None Remove="Web\fileorganizer.template.html" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Configuration\autoorganizelog.html" />
-    <EmbeddedResource Include="Configuration\autoorganizelog.js" />
-    <EmbeddedResource Include="Configuration\autoorganizesmart.html" />
-    <EmbeddedResource Include="Configuration\autoorganizesmart.js" />
-    <EmbeddedResource Include="Configuration\autoorganizemovie.html" />
-    <EmbeddedResource Include="Configuration\autoorganizemovie.js" />
-    <EmbeddedResource Include="Configuration\autoorganizetv.html" />
-    <EmbeddedResource Include="Configuration\autoorganizetv.js" />
-    <EmbeddedResource Include="Configuration\fileorganizer.js" />
-    <EmbeddedResource Include="Configuration\fileorganizer.template.html" />
+    <EmbeddedResource Include="Web\autoorganizelog.html" />
+    <EmbeddedResource Include="Web\autoorganizelog.js" />
+    <EmbeddedResource Include="Web\autoorganizesmart.html" />
+    <EmbeddedResource Include="Web\autoorganizesmart.js" />
+    <EmbeddedResource Include="Web\autoorganizemovie.html" />
+    <EmbeddedResource Include="Web\autoorganizemovie.js" />
+    <EmbeddedResource Include="Web\autoorganizetv.html" />
+    <EmbeddedResource Include="Web\autoorganizetv.js" />
+    <EmbeddedResource Include="Web\fileorganizer.js" />
+    <EmbeddedResource Include="Web\fileorganizer.template.html" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,7 +46,7 @@
 
   <!-- Code Analyzers-->
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3" PrivateAssets="All" /> 
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3" PrivateAssets="All" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
   </ItemGroup>
 
