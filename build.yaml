@@ -2,14 +2,32 @@
 name: "Auto Organize"
 guid: "70b7b43b-471b-4159-b4be-56750c795499"
 imageUrl: "https://repo.jellyfin.org/releases/plugin/images/jellyfin-plugin-autoorganize.png"
-version: "9.0.0.0"
-targetAbi: "10.7.0.0"
+version: "10"
+targetAbi: "10.8.0.0"
 framework: "net6.0"
 owner: "jellyfin"
 overview: "Automatically organize your media"
 description: "Automatically organize your media"
 category: "General"
 artifacts:
-- "AutoOrganize.dll"
-changelog: |
-  changelog
+  - "AutoOrganize.dll"
+changelog: |2-
+  ### New features and improvements ###
+  - Migration to es6 (#67) @grafixeyehero
+  - chore: plugin images (#63) @h1dden-da3m0n
+
+  ### Code or Repo Maintenance ###
+  - 10.8 support (#73) @crobibero
+  - Rename Emby.AutoOrganize to AutoOrganize (#69) @grafixeyehero
+  - Migrate from FxCop analyzers to .NET analyzers (#52) @crobibero
+  - Use System.Text.Json (#53) @daullmer
+
+  ### Dependency updates ###
+  - chore(deps): bump SQLitePCL.pretty.netstandard from 2.1.0 to 2.2.0 (#62) @dependabot
+  - chore(deps): bump release-drafter/release-drafter from v5.14.0 to v5.15.0 (#59) @dependabot
+  - chore(deps): bump Microsoft.CodeAnalysis.NetAnalyzers from 5.0.0 to 5.0.3 (#60) @dependabot
+  - chore(deps): bump SQLitePCL.pretty.netstandard from 2.0.1 to 2.1.0 (#61) @dependabot
+
+  ### CI & build changes ###
+  - Update ci (#70) @h1dden-da3m0n
+  - chore(ci): builds, releas drafter and more (#57) @h1dden-da3m0n
