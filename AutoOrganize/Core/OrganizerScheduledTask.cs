@@ -89,7 +89,6 @@ namespace AutoOrganize.Core
                     _fileSystem,
                     _libraryMonitor,
                     fileOrganizationService,
-                    _config,
                     _providerManager)
                     .Organize(options.TvOptions, progress, cancellationToken).ConfigureAwait(false);
             }
@@ -99,7 +98,7 @@ namespace AutoOrganize.Core
                 queueMovie = options.MovieOptions.QueueLibraryScan;
                 var fileOrganizationService = PluginEntryPoint.Current.FileOrganizationService;
 
-                await new MovieFolderOrganizer(_libraryManager, _loggerFactory, _fileSystem, _libraryMonitor, fileOrganizationService, _config, _providerManager)
+                await new MovieFolderOrganizer(_libraryManager, _loggerFactory, _fileSystem, _libraryMonitor, fileOrganizationService, _providerManager)
                     .Organize(options.MovieOptions, progress, cancellationToken).ConfigureAwait(false);
             }
 

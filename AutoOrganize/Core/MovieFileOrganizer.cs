@@ -89,9 +89,8 @@ namespace AutoOrganize.Core
                 }
 
                 _namingOptions ??= new NamingOptions();
-                var resolver = new VideoResolver(_namingOptions);
 
-                var movieInfo = resolver.Resolve(path, false);
+                var movieInfo = VideoResolver.Resolve(path, false, _namingOptions);
                 if (!string.IsNullOrEmpty(movieInfo?.Name))
                 {
                     var movieYear = movieInfo.Year;
@@ -112,7 +111,7 @@ namespace AutoOrganize.Core
                     var msg = "Unable to determine movie name from " + path;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.LogWarning(msg);
+                    _logger.LogWarning("Unable to determine movie name from {Path}", path);
                 }
 
                 // Handle previous result
@@ -242,7 +241,7 @@ namespace AutoOrganize.Core
                     var msg = "Unable to find movie in library matching name " + movieName;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.LogWarning(msg);
+                    _logger.LogWarning("Unable to find movie in library matching name {MovieName}", movieName);
                     return;
                 }
             }
@@ -296,7 +295,7 @@ namespace AutoOrganize.Core
                     if (options.CopyOriginalFile && fileExists && IsSameMovie(sourcePath, newPath))
                     {
                         var msg = $"File '{sourcePath}' already copied to new path '{newPath}', stopping organization";
-                        _logger.LogInformation(msg);
+                        _logger.LogInformation("File {SourcePath} already copied to new path {NewPath}, stopping organization", sourcePath, newPath);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         return Task.CompletedTask;
@@ -305,7 +304,7 @@ namespace AutoOrganize.Core
                     if (fileExists)
                     {
                         var msg = $"File '{sourcePath}' already exists as '{newPath}', stopping organization";
-                        _logger.LogInformation(msg);
+                        _logger.LogInformation("File {SourcePath} already exists as {NewPath}, stopping organization", sourcePath, newPath);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.TargetPath = newPath;
@@ -368,7 +367,7 @@ namespace AutoOrganize.Core
 
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = errorMsg;
-                _logger.LogError(ex, errorMsg);
+                _logger.LogError(ex, "Failed to move file from {OriginalPath} to {TargetPath}", result.OriginalPath, result.TargetPath);
 
                 return;
             }

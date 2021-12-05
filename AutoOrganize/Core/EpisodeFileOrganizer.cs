@@ -19,6 +19,7 @@ using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
 using EpisodeInfo = MediaBrowser.Controller.Providers.EpisodeInfo;
+using SeriesInfo = MediaBrowser.Controller.Providers.SeriesInfo;
 
 namespace AutoOrganize.Core
 {
@@ -33,8 +34,6 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
-
-        private readonly CultureInfo _usCulture = new CultureInfo("en-US");
 
         private NamingOptions _namingOptions;
 
@@ -174,7 +173,7 @@ namespace AutoOrganize.Core
                         var msg = "Unable to determine episode number from " + path;
                         result.Status = FileSortingStatus.Failure;
                         result.StatusMessage = msg;
-                        _logger.LogWarning(msg);
+                        _logger.LogWarning("Unable to determine episode number from {Path}", path);
                     }
                 }
                 else
@@ -182,7 +181,7 @@ namespace AutoOrganize.Core
                     var msg = "Unable to determine series name from " + path;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.LogWarning(msg);
+                    _logger.LogWarning("Unable to determine series name from {Path}", path);
                 }
 
                 // Handle previous result
@@ -368,7 +367,7 @@ namespace AutoOrganize.Core
             return result;
         }
 
-        private Task OrganizeEpisode(
+        private async Task OrganizeEpisode(
             string sourcePath,
             string seriesName,
             int? seriesYear,
@@ -385,29 +384,30 @@ namespace AutoOrganize.Core
 
             if (series == null)
             {
-                series = AutoDetectSeries(seriesName, null, options, cancellationToken).Result;
+                series = await AutoDetectSeries(seriesName, null, options, cancellationToken).ConfigureAwait(false);
 
                 if (series == null)
                 {
                     var msg = "Unable to find series in library matching name " + seriesName;
                     result.Status = FileSortingStatus.Failure;
                     result.StatusMessage = msg;
-                    _logger.LogWarning(msg);
-                    return Task.FromResult(true);
+                    _logger.LogWarning("Unable to find series in library matching name {SeriesName}", seriesName);
+                    return;
                 }
             }
 
-            return OrganizeEpisode(
-                sourcePath,
-                series,
-                seasonNumber,
-                episodeNumber,
-                endingEpiosdeNumber,
-                premiereDate,
-                options,
-                rememberCorrection,
-                result,
-                cancellationToken);
+            await OrganizeEpisode(
+                    sourcePath,
+                    series,
+                    seasonNumber,
+                    episodeNumber,
+                    endingEpiosdeNumber,
+                    premiereDate,
+                    options,
+                    rememberCorrection,
+                    result,
+                    cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -502,7 +502,7 @@ namespace AutoOrganize.Core
                     if (options.CopyOriginalFile && fileExists && IsSameEpisode(sourcePath, newPath))
                     {
                         var msg = $"File '{sourcePath}' already copied to new path '{newPath}', stopping organization";
-                        _logger.LogInformation(msg);
+                        _logger.LogInformation("File {SourcePath} already copied to new path {NewPath}, stopping organization", sourcePath, newPath);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         return Task.CompletedTask;
@@ -511,7 +511,7 @@ namespace AutoOrganize.Core
                     if (fileExists)
                     {
                         var msg = $"File '{sourcePath}' already exists as '{newPath}', stopping organization";
-                        _logger.LogInformation(msg);
+                        _logger.LogInformation("File '{SourcePath}' already exists as '{NewPath}', stopping organization", sourcePath, newPath);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.TargetPath = newPath;
@@ -521,7 +521,7 @@ namespace AutoOrganize.Core
                     if (otherDuplicatePaths.Count > 0)
                     {
                         var msg = $"File '{sourcePath}' already exists as these:'{string.Join("', '", otherDuplicatePaths)}'. Stopping organization";
-                        _logger.LogInformation(msg);
+                        _logger.LogInformation("File '{SourcePath}' already exists as these: {@OtherPaths}. Stopping organization", sourcePath, otherDuplicatePaths);
                         result.Status = FileSortingStatus.SkippedExisting;
                         result.StatusMessage = msg;
                         result.DuplicatePaths = otherDuplicatePaths;
@@ -739,7 +739,7 @@ namespace AutoOrganize.Core
 
                 result.Status = FileSortingStatus.Failure;
                 result.StatusMessage = errorMsg;
-                _logger.LogError(ex, errorMsg);
+                _logger.LogError(ex, "Failed to move file from {OriginalPath} to {TargetPath}", result.OriginalPath, result.TargetPath);
 
                 return;
             }
@@ -802,7 +802,7 @@ namespace AutoOrganize.Core
                     if (!episode.ParentIndexNumber.HasValue)
                     {
                         var msg = $"No season found for {series.Name} season {episode.ParentIndexNumber} episode {episode.IndexNumber}.";
-                        _logger.LogWarning(msg);
+                        _logger.LogWarning("No season found for {SeriesName} S{SeasonNumber}E{EpisodeNumber}", series.Name, episode.ParentIndexNumber, episode.IndexNumber);
                         throw new OrganizationException(msg);
                     }
 
@@ -927,7 +927,7 @@ namespace AutoOrganize.Core
             if (episodeSearch == null)
             {
                 var msg = $"No provider metadata found for {series.Name} season {seasonNumber} episode {episodeNumber}";
-                _logger.LogWarning(msg);
+                _logger.LogWarning("No provider metadata found for {SeriesName} S{SeasonNumber}E{EpisodeNumber}", series.Name, seasonNumber, episodeNumber);
                 throw new OrganizationException(msg);
             }
 
@@ -970,9 +970,9 @@ namespace AutoOrganize.Core
             }
 
             var seasonFolderName = options.SeasonFolderPattern
-                .Replace("%s", seasonNumber.ToString(_usCulture), StringComparison.Ordinal)
-                .Replace("%0s", seasonNumber.ToString("00", _usCulture), StringComparison.Ordinal)
-                .Replace("%00s", seasonNumber.ToString("000", _usCulture), StringComparison.Ordinal);
+                .Replace("%s", seasonNumber.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%0s", seasonNumber.ToString("00", CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%00s", seasonNumber.ToString("000", CultureInfo.InvariantCulture), StringComparison.Ordinal);
 
             return Path.Combine(path, _fileSystem.GetValidFilename(seasonFolderName));
         }
@@ -1018,9 +1018,9 @@ namespace AutoOrganize.Core
             var result = pattern.Replace("%sn", seriesName, StringComparison.Ordinal)
                 .Replace("%s.n", seriesName.Replace(' ', '.'), StringComparison.Ordinal)
                 .Replace("%s_n", seriesName.Replace(' ', '_'), StringComparison.Ordinal)
-                .Replace("%s", seasonNumber.ToString(_usCulture), StringComparison.Ordinal)
-                .Replace("%0s", seasonNumber.ToString("00", _usCulture), StringComparison.Ordinal)
-                .Replace("%00s", seasonNumber.ToString("000", _usCulture), StringComparison.Ordinal)
+                .Replace("%s", seasonNumber.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%0s", seasonNumber.ToString("00", CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%00s", seasonNumber.ToString("000", CultureInfo.InvariantCulture), StringComparison.Ordinal)
                 .Replace("%ext", sourceExtension, StringComparison.Ordinal)
                 .Replace("%en", "%#1", StringComparison.Ordinal)
                 .Replace("%e.n", "%#2", StringComparison.Ordinal)
@@ -1029,14 +1029,14 @@ namespace AutoOrganize.Core
 
             if (endingEpisodeNumber.HasValue)
             {
-                result = result.Replace("%ed", endingEpisodeNumber.Value.ToString(_usCulture), StringComparison.Ordinal)
-                .Replace("%0ed", endingEpisodeNumber.Value.ToString("00", _usCulture), StringComparison.Ordinal)
-                .Replace("%00ed", endingEpisodeNumber.Value.ToString("000", _usCulture), StringComparison.Ordinal);
+                result = result.Replace("%ed", endingEpisodeNumber.Value.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%0ed", endingEpisodeNumber.Value.ToString("00", CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%00ed", endingEpisodeNumber.Value.ToString("000", CultureInfo.InvariantCulture), StringComparison.Ordinal);
             }
 
-            result = result.Replace("%e", episodeNumber.ToString(_usCulture), StringComparison.Ordinal)
-                .Replace("%0e", episodeNumber.ToString("00", _usCulture), StringComparison.Ordinal)
-                .Replace("%00e", episodeNumber.ToString("000", _usCulture), StringComparison.Ordinal);
+            result = result.Replace("%e", episodeNumber.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%0e", episodeNumber.ToString("00", CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("%00e", episodeNumber.ToString("000", CultureInfo.InvariantCulture), StringComparison.Ordinal);
 
             if (result.Contains("%#", StringComparison.Ordinal))
             {

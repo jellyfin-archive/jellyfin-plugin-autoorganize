@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoOrganize.Model;
-using MediaBrowser.Common.Json;
+using Jellyfin.Extensions.Json;
 using MediaBrowser.Controller;
 using MediaBrowser.Model.Querying;
 using Microsoft.Extensions.Logging;
@@ -21,8 +21,6 @@ namespace AutoOrganize.Data
     /// </summary>
     public class SqliteFileOrganizationRepository : BaseSqliteRepository, IFileOrganizationRepository
     {
-        private readonly CultureInfo _usCulture = new CultureInfo("en-US");
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SqliteFileOrganizationRepository"/> class.
         /// </summary>
@@ -92,7 +90,7 @@ namespace AutoOrganize.Data
                                 statement.TryBind("@ExtractedSeasonNumber", result.ExtractedSeasonNumber);
                                 statement.TryBind("@ExtractedEpisodeNumber", result.ExtractedEpisodeNumber);
                                 statement.TryBind("@ExtractedEndingEpisodeNumber", result.ExtractedEndingEpisodeNumber);
-                                statement.TryBind("@DuplicatePaths", string.Join("|", result.DuplicatePaths.ToArray()));
+                                statement.TryBind("@DuplicatePaths", string.Join('|', result.DuplicatePaths));
 
                                 statement.MoveNext();
                             }
@@ -187,7 +185,7 @@ namespace AutoOrganize.Data
 
                     if (query.StartIndex.HasValue && query.StartIndex.Value > 0)
                     {
-                        var startIndex = query.StartIndex.Value.ToString(_usCulture);
+                        var startIndex = query.StartIndex.Value.ToString(CultureInfo.InvariantCulture);
                         commandText += $" WHERE ResultId NOT IN (SELECT ResultId FROM FileOrganizerResults ORDER BY OrganizationDate DESC LIMIT {startIndex})";
                     }
 
@@ -195,7 +193,7 @@ namespace AutoOrganize.Data
 
                     if (query.Limit.HasValue)
                     {
-                        commandText += " LIMIT " + query.Limit.Value.ToString(_usCulture);
+                        commandText += " LIMIT " + query.Limit.Value.ToString(CultureInfo.InvariantCulture);
                     }
 
                     var list = new List<FileOrganizationResult>();
@@ -250,7 +248,7 @@ namespace AutoOrganize.Data
             }
         }
 
-        private FileOrganizationResult GetResult(IReadOnlyList<IResultSetValue> reader)
+        private FileOrganizationResult GetResult(IReadOnlyList<ResultSetValue> reader)
         {
             var index = 0;
 
@@ -356,7 +354,7 @@ namespace AutoOrganize.Data
                                 statement.TryBind("@ItemName", result.ItemName);
                                 statement.TryBind("@DisplayName", result.DisplayName);
                                 statement.TryBind("@OrganizerType", result.OrganizerType.ToString());
-                                statement.TryBind("@MatchStrings", JsonSerializer.Serialize(result.MatchStrings, JsonDefaults.GetOptions()));
+                                statement.TryBind("@MatchStrings", JsonSerializer.Serialize(result.MatchStrings, JsonDefaults.Options));
 
                                 statement.MoveNext();
                             }
@@ -472,7 +470,7 @@ namespace AutoOrganize.Data
 
                     if (query.StartIndex.HasValue && query.StartIndex.Value > 0)
                     {
-                        var startIndex = query.StartIndex.Value.ToString(_usCulture);
+                        var startIndex = query.StartIndex.Value.ToString(CultureInfo.InvariantCulture);
                         commandText += $" WHERE Id NOT IN (SELECT Id FROM SmartMatch ORDER BY ItemName DESC LIMIT {startIndex})";
                     }
 
@@ -480,7 +478,7 @@ namespace AutoOrganize.Data
 
                     if (query.Limit.HasValue)
                     {
-                        commandText += " LIMIT " + query.Limit.Value.ToString(_usCulture);
+                        commandText += " LIMIT " + query.Limit.Value.ToString(CultureInfo.InvariantCulture);
                     }
 
                     var list = new List<SmartMatchResult>();
@@ -508,7 +506,7 @@ namespace AutoOrganize.Data
             }
         }
 
-        private SmartMatchResult GetResultSmartMatch(IReadOnlyList<IResultSetValue> reader)
+        private SmartMatchResult GetResultSmartMatch(IReadOnlyList<ResultSetValue> reader)
         {
             var index = 0;
 
@@ -529,7 +527,7 @@ namespace AutoOrganize.Data
             index++;
             if (reader[index].SQLiteType != SQLiteType.Null)
             {
-                result.MatchStrings.AddRange(JsonSerializer.Deserialize<List<string>>(reader[index].ToString(), JsonDefaults.GetOptions()));
+                result.MatchStrings.AddRange(JsonSerializer.Deserialize<List<string>>(reader[index].ToString(), JsonDefaults.Options));
             }
 
             return result;
