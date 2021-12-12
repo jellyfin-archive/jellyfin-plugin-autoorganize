@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using Emby.Naming.Common;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
@@ -24,6 +25,7 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IServerConfigurationManager _config;
         private readonly IProviderManager _providerManager;
+        private readonly NamingOptions _namingOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizerScheduledTask"/> class.
@@ -44,6 +46,7 @@ namespace AutoOrganize.Core
             _fileSystem = fileSystem;
             _config = config;
             _providerManager = providerManager;
+            _namingOptions = new NamingOptions();
         }
 
         /// <inheritdoc/>
@@ -89,7 +92,8 @@ namespace AutoOrganize.Core
                     _fileSystem,
                     _libraryMonitor,
                     fileOrganizationService,
-                    _providerManager)
+                    _providerManager,
+                    _namingOptions)
                     .Organize(options.TvOptions, progress, cancellationToken).ConfigureAwait(false);
             }
 
@@ -98,7 +102,14 @@ namespace AutoOrganize.Core
                 queueMovie = options.MovieOptions.QueueLibraryScan;
                 var fileOrganizationService = PluginEntryPoint.Current.FileOrganizationService;
 
-                await new MovieFolderOrganizer(_libraryManager, _loggerFactory, _fileSystem, _libraryMonitor, fileOrganizationService, _providerManager)
+                await new MovieFolderOrganizer(
+                        _libraryManager,
+                        _loggerFactory,
+                        _fileSystem,
+                        _libraryMonitor,
+                        fileOrganizationService,
+                        _providerManager,
+                        _namingOptions)
                     .Organize(options.MovieOptions, progress, cancellationToken).ConfigureAwait(false);
             }
 

@@ -27,7 +27,7 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
-        private NamingOptions _namingOptions;
+        private readonly NamingOptions _namingOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TvFolderOrganizer"/> class.
@@ -39,7 +39,8 @@ namespace AutoOrganize.Core
             IFileSystem fileSystem,
             ILibraryMonitor libraryMonitor,
             IFileOrganizationService organizationService,
-            IProviderManager providerManager)
+            IProviderManager providerManager,
+            NamingOptions namingOptions)
         {
             _libraryManager = libraryManager;
             _loggerFactory = loggerFactory;
@@ -48,12 +49,7 @@ namespace AutoOrganize.Core
             _libraryMonitor = libraryMonitor;
             _organizationService = organizationService;
             _providerManager = providerManager;
-        }
-
-        private NamingOptions GetNamingOptionsInternal()
-        {
-            _namingOptions = _namingOptions ?? new NamingOptions();
-            return _namingOptions;
+            _namingOptions = namingOptions;
         }
 
         private bool EnableOrganization(FileSystemMetadata fileInfo, TvFileOrganizationOptions options)
@@ -62,7 +58,7 @@ namespace AutoOrganize.Core
 
             try
             {
-                return VideoResolver.IsVideoFile(fileInfo.FullName, GetNamingOptionsInternal()) && fileInfo.Length >= minFileBytes;
+                return VideoResolver.IsVideoFile(fileInfo.FullName, _namingOptions) && fileInfo.Length >= minFileBytes;
             }
             catch (Exception ex)
             {
@@ -125,7 +121,8 @@ namespace AutoOrganize.Core
                     _loggerFactory.CreateLogger<EpisodeFileOrganizer>(),
                     _libraryManager,
                     _libraryMonitor,
-                    _providerManager);
+                    _providerManager,
+                    _namingOptions);
 
                 foreach (var file in eligibleFiles)
                 {

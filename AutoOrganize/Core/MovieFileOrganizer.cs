@@ -29,7 +29,7 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
-        private NamingOptions _namingOptions;
+        private readonly NamingOptions _namingOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MovieFileOrganizer"/> class.
@@ -41,7 +41,8 @@ namespace AutoOrganize.Core
             ILogger<MovieFileOrganizer> logger,
             ILibraryManager libraryManager,
             ILibraryMonitor libraryMonitor,
-            IProviderManager providerManager)
+            IProviderManager providerManager,
+            NamingOptions namingOptions)
         {
             _organizationService = organizationService;
             _fileSystem = fileSystem;
@@ -49,6 +50,7 @@ namespace AutoOrganize.Core
             _libraryManager = libraryManager;
             _libraryMonitor = libraryMonitor;
             _providerManager = providerManager;
+            _namingOptions = namingOptions;
         }
 
         private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Movie;
@@ -87,8 +89,6 @@ namespace AutoOrganize.Core
                     _logger.LogInformation("Auto-organize Path is locked by other processes. Please try again later.");
                     return result;
                 }
-
-                _namingOptions ??= new NamingOptions();
 
                 var movieInfo = VideoResolver.Resolve(path, false, _namingOptions);
                 if (!string.IsNullOrEmpty(movieInfo?.Name))
