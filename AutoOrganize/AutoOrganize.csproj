@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyVersion>9.0.0.0</AssemblyVersion>
-    <FileVersion>9.0.0.0</FileVersion>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <FileVersion>10.0.0.0</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
@@ -14,41 +14,41 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Web\autoorganizelog.html" />
-    <None Remove="Web\autoorganizelog.js" />
-    <None Remove="Web\autoorganizemovie.html" />
-    <None Remove="Web\autoorganizemovie.js" />
-    <None Remove="Web\autoorganizesmart.html" />
-    <None Remove="Web\autoorganizesmart.js" />
-    <None Remove="Web\autoorganizetv.html" />
-    <None Remove="Web\autoorganizetv.js" />
-    <None Remove="Web\fileorganizer.js" />
-    <None Remove="Web\fileorganizer.template.html" />
+    <None Remove="Web\autoorganizelog.html"/>
+    <None Remove="Web\autoorganizelog.js"/>
+    <None Remove="Web\autoorganizemovie.html"/>
+    <None Remove="Web\autoorganizemovie.js"/>
+    <None Remove="Web\autoorganizesmart.html"/>
+    <None Remove="Web\autoorganizesmart.js"/>
+    <None Remove="Web\autoorganizetv.html"/>
+    <None Remove="Web\autoorganizetv.js"/>
+    <None Remove="Web\fileorganizer.js"/>
+    <None Remove="Web\fileorganizer.template.html"/>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Web\autoorganizelog.html" />
-    <EmbeddedResource Include="Web\autoorganizelog.js" />
-    <EmbeddedResource Include="Web\autoorganizesmart.html" />
-    <EmbeddedResource Include="Web\autoorganizesmart.js" />
-    <EmbeddedResource Include="Web\autoorganizemovie.html" />
-    <EmbeddedResource Include="Web\autoorganizemovie.js" />
-    <EmbeddedResource Include="Web\autoorganizetv.html" />
-    <EmbeddedResource Include="Web\autoorganizetv.js" />
-    <EmbeddedResource Include="Web\fileorganizer.js" />
-    <EmbeddedResource Include="Web\fileorganizer.template.html" />
+    <EmbeddedResource Include="Web\autoorganizelog.html"/>
+    <EmbeddedResource Include="Web\autoorganizelog.js"/>
+    <EmbeddedResource Include="Web\autoorganizesmart.html"/>
+    <EmbeddedResource Include="Web\autoorganizesmart.js"/>
+    <EmbeddedResource Include="Web\autoorganizemovie.html"/>
+    <EmbeddedResource Include="Web\autoorganizemovie.js"/>
+    <EmbeddedResource Include="Web\autoorganizetv.html"/>
+    <EmbeddedResource Include="Web\autoorganizetv.js"/>
+    <EmbeddedResource Include="Web\fileorganizer.js"/>
+    <EmbeddedResource Include="Web\fileorganizer.template.html"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jellyfin.Controller" Version="10.*-*" />
-    <PackageReference Include="Jellyfin.Naming" Version="10.*-*" />
-    <PackageReference Include="SQLitePCL.pretty.netstandard" Version="3.1.0" />
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.*-*"/>
+    <PackageReference Include="Jellyfin.Naming" Version="10.*-*"/>
+    <PackageReference Include="SQLitePCL.pretty.netstandard" Version="3.1.0"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
 
   <!-- Code Analyzers-->
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All"/>
   </ItemGroup>
 
   <PropertyGroup>

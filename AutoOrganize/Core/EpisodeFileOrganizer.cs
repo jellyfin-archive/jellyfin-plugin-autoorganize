@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoOrganize.Model;
 using Emby.Naming.Common;
 using Emby.Naming.TV;
+using Emby.Naming.Video;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
@@ -34,8 +35,7 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
-
-        private NamingOptions _namingOptions;
+        private readonly NamingOptions _namingOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EpisodeFileOrganizer"/> class.
@@ -47,7 +47,8 @@ namespace AutoOrganize.Core
             ILogger<EpisodeFileOrganizer> logger,
             ILibraryManager libraryManager,
             ILibraryMonitor libraryMonitor,
-            IProviderManager providerManager)
+            IProviderManager providerManager,
+            NamingOptions namingOptions)
         {
             _organizationService = organizationService;
             _fileSystem = fileSystem;
@@ -55,15 +56,10 @@ namespace AutoOrganize.Core
             _libraryManager = libraryManager;
             _libraryMonitor = libraryMonitor;
             _providerManager = providerManager;
+            _namingOptions = namingOptions;
         }
 
         private FileOrganizerType CurrentFileOrganizerType => FileOrganizerType.Episode;
-
-        private NamingOptions GetNamingOptionsInternal()
-        {
-            _namingOptions = _namingOptions ?? new NamingOptions();
-            return _namingOptions;
-        }
 
         /// <summary>
         /// Organize an episode file.
@@ -98,8 +94,7 @@ namespace AutoOrganize.Core
                     return result;
                 }
 
-                var namingOptions = GetNamingOptionsInternal();
-                var resolver = new EpisodeResolver(namingOptions);
+                var resolver = new EpisodeResolver(_namingOptions);
 
                 var episodeInfo = resolver.Resolve(path, false) ??
                                   new Emby.Naming.TV.EpisodeInfo(string.Empty);
@@ -691,7 +686,7 @@ namespace AutoOrganize.Core
             try
             {
                 var filesOfOtherExtensions = _fileSystem.GetFilePaths(folder)
-                    .Where(i => _libraryManager.IsVideoFile(i) && string.Equals(Path.GetFileNameWithoutExtension(i), targetFileNameWithoutExtension, StringComparison.OrdinalIgnoreCase));
+                    .Where(i => VideoResolver.IsVideoFile(i, _namingOptions) && string.Equals(Path.GetFileNameWithoutExtension(i), targetFileNameWithoutExtension, StringComparison.OrdinalIgnoreCase));
 
                 episodePaths.AddRange(filesOfOtherExtensions);
             }

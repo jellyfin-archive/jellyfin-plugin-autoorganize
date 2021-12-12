@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoOrganize.Model;
+using Emby.Naming.Common;
+using Emby.Naming.Video;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
@@ -25,6 +27,7 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
+        private readonly NamingOptions _namingOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MovieFolderOrganizer"/> class.
@@ -36,7 +39,8 @@ namespace AutoOrganize.Core
             IFileSystem fileSystem,
             ILibraryMonitor libraryMonitor,
             IFileOrganizationService organizationService,
-            IProviderManager providerManager)
+            IProviderManager providerManager,
+            NamingOptions namingOptions)
         {
             _libraryManager = libraryManager;
             _loggerFactory = loggerFactory;
@@ -45,6 +49,7 @@ namespace AutoOrganize.Core
             _libraryMonitor = libraryMonitor;
             _organizationService = organizationService;
             _providerManager = providerManager;
+            _namingOptions = namingOptions;
         }
 
         private bool CanOrganize(FileSystemMetadata fileInfo, MovieFileOrganizationOptions options)
@@ -53,7 +58,7 @@ namespace AutoOrganize.Core
 
             try
             {
-                return _libraryManager.IsVideoFile(fileInfo.FullName) && fileInfo.Length >= minFileBytes;
+                return VideoResolver.IsVideoFile(fileInfo.FullName, _namingOptions) && fileInfo.Length >= minFileBytes;
             }
             catch (Exception ex)
             {
@@ -116,7 +121,8 @@ namespace AutoOrganize.Core
                     _loggerFactory.CreateLogger<MovieFileOrganizer>(),
                     _libraryManager,
                     _libraryMonitor,
-                    _providerManager);
+                    _providerManager,
+                    _namingOptions);
 
                 foreach (var file in eligibleFiles)
                 {

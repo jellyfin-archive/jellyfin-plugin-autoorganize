@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoOrganize.Data;
 using AutoOrganize.Model;
+using Emby.Naming.Common;
 using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Library;
@@ -30,6 +31,7 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IProviderManager _providerManager;
         private readonly ConcurrentDictionary<string, bool> _inProgressItemIds = new ConcurrentDictionary<string, bool>();
+        private readonly NamingOptions _namingOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileOrganizationService"/> class.
@@ -54,6 +56,7 @@ namespace AutoOrganize.Core
             _config = config;
             _fileSystem = fileSystem;
             _providerManager = providerManager;
+            _namingOptions = new NamingOptions();
         }
 
         /// <inheritdoc/>
@@ -175,7 +178,8 @@ namespace AutoOrganize.Core
                         _loggerFactory.CreateLogger<EpisodeFileOrganizer>(),
                         _libraryManager,
                         _libraryMonitor,
-                        _providerManager);
+                        _providerManager,
+                        _namingOptions);
                     organizeResult = await episodeOrganizer.OrganizeEpisodeFile(result.OriginalPath, options.TvOptions, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
@@ -186,7 +190,8 @@ namespace AutoOrganize.Core
                         _loggerFactory.CreateLogger<MovieFileOrganizer>(),
                         _libraryManager,
                         _libraryMonitor,
-                        _providerManager);
+                        _providerManager,
+                        _namingOptions);
                     organizeResult = await movieOrganizer.OrganizeMovieFile(result.OriginalPath, options.MovieOptions, true, CancellationToken.None)
                         .ConfigureAwait(false);
                     break;
@@ -221,7 +226,8 @@ namespace AutoOrganize.Core
                 _loggerFactory.CreateLogger<EpisodeFileOrganizer>(),
                 _libraryManager,
                 _libraryMonitor,
-                _providerManager);
+                _providerManager,
+                _namingOptions);
 
             var options = _config.GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.TvOptions, CancellationToken.None).ConfigureAwait(false);
@@ -241,7 +247,8 @@ namespace AutoOrganize.Core
                 _loggerFactory.CreateLogger<MovieFileOrganizer>(),
                 _libraryManager,
                 _libraryMonitor,
-                _providerManager);
+                _providerManager,
+                _namingOptions);
 
             var options = _config.GetAutoOrganizeOptions();
             var result = await organizer.OrganizeWithCorrection(request, options.MovieOptions, CancellationToken.None).ConfigureAwait(false);
