@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoOrganize.Model;
 using Emby.Naming.Common;
 using Emby.Naming.TV;
+using Emby.Naming.Video;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
@@ -691,7 +692,7 @@ namespace AutoOrganize.Core
             try
             {
                 var filesOfOtherExtensions = _fileSystem.GetFilePaths(folder)
-                    .Where(i => _libraryManager.IsVideoFile(i) && string.Equals(Path.GetFileNameWithoutExtension(i), targetFileNameWithoutExtension, StringComparison.OrdinalIgnoreCase));
+                    .Where(i => VideoResolver.IsVideoFile(i, GetNamingOptionsInternal()) && string.Equals(Path.GetFileNameWithoutExtension(i), targetFileNameWithoutExtension, StringComparison.OrdinalIgnoreCase));
 
                 episodePaths.AddRange(filesOfOtherExtensions);
             }

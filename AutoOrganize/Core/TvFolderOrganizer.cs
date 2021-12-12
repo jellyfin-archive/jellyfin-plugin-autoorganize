@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoOrganize.Model;
+using Emby.Naming.Common;
+using Emby.Naming.Video;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
@@ -25,6 +27,7 @@ namespace AutoOrganize.Core
         private readonly IFileSystem _fileSystem;
         private readonly IFileOrganizationService _organizationService;
         private readonly IProviderManager _providerManager;
+        private NamingOptions _namingOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TvFolderOrganizer"/> class.
@@ -47,13 +50,19 @@ namespace AutoOrganize.Core
             _providerManager = providerManager;
         }
 
+        private NamingOptions GetNamingOptionsInternal()
+        {
+            _namingOptions = _namingOptions ?? new NamingOptions();
+            return _namingOptions;
+        }
+
         private bool EnableOrganization(FileSystemMetadata fileInfo, TvFileOrganizationOptions options)
         {
             var minFileBytes = options.MinFileSizeMb * 1024 * 1024;
 
             try
             {
-                return _libraryManager.IsVideoFile(fileInfo.FullName) && fileInfo.Length >= minFileBytes;
+                return VideoResolver.IsVideoFile(fileInfo.FullName, GetNamingOptionsInternal()) && fileInfo.Length >= minFileBytes;
             }
             catch (Exception ex)
             {

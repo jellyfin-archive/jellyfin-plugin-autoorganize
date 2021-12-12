@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyVersion>9.0.0.0</AssemblyVersion>
-    <FileVersion>9.0.0.0</FileVersion>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <FileVersion>10.0.0.0</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
@@ -40,10 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jellyfin.Controller" Version="10.*-*" />
-    <PackageReference Include="Jellyfin.Naming" Version="10.*-*" />
-    <PackageReference Include="SQLitePCL.pretty.netstandard" Version="3.1.0" />
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.8.0-alpha3"/>
+    <PackageReference Include="Jellyfin.Naming" Version="10.8.0-alpha3"/>
+    <PackageReference Include="SQLitePCL.pretty.netstandard" Version="3.1.0"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
 
   <!-- Code Analyzers-->
