@@ -95,7 +95,7 @@ function onSubmit(view) {
         const watchLocation = view.querySelector('#txtWatchFolder').value;
         tvOptions.WatchLocations = watchLocation ? [watchLocation] : [];
 
-        tvOptions.CopyOriginalFile = view.querySelector('#copyOrMoveFile').value;
+        tvOptions.CopyOriginalFile = view.querySelector('#copyOrMoveFile').value === 'true';
 
         tvOptions.QueueLibraryScan = view.querySelector('#chkQueueLibScan').checked;
 

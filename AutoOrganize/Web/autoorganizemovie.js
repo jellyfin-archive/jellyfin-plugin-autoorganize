@@ -76,7 +76,7 @@ function onSubmit(view) {
         const watchLocation = view.querySelector('#txtWatchMovieFolder').value;
         movieOptions.WatchLocations = watchLocation ? [watchLocation] : [];
 
-        movieOptions.CopyOriginalFile = view.querySelector('#copyOrMoveMovieFile').value;
+        movieOptions.CopyOriginalFile = view.querySelector('#copyOrMoveMovieFile').value === 'true';
 
         movieOptions.QueueLibraryScan = view.querySelector('#chkQueueLibScan').checked;
 
