@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoOrganize.Model;
 using Emby.Naming.Common;
 using Emby.Naming.Video;
+using Jellyfin.Data.Enums;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
@@ -478,7 +479,7 @@ namespace AutoOrganize.Core
 
             var movie = _libraryManager.GetItemList(new InternalItemsQuery
             {
-                IncludeItemTypes = new[] { typeof(Movie).Name },
+                IncludeItemTypes = new[] { BaseItemKind.Movie },
                 Recursive = true,
                 DtoOptions = new DtoOptions(true),
             })
