@@ -10,6 +10,7 @@ using AutoOrganize.Model;
 using Emby.Naming.Common;
 using Emby.Naming.TV;
 using Emby.Naming.Video;
+using Jellyfin.Data.Enums;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
@@ -830,7 +831,7 @@ namespace AutoOrganize.Core
 
             var series = _libraryManager.GetItemList(new InternalItemsQuery
             {
-                IncludeItemTypes = new[] { typeof(Series).Name },
+                IncludeItemTypes = new[] { BaseItemKind.Series },
                 Recursive = true,
                 DtoOptions = new DtoOptions(true)
             })
@@ -849,7 +850,7 @@ namespace AutoOrganize.Core
                 {
                     series = _libraryManager.GetItemList(new InternalItemsQuery
                     {
-                        IncludeItemTypes = new[] { typeof(Series).Name },
+                        IncludeItemTypes = new[] { BaseItemKind.Series },
                         Recursive = true,
                         Name = info.ItemName,
                         DtoOptions = new DtoOptions(true)
