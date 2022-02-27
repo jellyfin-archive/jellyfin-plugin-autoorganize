@@ -1,3 +1,5 @@
+**DEPRECATION NOTICE**: The AutoOrganize plugin has been deprecated due to maintainability issues and many bugs.
+
 <h1 align="center">Jellyfin AutoOrganize Plugin</h1>
 <h3 align="center">Part of the <a href="https://jellyfin.media">Jellyfin Project</a></h3>
 
