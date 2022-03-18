@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using AutoOrganize.Core;
@@ -112,45 +113,18 @@ namespace AutoOrganize.Api
         /// Performs organization of a tv episode.
         /// </summary>
         /// <param name="id">Result id.</param>
-        /// <param name="seriesId">Series id.</param>
-        /// <param name="seasonNumber">Season number.</param>
-        /// <param name="episodeNumber">Episode number.</param>
-        /// <param name="endingEpisodeNumber">Ending episode number.</param>
-        /// <param name="newSeriesName">Name of a series to add.</param>
-        /// <param name="newSeriesYear">Year of a series to add.</param>
-        /// <param name="newSeriesProviderIds">A list of provider IDs identifying a new series.</param>
-        /// <param name="rememberCorrection">Whether or not to apply the same correction to future episodes of the same series.</param>
-        /// <param name="targetFolder">Target folder.</param>
+        /// <param name="request">The request body.</param>
         /// <response code="204">Organization performed successfully.</response>
         /// <returns>An <see cref="NoContentResult"/> indicating success.</returns>
         [HttpPost("{id}/Episode/Organize")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public ActionResult OrganizeEpisode(
             [FromRoute] string id,
-            [FromQuery] string seriesId,
-            [FromQuery] int seasonNumber,
-            [FromQuery] int episodeNumber,
-            [FromQuery] int? endingEpisodeNumber,
-            [FromQuery] string newSeriesName,
-            [FromQuery] int? newSeriesYear,
-            [FromQuery] Dictionary<string, string> newSeriesProviderIds,
-            [FromQuery] bool rememberCorrection,
-            [FromQuery] string targetFolder)
+            [FromBody, Required] EpisodeFileOrganizationRequest request)
         {
+            request.ResultId = id;
             // Don't await this
-            var task = InternalFileOrganizationService.PerformOrganization(new EpisodeFileOrganizationRequest
-            {
-                EndingEpisodeNumber = endingEpisodeNumber,
-                EpisodeNumber = episodeNumber,
-                RememberCorrection = rememberCorrection,
-                ResultId = id,
-                SeasonNumber = seasonNumber,
-                SeriesId = seriesId,
-                NewSeriesName = newSeriesName,
-                NewSeriesYear = newSeriesYear,
-                NewSeriesProviderIds = newSeriesProviderIds ?? new Dictionary<string, string>(),
-                TargetFolder = targetFolder
-            });
+            var task = InternalFileOrganizationService.PerformOrganization(request);
 
             // Async processing (close dialog early instead of waiting until the file has been copied)
             // Wait 2s for exceptions that may occur to have them forwarded to the client for immediate error display
@@ -163,33 +137,18 @@ namespace AutoOrganize.Api
         /// Performs organization of a movie.
         /// </summary>
         /// <param name="id">Result id.</param>
-        /// <param name="movieId">Movie id.</param>
-        /// <param name="newMovieName">Name of a movie to add.</param>
-        /// <param name="newMovieYear">Year of a movie to add.</param>
-        /// <param name="newMovieProviderIds">A list of provider IDs identifying a new movie.</param>
-        /// <param name="targetFolder">Target Folder.</param>
+        /// <param name="request">The request.</param>
         /// <response code="204">Organization performed successfully.</response>
         /// <returns>A <see cref="NoContentResult"/> indicating success.</returns>
         [HttpPost("{id}/Movie/Organize")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public ActionResult OrganizeMovie(
             [FromRoute] string id,
-            [FromQuery] string movieId,
-            [FromQuery] string newMovieName,
-            [FromQuery] int? newMovieYear,
-            [FromQuery] Dictionary<string, string> newMovieProviderIds,
-            [FromQuery] string targetFolder)
+            [FromBody, Required] MovieFileOrganizationRequest request)
         {
             // Don't await this
-            var task = InternalFileOrganizationService.PerformOrganization(new MovieFileOrganizationRequest
-            {
-                ResultId = id,
-                MovieId = movieId,
-                NewMovieName = newMovieName,
-                NewMovieYear = newMovieYear,
-                NewMovieProviderIds = newMovieProviderIds ?? new Dictionary<string, string>(),
-                TargetFolder = targetFolder
-            });
+            request.ResultId = id;
+            var task = InternalFileOrganizationService.PerformOrganization(request);
 
             // Async processing (close dialog early instead of waiting until the file has been copied)
             // Wait 2s for exceptions that may occur to have them forwarded to the client for immediate error display

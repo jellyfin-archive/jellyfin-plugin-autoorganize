@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace AutoOrganize.Model
@@ -16,7 +17,7 @@ namespace AutoOrganize.Model
         /// <summary>
         /// Gets or sets the ID of the movie to organize.
         /// </summary>
-        public string MovieId { get; set; }
+        public Guid MovieId { get; set; }
 
         /// <summary>
         /// Gets or sets the movie name. Only required if this movie has not yet been added to the library, otherwise

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace AutoOrganize.Model
@@ -16,7 +17,7 @@ namespace AutoOrganize.Model
         /// <summary>
         /// Gets or sets the ID of the series that contains the episode.
         /// </summary>
-        public string SeriesId { get; set; }
+        public Guid SeriesId { get; set; }
 
         /// <summary>
         /// Gets or sets the season number the episode is in.
